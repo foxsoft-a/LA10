@@ -461,7 +461,7 @@
             whisper("这种反驳太软弱了。你承认了对方的观点，却没有给出足够强力的反击（Counter-point）。");
         } else if (choice === 2) {
             whisper("精彩的反驳！你使用了‘区分 (Distinction)’策略——区分了‘学术目标’和‘社交目标’，并提出了替代方案（课外活动）。这是逻辑的胜利。");
-            setTimeout(() => nextSlide(5); CourseEngine.markComplete(9), 4000);
+            setTimeout(() => { nextSlide(5); CourseEngine.markComplete(9); }, 4000);
         }
     }
 

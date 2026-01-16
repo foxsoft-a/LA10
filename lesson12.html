@@ -471,7 +471,7 @@
 
         if(correctCount >= 2) {
             whisper("正是如此。他没有撒谎说爱人是女神，而是说她是一个真实的凡人。这种诚实（Honesty）是另一种强大的影响力。");
-            setTimeout(() => nextSlide(5); CourseEngine.markComplete(12), 4000);
+            setTimeout(() => { nextSlide(5); CourseEngine.markComplete(12); }, 4000);
         } else {
             whisper("寻找那些听起来不像‘情话’的句子。比如形容头发像铁丝，或者口气不好闻。");
         }
