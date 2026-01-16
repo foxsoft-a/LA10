@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unit 10 Lesson 15: Hall of Mirrors</title>
     <style>
         :root {
-            --bg-color: #1a0b1c; /* Dark Purple */
+            --bg-color: #1a0b1c;
+            /* Dark Purple */
             --glass-bg: rgba(255, 255, 255, 0.05);
             --text-color: #e0d0e8;
             --accent-cyan: #00f2ff;
@@ -27,7 +29,7 @@
             align-items: center;
             min-height: 100vh;
             overflow-x: hidden;
-            background-image: 
+            background-image:
                 linear-gradient(135deg, #1a0b1c 0%, #000000 100%);
         }
 
@@ -42,10 +44,10 @@
             z-index: 0;
             pointer-events: none;
         }
-        
+
         .shard {
             position: absolute;
-            background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%);
+            background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.05) 50%, transparent 60%);
             width: 200px;
             height: 400px;
             transform: rotate(45deg);
@@ -58,7 +60,7 @@
             min-height: 85vh;
             background: var(--glass-bg);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 0 40px rgba(168, 85, 247, 0.2);
             border-radius: 20px;
             padding: 40px;
@@ -70,7 +72,7 @@
 
         header {
             text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
@@ -82,9 +84,10 @@
             text-transform: uppercase;
             letter-spacing: 4px;
             background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(255,0,255,0.3);
+            text-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
         }
 
         /* Slides */
@@ -93,11 +96,21 @@
             flex: 1;
             animation: fractureIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .slide.active { display: block; }
+
+        .slide.active {
+            display: block;
+        }
 
         @keyframes fractureIn {
-            0% { opacity: 0; transform: scale(0.9) rotate(-1deg); }
-            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+            0% {
+                opacity: 0;
+                transform: scale(0.9) rotate(-1deg);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
         }
 
         /* Slide 1: Cognitive Illusion */
@@ -130,25 +143,33 @@
 
         .surround-circle {
             position: absolute;
-            background-color: rgba(255,255,255,0.2);
+            background-color: rgba(255, 255, 255, 0.2);
             border-radius: 50%;
         }
 
-        .small .surround-circle { width: 20px; height: 20px; }
-        .large .surround-circle { width: 60px; height: 60px; }
+        .small .surround-circle {
+            width: 20px;
+            height: 20px;
+        }
+
+        .large .surround-circle {
+            width: 60px;
+            height: 60px;
+        }
 
         /* Slide 2: Art Analysis */
         .art-stage {
             display: flex;
             gap: 20px;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.3);
             padding: 20px;
             border-radius: 10px;
         }
 
         .art-image {
             flex: 1;
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e4/Johann_Heinrich_F%C3%BCssli_024.jpg'); /* Fuseli Lady Macbeth */
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e4/Johann_Heinrich_F%C3%BCssli_024.jpg');
+            /* Fuseli Lady Macbeth */
             background-size: cover;
             background-position: top;
             min-height: 300px;
@@ -168,9 +189,20 @@
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         .art-details {
@@ -196,19 +228,28 @@
 
         .bucket {
             flex: 1;
-            border: 2px dashed rgba(255,255,255,0.2);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
             border-radius: 10px;
             padding: 15px;
             transition: all 0.3s;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0, 0, 0, 0.2);
         }
 
-        .bucket h3 { text-align: center; margin-top: 0; }
-        .bucket.real { border-color: var(--accent-cyan); }
-        .bucket.fake { border-color: var(--accent-magenta); }
+        .bucket h3 {
+            text-align: center;
+            margin-top: 0;
+        }
+
+        .bucket.real {
+            border-color: var(--accent-cyan);
+        }
+
+        .bucket.fake {
+            border-color: var(--accent-magenta);
+        }
 
         .line-card {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             padding: 10px;
             margin-bottom: 10px;
             cursor: grab;
@@ -261,252 +302,273 @@
             bottom: 20px;
             right: 20px;
             width: 280px;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.8);
             border: 1px solid var(--accent-magenta);
             padding: 15px;
             border-radius: 10px;
             display: none;
             box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
         }
-        
-        #subconscious h4 { margin: 0 0 5px 0; color: var(--accent-magenta); font-size: 0.9rem; }
-        #sub-text { font-size: 0.85rem; }
 
+        #subconscious h4 {
+            margin: 0 0 5px 0;
+            color: var(--accent-magenta);
+            font-size: 0.9rem;
+        }
+
+        #sub-text {
+            font-size: 0.85rem;
+        }
     </style>
     <script src="course.js"></script>
 </head>
+
 <body>
-    <a href="index.html" style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
-<div class="shards">
-    <div class="shard" style="top:10%; left:20%;"></div>
-    <div class="shard" style="top:60%; left:80%;"></div>
-    <div class="shard" style="top:30%; left:50%; width:100px; height:100px;"></div>
-</div>
-
-<div id="mirror-hall">
-    <header>
-        <h1>Hall of Mirrors</h1>
-        <div style="font-size: 0.9rem; opacity: 0.7;">UNIT 10.15: EXPECTATIONS VS. REALITY</div>
-    </header>
-
-    <!-- Slide 1: Cognitive Illusion (Hook) -->
-    <div class="slide active" id="slide-1">
-        <h2>01. 视觉欺骗 (The Illusion)</h2>
-        <p>Dan Ariely 在 TED 演讲中指出：我们以为我们在控制决定，其实是“环境”和“期望”在控制我们。就像下面的 Ebbinghaus 错觉：</p>
-        <p><b>任务：</b> 点击你认为<b>更大</b>的那个青色圆球。</p>
-        
-        <div class="illusion-box">
-            <div class="circle-container small" onclick="checkIllusion('left')">
-                <!-- Surrounded by small circles -->
-                <div class="surround-circle" style="top:0; left:65px;"></div>
-                <div class="surround-circle" style="bottom:0; left:65px;"></div>
-                <div class="surround-circle" style="top:65px; left:0;"></div>
-                <div class="surround-circle" style="top:65px; right:0;"></div>
-                <div class="center-circle" id="c1"></div>
-            </div>
-            
-            <div class="circle-container large" onclick="checkIllusion('right')">
-                <!-- Surrounded by large circles -->
-                <div class="surround-circle" style="top:-30px; left:45px;"></div>
-                <div class="surround-circle" style="bottom:-30px; left:45px;"></div>
-                <div class="surround-circle" style="top:45px; left:-30px;"></div>
-                <div class="surround-circle" style="top:45px; right:-30px;"></div>
-                <div class="center-circle" id="c2"></div>
-            </div>
-        </div>
-        <p id="illusion-result" style="text-align:center; height:20px;"></p>
-        
-        <button class="btn" id="btn-slide-1" style="display:none;" onclick="nextSlide(2)">进入潜意识 >></button>
+    <a href="index.html"
+        style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+    <div class="shards">
+        <div class="shard" style="top:10%; left:20%;"></div>
+        <div class="shard" style="top:60%; left:80%;"></div>
+        <div class="shard" style="top:30%; left:50%; width:100px; height:100px;"></div>
     </div>
 
-    <!-- Slide 2: Art Analysis -->
-    <div class="slide" id="slide-2">
-        <h2>02. 恐惧的具象化 (Art Analysis)</h2>
-        <p>这幅画描绘了 Act 2 Scene 2 谋杀后的场景。Henry Fuseli 捕捉到了期望与现实的碰撞。</p>
-        <p><b>任务：</b> 找出画面中的两个关键细节（点击闪烁点）：</p>
-        <ul>
-            <li>1. 谁看起来更冷静/占主导地位？</li>
-            <li>2. 谁看起来被恐惧吞噬？</li>
-        </ul>
+    <div id="mirror-hall">
+        <header>
+            <h1>Hall of Mirrors</h1>
+            <div style="font-size: 0.9rem; opacity: 0.7;">UNIT 10.15: EXPECTATIONS VS. REALITY</div>
+        </header>
 
-        <div class="art-stage">
-            <div class="art-image">
-                <div class="hotspot" style="top: 20%; left: 45%;" onclick="analyzeArt('lady')"></div>
-                <div class="hotspot" style="top: 30%; left: 65%;" onclick="analyzeArt('macbeth')"></div>
+        <!-- Slide 1: Cognitive Illusion (Hook) -->
+        <div class="slide active" id="slide-1">
+            <h2>01. 视觉欺骗 (The Illusion)</h2>
+            <p>Dan Ariely 在 TED 演讲中指出：我们以为我们在控制决定，其实是“环境”和“期望”在控制我们。就像下面的 Ebbinghaus 错觉：</p>
+            <p><b>任务：</b> 点击你认为<b>更大</b>的那个青色圆球。</p>
+
+            <div class="illusion-box">
+                <div class="circle-container small" onclick="checkIllusion('left')">
+                    <!-- Surrounded by small circles -->
+                    <div class="surround-circle" style="top:0; left:65px;"></div>
+                    <div class="surround-circle" style="bottom:0; left:65px;"></div>
+                    <div class="surround-circle" style="top:65px; left:0;"></div>
+                    <div class="surround-circle" style="top:65px; right:0;"></div>
+                    <div class="center-circle" id="c1"></div>
+                </div>
+
+                <div class="circle-container large" onclick="checkIllusion('right')">
+                    <!-- Surrounded by large circles -->
+                    <div class="surround-circle" style="top:-30px; left:45px;"></div>
+                    <div class="surround-circle" style="bottom:-30px; left:45px;"></div>
+                    <div class="surround-circle" style="top:45px; left:-30px;"></div>
+                    <div class="surround-circle" style="top:45px; right:-30px;"></div>
+                    <div class="center-circle" id="c2"></div>
+                </div>
             </div>
-            <div class="art-details" id="art-feedback">
-                点击左侧的闪烁点进行分析...
+            <p id="illusion-result" style="text-align:center; height:20px;"></p>
+
+            <button class="btn" id="btn-slide-1" style="display:none;" onclick="nextSlide(2)">进入潜意识 >></button>
+        </div>
+
+        <!-- Slide 2: Art Analysis -->
+        <div class="slide" id="slide-2">
+            <h2>02. 恐惧的具象化 (Art Analysis)</h2>
+            <p>这幅画描绘了 Act 2 Scene 2 谋杀后的场景。Henry Fuseli 捕捉到了期望与现实的碰撞。</p>
+            <p><b>任务：</b> 找出画面中的两个关键细节（点击闪烁点）：</p>
+            <ul>
+                <li>1. 谁看起来更冷静/占主导地位？</li>
+                <li>2. 谁看起来被恐惧吞噬？</li>
+            </ul>
+
+            <div class="art-stage">
+                <div class="art-image">
+                    <div class="hotspot" style="top: 20%; left: 45%;" onclick="analyzeArt('lady')"></div>
+                    <div class="hotspot" style="top: 30%; left: 65%;" onclick="analyzeArt('macbeth')"></div>
+                </div>
+                <div class="art-details" id="art-feedback">
+                    点击左侧的闪烁点进行分析...
+                </div>
+            </div>
+
+            <button class="btn" id="btn-slide-2" style="display:none;" onclick="nextSlide(3)">进入内心独白 >></button>
+        </div>
+
+        <!-- Slide 3: Ariely's Theory (Simulation) -->
+        <div class="slide" id="slide-3">
+            <h2>03. 默认选项的力量 (The Default Effect)</h2>
+            <p>Dan Ariely 提到，如果我们不勾选任何东西，我们就接受了“默认设置”。</p>
+            <p>麦克白面临着一种“命运的默认设置”。女巫给了他一个“成为国王”的选项，他觉得必须去勾选它。</p>
+
+            <div class="form-simulation">
+                <h3>Life Choices Form (人生选择表)</h3>
+                <p>请做出你的选择：</p>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="opt-out">
+                    <b>如果不选此项</b>，你将等待命运自然发生（Banquo的选择）。
+                </div>
+
+                <div class="checkbox-group" style="background:#e8f0fe; border-color:#2980b9;">
+                    <input type="checkbox" id="opt-in" checked disabled>
+                    <b>[已默认勾选]</b> 采取行动实现预言（杀掉邓肯）。<br>
+                    <i style="font-size:0.8rem; color:#666;">* Lady Macbeth 已经为你勾选了此项。</i>
+                </div>
+            </div>
+
+            <p><b>反思：</b> 麦克白是否真正拥有“自由意志”，还是他只是被“默认选项（期望）”推着走？</p>
+            <textarea style="width:100%; background:rgba(0,0,0,0.3); color:#fff; padding:10px; border:1px solid #555;"
+                rows="2"></textarea>
+
+            <button class="btn" onclick="nextSlide(4)">面对幻觉 >></button>
+        </div>
+
+        <!-- Slide 4: Soliloquy Sorting -->
+        <div class="slide" id="slide-4">
+            <h2>04. 理智分类器 (Sanity Sorter)</h2>
+            <p>在刺杀之前，麦克白看到了著名的“空中匕首”。这是真实的魔法，还是他“受热压迫的大脑”的产物？</p>
+            <p><b>任务：</b> 将台词拖入正确的分类：<b>物理现实 (Reality)</b> 还是 <b>心理幻觉 (Hallucination)</b>？</p>
+
+            <div class="sort-area">
+                <div class="bucket real" ondrop="drop(event, 'real')" ondragover="allowDrop(event)">
+                    <h3 style="color:var(--accent-cyan)">REALITY<br>(手/触觉)</h3>
+                </div>
+
+                <div style="width: 200px; display: flex; flex-direction: column; justify-content: center;">
+                    <div class="line-card" draggable="true" ondragstart="drag(event)" id="l1" data-type="hallucination">
+                        "Is this a dagger which I see before me?"</div>
+                    <div class="line-card" draggable="true" ondragstart="drag(event)" id="l2" data-type="real">"Come,
+                        let me clutch thee."</div>
+                    <div class="line-card" draggable="true" ondragstart="drag(event)" id="l3" data-type="real">"I have
+                        thee not,"</div>
+                    <div class="line-card" draggable="true" ondragstart="drag(event)" id="l4" data-type="hallucination">
+                        "and yet I see thee still."</div>
+                    <div class="line-card" draggable="true" ondragstart="drag(event)" id="l5" data-type="hallucination">
+                        "A dagger of the mind, a false creation."</div>
+                </div>
+
+                <div class="bucket fake" ondrop="drop(event, 'hallucination')" ondragover="allowDrop(event)">
+                    <h3 style="color:var(--accent-magenta)">HALLUCINATION<br>(眼/视觉)</h3>
+                </div>
+            </div>
+
+            <button class="btn" id="btn-slide-4" style="display:none;" onclick="finishLesson()">诊断完成</button>
+            <div style="text-align:center; margin-top:15px;">
+                <button class="btn" style="border-color:var(--accent-cyan); font-size:0.8rem;"
+                    onclick="reportToOS('REQUEST_SPLIT_VIEW', {defaultText: 'macbeth_2_1'})">🖥️ Open Text in Split
+                    View</button>
             </div>
         </div>
 
-        <button class="btn" id="btn-slide-2" style="display:none;" onclick="nextSlide(3)">进入内心独白 >></button>
-    </div>
-
-    <!-- Slide 3: Ariely's Theory (Simulation) -->
-    <div class="slide" id="slide-3">
-        <h2>03. 默认选项的力量 (The Default Effect)</h2>
-        <p>Dan Ariely 提到，如果我们不勾选任何东西，我们就接受了“默认设置”。</p>
-        <p>麦克白面临着一种“命运的默认设置”。女巫给了他一个“成为国王”的选项，他觉得必须去勾选它。</p>
-        
-        <div class="form-simulation">
-            <h3>Life Choices Form (人生选择表)</h3>
-            <p>请做出你的选择：</p>
-            
-            <div class="checkbox-group">
-                <input type="checkbox" id="opt-out"> 
-                <b>如果不选此项</b>，你将等待命运自然发生（Banquo的选择）。
-            </div>
-            
-            <div class="checkbox-group" style="background:#e8f0fe; border-color:#2980b9;">
-                <input type="checkbox" id="opt-in" checked disabled> 
-                <b>[已默认勾选]</b> 采取行动实现预言（杀掉邓肯）。<br>
-                <i style="font-size:0.8rem; color:#666;">* Lady Macbeth 已经为你勾选了此项。</i>
+        <!-- Slide 5: End -->
+        <div class="slide" id="slide-5">
+            <div style="text-align: center; margin-top: 100px;">
+                <div style="font-size: 4rem; color: var(--accent-magenta);">👁️</div>
+                <h1>REALITY FRACTURED</h1>
+                <p>你已经分析了麦克白心理崩溃的瞬间。</p>
+                <p>期望（Expectation）不仅影响我们的决定，有时甚至会制造出并不存在的现实（幻觉）。</p>
+                <p style="color: #888;">Unit 10.15 Complete</p>
             </div>
         </div>
 
-        <p><b>反思：</b> 麦克白是否真正拥有“自由意志”，还是他只是被“默认选项（期望）”推着走？</p>
-        <textarea style="width:100%; background:rgba(0,0,0,0.3); color:#fff; padding:10px; border:1px solid #555;" rows="2"></textarea>
-        
-        <button class="btn" onclick="nextSlide(4)">面对幻觉 >></button>
     </div>
 
-    <!-- Slide 4: Soliloquy Sorting -->
-    <div class="slide" id="slide-4">
-        <h2>04. 理智分类器 (Sanity Sorter)</h2>
-        <p>在刺杀之前，麦克白看到了著名的“空中匕首”。这是真实的魔法，还是他“受热压迫的大脑”的产物？</p>
-        <p><b>任务：</b> 将台词拖入正确的分类：<b>物理现实 (Reality)</b> 还是 <b>心理幻觉 (Hallucination)</b>？</p>
-
-        <div class="sort-area">
-            <div class="bucket real" ondrop="drop(event, 'real')" ondragover="allowDrop(event)">
-                <h3 style="color:var(--accent-cyan)">REALITY<br>(手/触觉)</h3>
-            </div>
-            
-            <div style="width: 200px; display: flex; flex-direction: column; justify-content: center;">
-                <div class="line-card" draggable="true" ondragstart="drag(event)" id="l1" data-type="hallucination">"Is this a dagger which I see before me?"</div>
-                <div class="line-card" draggable="true" ondragstart="drag(event)" id="l2" data-type="real">"Come, let me clutch thee."</div>
-                <div class="line-card" draggable="true" ondragstart="drag(event)" id="l3" data-type="real">"I have thee not,"</div>
-                <div class="line-card" draggable="true" ondragstart="drag(event)" id="l4" data-type="hallucination">"and yet I see thee still."</div>
-                <div class="line-card" draggable="true" ondragstart="drag(event)" id="l5" data-type="hallucination">"A dagger of the mind, a false creation."</div>
-            </div>
-
-            <div class="bucket fake" ondrop="drop(event, 'hallucination')" ondragover="allowDrop(event)">
-                <h3 style="color:var(--accent-magenta)">HALLUCINATION<br>(眼/视觉)</h3>
-            </div>
-        </div>
-
-        <button class="btn" id="btn-slide-4" style="display:none;" onclick="finishLesson()">诊断完成</button>
+    <!-- Subconscious Whisper -->
+    <div id="subconscious">
+        <h4>🧠 The Subconscious:</h4>
+        <div id="sub-text">...</div>
     </div>
 
-    <!-- Slide 5: End -->
-    <div class="slide" id="slide-5">
-        <div style="text-align: center; margin-top: 100px;">
-            <div style="font-size: 4rem; color: var(--accent-magenta);">👁️</div>
-            <h1>REALITY FRACTURED</h1>
-            <p>你已经分析了麦克白心理崩溃的瞬间。</p>
-            <p>期望（Expectation）不仅影响我们的决定，有时甚至会制造出并不存在的现实（幻觉）。</p>
-            <p style="color: #888;">Unit 10.15 Complete</p>
-        </div>
-    </div>
+    <script>
+        // State
+        let currentSlide = 1;
+        let artAnalysisCount = 0;
+        let sortedLines = 0;
 
-</div>
-
-<!-- Subconscious Whisper -->
-<div id="subconscious">
-    <h4>🧠 The Subconscious:</h4>
-    <div id="sub-text">...</div>
-</div>
-
-<script>
-    // State
-    let currentSlide = 1;
-    let artAnalysisCount = 0;
-    let sortedLines = 0;
-
-    // Helper: Whisper
-    function whisper(msg) {
-        const box = document.getElementById('subconscious');
-        document.getElementById('sub-text').innerText = msg;
-        box.style.display = 'block';
-        setTimeout(() => box.style.display = 'none', 6000);
-    }
-
-    function nextSlide(n) {
-        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
-        document.getElementById(`slide-${n}`).classList.add('active');
-    }
-
-    // Slide 1: Illusion
-    function checkIllusion(side) {
-        const res = document.getElementById('illusion-result');
-        const c1 = document.getElementById('c1');
-        const c2 = document.getElementById('c2');
-        
-        // Remove transitions for measurement
-        
-        res.innerHTML = "<span style='color:var(--accent-cyan)'>它们是一样大的。</span> 这叫艾宾浩斯错觉。你的眼睛被周围的环境（Context）欺骗了。";
-        whisper("就像麦克白被女巫的预言（环境）欺骗了一样。他以为‘王位’很大，其实代价更大。");
-        
-        // Visual proof: move circles together
-        c1.style.position = 'relative';
-        c1.style.zIndex = '100';
-        c1.style.transform = 'translate(50px, 0)';
-        
-        c2.style.position = 'relative';
-        c2.style.zIndex = '100';
-        c2.style.transform = 'translate(-50px, 0)';
-
-        document.getElementById('btn-slide-1').style.display = 'inline-block';
-    }
-
-    // Slide 2: Art Analysis
-    function analyzeArt(target) {
-        const feedback = document.getElementById('art-feedback');
-        
-        if(target === 'lady') {
-            feedback.innerHTML += "<p><strong style='color:var(--accent-magenta)'>Lady Macbeth:</strong> 她看起来冷静、强势，处于支配地位。她代表了‘期望’的压力。</p>";
-            whisper("注意她的姿势。她是指挥者。");
-        } else {
-            feedback.innerHTML += "<p><strong style='color:var(--accent-cyan)'>Macbeth:</strong> 他的眼神惊恐，身体后缩。他被自己的行为吓坏了。</p>";
-            whisper("他在看什么？也许是那把他想象中的匕首？");
+        // Helper: Whisper
+        function whisper(msg) {
+            const box = document.getElementById('subconscious');
+            document.getElementById('sub-text').innerText = msg;
+            box.style.display = 'block';
+            setTimeout(() => box.style.display = 'none', 6000);
         }
-        
-        artAnalysisCount++;
-        if(artAnalysisCount >= 2) {
-            document.getElementById('btn-slide-2').style.display = 'inline-block';
-        }
-    }
 
-    // Slide 4: Drag & Drop Soliloquy
-    function allowDrop(ev) { ev.preventDefault(); }
-    function drag(ev) { 
-        ev.dataTransfer.setData("text", ev.target.id); 
-        ev.dataTransfer.setData("type", ev.target.dataset.type);
-    }
-    
-    function drop(ev, bucketType) {
-        ev.preventDefault();
-        var data = ev.dataTransfer.getData("text");
-        var type = ev.dataTransfer.getData("type");
-        
-        if(type === bucketType) {
-            ev.target.appendChild(document.getElementById(data));
-            document.getElementById(data).style.borderLeftColor = bucketType === 'real' ? 'var(--accent-cyan)' : 'var(--accent-magenta)';
-            sortedLines++;
-            
-            if(sortedLines === 5) {
-                document.getElementById('btn-slide-4').style.display = 'inline-block';
-                whisper("理智线断裂。麦克白最终承认这是一个‘Dagger of the mind’，但他还是跟着它走了。");
+        function nextSlide(n) {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.getElementById(`slide-${n}`).classList.add('active');
+        }
+
+        // Slide 1: Illusion
+        function checkIllusion(side) {
+            const res = document.getElementById('illusion-result');
+            const c1 = document.getElementById('c1');
+            const c2 = document.getElementById('c2');
+
+            // Remove transitions for measurement
+
+            res.innerHTML = "<span style='color:var(--accent-cyan)'>它们是一样大的。</span> 这叫艾宾浩斯错觉。你的眼睛被周围的环境（Context）欺骗了。";
+            whisper("就像麦克白被女巫的预言（环境）欺骗了一样。他以为‘王位’很大，其实代价更大。");
+
+            // Visual proof: move circles together
+            c1.style.position = 'relative';
+            c1.style.zIndex = '100';
+            c1.style.transform = 'translate(50px, 0)';
+
+            c2.style.position = 'relative';
+            c2.style.zIndex = '100';
+            c2.style.transform = 'translate(-50px, 0)';
+
+            document.getElementById('btn-slide-1').style.display = 'inline-block';
+        }
+
+        // Slide 2: Art Analysis
+        function analyzeArt(target) {
+            const feedback = document.getElementById('art-feedback');
+
+            if (target === 'lady') {
+                feedback.innerHTML += "<p><strong style='color:var(--accent-magenta)'>Lady Macbeth:</strong> 她看起来冷静、强势，处于支配地位。她代表了‘期望’的压力。</p>";
+                whisper("注意她的姿势。她是指挥者。");
+            } else {
+                feedback.innerHTML += "<p><strong style='color:var(--accent-cyan)'>Macbeth:</strong> 他的眼神惊恐，身体后缩。他被自己的行为吓坏了。</p>";
+                whisper("他在看什么？也许是那把他想象中的匕首？");
             }
-        } else {
-            whisper("再读一遍。他能摸到它吗？还是只能看到？");
+
+            artAnalysisCount++;
+            if (artAnalysisCount >= 2) {
+                document.getElementById('btn-slide-2').style.display = 'inline-block';
+            }
         }
-    }
 
-    function finishLesson() {
-        nextSlide(5); CourseEngine.markComplete(15);
-    }
+        // Slide 4: Drag & Drop Soliloquy
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+            ev.dataTransfer.setData("type", ev.target.dataset.type);
+        }
 
-</script>
+        function drop(ev, bucketType) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            var type = ev.dataTransfer.getData("type");
 
+            if (type === bucketType) {
+                ev.target.appendChild(document.getElementById(data));
+                document.getElementById(data).style.borderLeftColor = bucketType === 'real' ? 'var(--accent-cyan)' : 'var(--accent-magenta)';
+                sortedLines++;
+
+                if (sortedLines === 5) {
+                    document.getElementById('btn-slide-4').style.display = 'inline-block';
+                    whisper("理智线断裂。麦克白最终承认这是一个‘Dagger of the mind’，但他还是跟着它走了。");
+                }
+            } else {
+                whisper("再读一遍。他能摸到它吗？还是只能看到？");
+            }
+        }
+
+        function finishLesson() {
+            nextSlide(5); CourseEngine.markComplete(15);
+        }
+
+    </script>
+
+    <script src="scholar_adapter.js"></script>
 </body>
+
 </html>

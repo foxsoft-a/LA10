@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,7 +37,7 @@
             left: 0;
             width: 200%;
             height: 200%;
-            background-image: 
+            background-image:
                 linear-gradient(var(--grid-color) 1px, transparent 1px),
                 linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
             background-size: 50px 50px;
@@ -47,8 +48,13 @@
         }
 
         @keyframes gridMove {
-            0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); }
-            100% { transform: perspective(500px) rotateX(60deg) translateY(50px) translateZ(-200px); }
+            0% {
+                transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px);
+            }
+
+            100% {
+                transform: perspective(500px) rotateX(60deg) translateY(50px) translateZ(-200px);
+            }
         }
 
         /* Main Console */
@@ -92,7 +98,19 @@
             animation: blink 1s infinite;
         }
 
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        @keyframes blink {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
 
         /* Slides */
         .slide {
@@ -101,15 +119,34 @@
             overflow-y: auto;
             animation: glitchIn 0.3s ease-out;
         }
-        .slide.active { display: block; }
 
-        @keyframes glitchIn {
-            0% { opacity: 0; transform: skewX(10deg); }
-            50% { opacity: 0.5; transform: skewX(-10deg); }
-            100% { opacity: 1; transform: skewX(0); }
+        .slide.active {
+            display: block;
         }
 
-        h2 { color: #fff; margin-top: 0; border-left: 5px solid var(--neon-blue); padding-left: 15px; }
+        @keyframes glitchIn {
+            0% {
+                opacity: 0;
+                transform: skewX(10deg);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: skewX(-10deg);
+            }
+
+            100% {
+                opacity: 1;
+                transform: skewX(0);
+            }
+        }
+
+        h2 {
+            color: #fff;
+            margin-top: 0;
+            border-left: 5px solid var(--neon-blue);
+            padding-left: 15px;
+        }
 
         /* Slide 1: Power Pose */
         .skeleton-display {
@@ -128,8 +165,15 @@
             width: 200px;
         }
 
-        .pose-card:hover { border-color: var(--neon-green); background: rgba(0,255,65,0.1); }
-        .pose-card.active { border-color: var(--neon-blue); background: rgba(0,136,255,0.2); }
+        .pose-card:hover {
+            border-color: var(--neon-green);
+            background: rgba(0, 255, 65, 0.1);
+        }
+
+        .pose-card.active {
+            border-color: var(--neon-blue);
+            background: rgba(0, 136, 255, 0.2);
+        }
 
         .stick-figure {
             font-size: 5rem;
@@ -151,14 +195,78 @@
             margin-bottom: 20px;
         }
 
+        /* 基础演员点 */
         .actor-dot {
-            width: 20px;
-            height: 20px;
+            width: 30px;
+            height: 30px;
             background: var(--neon-blue);
             border-radius: 50%;
             position: absolute;
             box-shadow: 0 0 20px var(--neon-blue);
-            transition: all 1s ease-in-out;
+            transition: top 1s ease, left 1s ease, background 0.3s, transform 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+
+        /* 状态 A: 眼神接触 (Eye Contact) - 变亮且放大 */
+        .actor-dot.state-eye {
+            background: #ffffff;
+            box-shadow: 0 0 30px #ffffff, 0 0 50px var(--neon-blue);
+            transform: scale(1.3);
+        }
+
+        .actor-dot.state-eye::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 20px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* 状态 B: 手势 (Gesture) - 两侧出现摆动的小球 */
+        .actor-dot.state-gesture::before,
+        .actor-dot.state-gesture::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: waveHands 0.5s infinite alternate;
+        }
+
+        .actor-dot.state-gesture::before {
+            left: -15px;
+        }
+
+        .actor-dot.state-gesture::after {
+            right: -15px;
+        }
+
+        @keyframes waveHands {
+            from {
+                margin-top: -5px;
+            }
+
+            to {
+                margin-top: 5px;
+            }
+        }
+
+        /* 捕捉成功/失败的视觉反馈 */
+        .log-console span.success {
+            color: var(--neon-green);
+        }
+
+        .log-console span.fail {
+            color: var(--alert-red);
         }
 
         .data-stream {
@@ -175,10 +283,14 @@
             cursor: pointer;
             font-family: var(--font-tech);
         }
-        .data-btn:hover { background: var(--neon-green); color: #000; }
+
+        .data-btn:hover {
+            background: var(--neon-green);
+            color: #000;
+        }
 
         .log-console {
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             height: 100px;
             border: 1px solid #333;
             margin-top: 10px;
@@ -212,7 +324,8 @@
             background: var(--neon-blue);
             position: absolute;
             left: -10px;
-            bottom: 50%; /* Default middle */
+            bottom: 50%;
+            /* Default middle */
             cursor: grab;
             border-radius: 3px;
             box-shadow: 0 0 10px var(--neon-blue);
@@ -225,7 +338,10 @@
             gap: 15px;
         }
 
-        .fader-label { font-size: 0.8rem; color: #fff; }
+        .fader-label {
+            font-size: 0.8rem;
+            color: #fff;
+        }
 
         /* Slide 4: Checklist */
         .checklist-grid {
@@ -244,10 +360,22 @@
             align-items: center;
             gap: 10px;
         }
-        
-        .check-item.checked { border-color: var(--neon-green); color: var(--neon-green); }
-        .check-box { width: 15px; height: 15px; border: 1px solid #777; display: inline-block; }
-        .check-item.checked .check-box { background: var(--neon-green); }
+
+        .check-item.checked {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .check-box {
+            width: 15px;
+            height: 15px;
+            border: 1px solid #777;
+            display: inline-block;
+        }
+
+        .check-item.checked .check-box {
+            background: var(--neon-green);
+        }
 
         /* Buttons */
         .btn-main {
@@ -262,8 +390,11 @@
             clip-path: polygon(10% 0, 100% 0, 100% 80%, 90% 100%, 0 100%, 0 20%);
             transition: transform 0.2s;
         }
-        
-        .btn-main:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--neon-green); }
+
+        .btn-main:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--neon-green);
+        }
 
         /* AI Coach */
         #coach-display {
@@ -277,265 +408,324 @@
             display: none;
             z-index: 100;
         }
-        
-        #coach-text { color: var(--neon-blue); font-size: 0.9rem; }
 
+        #coach-text {
+            color: var(--neon-blue);
+            font-size: 0.9rem;
+        }
     </style>
     <script src="course.js"></script>
 </head>
+
 <body>
-    <a href="index.html" style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
-<div class="grid-floor"></div>
+    <a href="index.html" target="_top"
+        style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+    <div class="grid-floor"></div>
 
-<div id="studio-console">
-    <header>
-        <div style="display:flex; align-items:center; gap:10px;">
-            <div class="rec-dot"></div>
-            <h1>MOCAP STUDIO</h1>
-        </div>
-        <div style="font-size:0.8rem;">UNIT 10.24 // PRESENTATION SKILLS</div>
-    </header>
-
-    <!-- Slide 1: Power Posing -->
-    <div class="slide active" id="slide-1">
-        <h2>01. Calibration: Body Language</h2>
-        <p>Amy Cuddy 的研究表明：你的姿势不仅影响别人如何看你，也影响你如何看自己。</p>
-        <p><b>任务：</b> 切换姿势，观察“置信度 (Confidence Level)”读数的变化。</p>
-        
-        <div class="skeleton-display">
-            <div class="pose-card" onclick="setPose('low')">
-                <span class="stick-figure">🙇</span>
-                <div>Low Power</div>
-                <div style="font-size:0.8rem; color:#777;">Hunched, Closed</div>
+    <div id="studio-console">
+        <header>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div class="rec-dot"></div>
+                <h1>MOCAP STUDIO</h1>
             </div>
-            <div class="pose-card" onclick="setPose('high')">
-                <span class="stick-figure">🙆</span>
-                <div>High Power</div>
-                <div style="font-size:0.8rem; color:#777;">Open, Expansive</div>
-            </div>
-        </div>
+            <div style="font-size:0.8rem;">UNIT 10.24 // PRESENTATION SKILLS</div>
+        </header>
 
-        <div id="bio-feedback" style="text-align:center; height: 40px; color: var(--neon-blue);">
-            STATUS: STANDBY
-        </div>
+        <!-- Slide 1: Power Posing -->
+        <div class="slide active" id="slide-1">
+            <h2>01. Calibration: Body Language</h2>
+            <p>Amy Cuddy 的研究表明：你的姿势不仅影响别人如何看你，也影响你如何看自己。</p>
+            <p><b>任务：</b> 切换姿势，观察“置信度 (Confidence Level)”读数的变化。</p>
 
-        <button class="btn-main" id="btn-1" style="display:none;" onclick="nextSlide(2)">CALIBRATION COMPLETE</button>
-    </div>
-
-    <!-- Slide 2: Mute Analysis -->
-    <div class="slide" id="slide-2">
-        <h2>02. Data Capture: The Silent Analysis</h2>
-        <p>我们要分析 Jamie Oliver (TED Prize Winner) 的演讲风格。视频已静音。</p>
-        <p><b>任务：</b> 观察模拟画面。当演讲者（蓝点）移动或做出动作时，点击下方对应的按钮来捕捉数据。</p>
-
-        <div class="video-simulator" id="video-sim">
-            <div class="actor-dot" id="actor"></div>
-            <div style="position:absolute; bottom:10px; color:#333; font-size:0.8rem;">[ VIDEO FEED: MUTED ]</div>
-        </div>
-
-        <div class="data-stream">
-            <button class="data-btn" onclick="logAction('MOVEMENT')">🚶 STAGE WALK</button>
-            <button class="data-btn" onclick="logAction('GESTURE')">👐 HAND GESTURE</button>
-            <button class="data-btn" onclick="logAction('EYE')">👁️ EYE CONTACT</button>
-        </div>
-
-        <div class="log-console" id="log-output">
-            > SYSTEM READY...<br>
-        </div>
-
-        <button class="btn-main" id="btn-2" style="display:none;" onclick="nextSlide(3)">DATA COLLECTED</button>
-    </div>
-
-    <!-- Slide 3: The Equalizer -->
-    <div class="slide" id="slide-3">
-        <h2>03. Audio/Visual Mixing</h2>
-        <p>一个好的演讲需要平衡。Bill Gates 的演讲风格比较静态，但他使用了强大的道具（Mosquitoes）。</p>
-        <p><b>任务：</b> 调整推子，找到各项指标的“最佳甜点 (Sweet Spot)”。如果太高，观众会害怕；如果太低，观众会睡着。</p>
-
-        <div class="equalizer-board">
-            <div class="fader-group">
-                <div class="fader-track" onclick="setFader(this, event, 'vol')">
-                    <div class="fader-thumb" id="thumb-vol" style="bottom:10%;"></div>
+            <div class="skeleton-display">
+                <div class="pose-card" onclick="setPose('low')">
+                    <span class="stick-figure">🙇</span>
+                    <div>Low Power</div>
+                    <div style="font-size:0.8rem; color:#777;">Hunched, Closed</div>
                 </div>
-                <div class="fader-label">VOLUME</div>
-            </div>
-            <div class="fader-group">
-                <div class="fader-track" onclick="setFader(this, event, 'spd')">
-                    <div class="fader-thumb" id="thumb-spd" style="bottom:90%;"></div>
+                <div class="pose-card" onclick="setPose('high')">
+                    <span class="stick-figure">🙆</span>
+                    <div>High Power</div>
+                    <div style="font-size:0.8rem; color:#777;">Open, Expansive</div>
                 </div>
-                <div class="fader-label">SPEED</div>
             </div>
-            <div class="fader-group">
-                <div class="fader-track" onclick="setFader(this, event, 'eye')">
-                    <div class="fader-thumb" id="thumb-eye" style="bottom:10%;"></div>
+
+            <div id="bio-feedback" style="text-align:center; height: 40px; color: var(--neon-blue);">
+                STATUS: STANDBY
+            </div>
+
+            <button class="btn-main" id="btn-1" style="display:none;" onclick="nextSlide(2)">CALIBRATION
+                COMPLETE</button>
+        </div>
+
+        <!-- Slide 2: Mute Analysis -->
+        <div class="slide" id="slide-2">
+            <h2>02. Data Capture: The Silent Analysis</h2>
+            <p>我们要分析 Jamie Oliver (TED Prize Winner) 的演讲风格。视频已静音。</p>
+            <p><b>任务：</b> 观察模拟画面。当演讲者（蓝点）移动或做出动作时，点击下方对应的按钮来捕捉数据。</p>
+
+            <div class="video-simulator" id="video-sim">
+                <div class="actor-dot" id="actor"></div>
+                <div style="position:absolute; bottom:10px; color:#333; font-size:0.8rem;">[ VIDEO FEED: MUTED ]</div>
+            </div>
+
+            <div class="data-stream">
+                <button class="data-btn" onclick="logAction('MOVEMENT')">🚶 STAGE WALK</button>
+                <button class="data-btn" onclick="logAction('GESTURE')">👐 HAND GESTURE</button>
+                <button class="data-btn" onclick="logAction('EYE')">👁️ EYE CONTACT</button>
+            </div>
+
+            <div class="log-console" id="log-output">
+                > SYSTEM READY...<br>
+            </div>
+
+            <button class="btn-main" id="btn-2" style="display:none;" onclick="nextSlide(3)">DATA COLLECTED</button>
+        </div>
+
+        <!-- Slide 3: The Equalizer -->
+        <div class="slide" id="slide-3">
+            <h2>03. Audio/Visual Mixing</h2>
+            <p>一个好的演讲需要平衡。Bill Gates 的演讲风格比较静态，但他使用了强大的道具（Mosquitoes）。</p>
+            <p><b>任务：</b> 调整推子，找到各项指标的“最佳甜点 (Sweet Spot)”。如果太高，观众会害怕；如果太低，观众会睡着。</p>
+
+            <div class="equalizer-board">
+                <div class="fader-group">
+                    <div class="fader-track" onclick="setFader(this, event, 'vol')">
+                        <div class="fader-thumb" id="thumb-vol" style="bottom:10%;"></div>
+                    </div>
+                    <div class="fader-label">VOLUME</div>
                 </div>
-                <div class="fader-label">EYE CONTACT</div>
+                <div class="fader-group">
+                    <div class="fader-track" onclick="setFader(this, event, 'spd')">
+                        <div class="fader-thumb" id="thumb-spd" style="bottom:90%;"></div>
+                    </div>
+                    <div class="fader-label">SPEED</div>
+                </div>
+                <div class="fader-group">
+                    <div class="fader-track" onclick="setFader(this, event, 'eye')">
+                        <div class="fader-thumb" id="thumb-eye" style="bottom:10%;"></div>
+                    </div>
+                    <div class="fader-label">EYE CONTACT</div>
+                </div>
+            </div>
+
+            <p id="mix-feedback" style="text-align:center; min-height:20px; color:var(--alert-red);"></p>
+
+            <button class="btn-main" id="btn-3" style="display:none;" onclick="nextSlide(4)">SETTINGS OPTIMIZED</button>
+        </div>
+
+        <!-- Slide 4: Final Checklist -->
+        <div class="slide" id="slide-4">
+            <h2>04. Pre-Flight Checklist</h2>
+            <p>你的民族志研究（Ethnographic Study）展示即将开始。请进行最后确认。</p>
+            <p><b>任务：</b> 勾选你已准备好的项目。如果你还没准备好，这就是你的 Homework。</p>
+
+            <div class="checklist-grid">
+                <div class="check-item" onclick="toggleCheck(this)">
+                    <div class="check-box"></div>
+                    <div>Visual Aids (PPT/Video/Props)</div>
+                </div>
+                <div class="check-item" onclick="toggleCheck(this)">
+                    <div class="check-box"></div>
+                    <div>Strong Opening (Hook)</div>
+                </div>
+                <div class="check-item" onclick="toggleCheck(this)">
+                    <div class="check-box"></div>
+                    <div>No Reading from Slides</div>
+                </div>
+                <div class="check-item" onclick="toggleCheck(this)">
+                    <div class="check-box"></div>
+                    <div>Body Language Rehearsed</div>
+                </div>
+            </div>
+
+            <button class="btn-main" onclick="finishLesson()">GO LIVE</button>
+        </div>
+
+        <!-- Slide 5: End -->
+        <div class="slide" id="slide-5">
+            <div style="text-align: center; margin-top: 100px;">
+                <div style="font-size: 4rem;">🎥</div>
+                <h1 style="color: var(--neon-green);">BROADCAST READY</h1>
+                <p>你的动作捕捉数据已分析完毕。</p>
+                <p>记住：你要影响观众，首先要用你的“存在感（Presence）”抓住他们。</p>
+                <p style="color: #666; margin-top: 20px;">Unit 10.24 Complete</p>
             </div>
         </div>
 
-        <p id="mix-feedback" style="text-align:center; min-height:20px; color:var(--alert-red);"></p>
-        
-        <button class="btn-main" id="btn-3" style="display:none;" onclick="nextSlide(4)">SETTINGS OPTIMIZED</button>
     </div>
 
-    <!-- Slide 4: Final Checklist -->
-    <div class="slide" id="slide-4">
-        <h2>04. Pre-Flight Checklist</h2>
-        <p>你的民族志研究（Ethnographic Study）展示即将开始。请进行最后确认。</p>
-        <p><b>任务：</b> 勾选你已准备好的项目。如果你还没准备好，这就是你的 Homework。</p>
-
-        <div class="checklist-grid">
-            <div class="check-item" onclick="toggleCheck(this)">
-                <div class="check-box"></div>
-                <div>Visual Aids (PPT/Video/Props)</div>
-            </div>
-            <div class="check-item" onclick="toggleCheck(this)">
-                <div class="check-box"></div>
-                <div>Strong Opening (Hook)</div>
-            </div>
-            <div class="check-item" onclick="toggleCheck(this)">
-                <div class="check-box"></div>
-                <div>No Reading from Slides</div>
-            </div>
-            <div class="check-item" onclick="toggleCheck(this)">
-                <div class="check-box"></div>
-                <div>Body Language Rehearsed</div>
-            </div>
-        </div>
-
-        <button class="btn-main" onclick="finishLesson()">GO LIVE</button>
+    <!-- AI Coach -->
+    <div id="coach-display">
+        <strong style="color:var(--neon-green)">🤖 MOCAP AI:</strong>
+        <div id="coach-text">Waiting for input...</div>
     </div>
 
-    <!-- Slide 5: End -->
-    <div class="slide" id="slide-5">
-        <div style="text-align: center; margin-top: 100px;">
-            <div style="font-size: 4rem;">🎥</div>
-            <h1 style="color: var(--neon-green);">BROADCAST READY</h1>
-            <p>你的动作捕捉数据已分析完毕。</p>
-            <p>记住：你要影响观众，首先要用你的“存在感（Presence）”抓住他们。</p>
-            <p style="color: #666; margin-top: 20px;">Unit 10.24 Complete</p>
-        </div>
-    </div>
+    <script>
+        // State
+        let currentSlide = 1;
+        let loggedActions = 0;
 
-</div>
-
-<!-- AI Coach -->
-<div id="coach-display">
-    <strong style="color:var(--neon-green)">🤖 MOCAP AI:</strong>
-    <div id="coach-text">Waiting for input...</div>
-</div>
-
-<script>
-    // State
-    let currentSlide = 1;
-    let loggedActions = 0;
-
-    // Helper: Whisper
-    function whisper(msg) {
-        const box = document.getElementById('coach-display');
-        document.getElementById('coach-text').innerText = msg;
-        box.style.display = 'block';
-        setTimeout(() => box.style.display = 'none', 5000);
-    }
-
-    function nextSlide(n) {
-        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
-        document.getElementById(`slide-${n}`).classList.add('active');
-    }
-
-    // Slide 1: Pose
-    function setPose(type) {
-        document.querySelectorAll('.pose-card').forEach(c => c.classList.remove('active'));
-        const feedback = document.getElementById('bio-feedback');
-        
-        if(type === 'high') {
-            event.currentTarget.classList.add('active');
-            feedback.innerHTML = "CORTISOL (Stress): <span style='color:green'>LOW</span> | TESTOSTERONE (Confidence): <span style='color:green'>HIGH</span>";
-            whisper("这就是 High Power Pose。在演讲前做两分钟，真的会改变你的激素水平。");
-            document.getElementById('btn-1').style.display = 'inline-block';
-        } else {
-            event.currentTarget.classList.add('active');
-            feedback.innerHTML = "CORTISOL (Stress): <span style='color:red'>HIGH</span> | TESTOSTERONE (Confidence): <span style='color:red'>LOW</span>";
-            whisper("低能量姿势会让你感到渺小和焦虑。避免在这个状态下演讲。");
+        // Helper: Whisper
+        function whisper(msg) {
+            const box = document.getElementById('coach-display');
+            document.getElementById('coach-text').innerText = msg;
+            box.style.display = 'block';
+            setTimeout(() => box.style.display = 'none', 5000);
         }
-    }
 
-    // Slide 2: Mute Analyst
-    // Simulate actor movement loop
-    const actor = document.getElementById('actor');
-    setInterval(() => {
-        // Random movement
-        const x = Math.random() * 80 + 10;
-        const y = Math.random() * 80 + 10;
-        actor.style.left = x + '%';
-        actor.style.top = y + '%';
-    }, 2000);
-
-    function logAction(type) {
-        const consoleDiv = document.getElementById('log-output');
-        const timestamp = new Date().toLocaleTimeString().split(' ')[0];
-        
-        consoleDiv.innerHTML += `> ${timestamp} [DETECTED]: ${type}<br>`;
-        consoleDiv.scrollTop = consoleDiv.scrollHeight;
-        
-        loggedActions++;
-        
-        if(loggedActions === 1) whisper("捕捉到数据。Jamie Oliver 非常活跃，他在舞台上不停走动以保持高能量。");
-        if(loggedActions === 3) whisper("很好的观察。即使静音，你也能感受到他的紧迫感。");
-        
-        if(loggedActions >= 5) {
-            document.getElementById('btn-2').style.display = 'inline-block';
+        function nextSlide(n) {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.getElementById(`slide-${n}`).classList.add('active');
         }
-    }
 
-    // Slide 3: Equalizer
-    function setFader(track, e, id) {
-        const rect = track.getBoundingClientRect();
-        const y = e.clientY - rect.top; // pixel from top
-        const height = rect.height;
-        let percent = 100 - (y / height * 100);
-        
-        // Clamp
-        if(percent < 0) percent = 0;
-        if(percent > 100) percent = 100;
-        
-        document.getElementById(`thumb-${id}`).style.bottom = `${percent}%`;
-        
-        checkMix();
-    }
+        // Slide 1: Pose
+        function setPose(type) {
+            document.querySelectorAll('.pose-card').forEach(c => c.classList.remove('active'));
+            const feedback = document.getElementById('bio-feedback');
 
-    function checkMix() {
-        const vol = parseFloat(document.getElementById('thumb-vol').style.bottom);
-        const spd = parseFloat(document.getElementById('thumb-spd').style.bottom);
-        const eye = parseFloat(document.getElementById('thumb-eye').style.bottom);
-        const feedback = document.getElementById('mix-feedback');
-        
-        let allGood = true;
-        
-        // Target range: 40-70%
-        if(vol < 30) { feedback.innerText = "Volume Too Low: 观众听不见。"; allGood = false; }
-        else if(vol > 80) { feedback.innerText = "Volume Too High: 你在吼叫。"; allGood = false; }
-        else if(spd > 80) { feedback.innerText = "Speed Too Fast: 观众跟不上。"; allGood = false; }
-        else if(eye < 40) { feedback.innerText = "No Eye Contact: 你在读稿子。"; allGood = false; }
-        else {
-            feedback.innerText = "PERFECT MIX: Engaging & Clear.";
-            feedback.style.color = "var(--neon-green)";
-            document.getElementById('btn-3').style.display = 'inline-block';
+            if (type === 'high') {
+                event.currentTarget.classList.add('active');
+                feedback.innerHTML = "CORTISOL (Stress): <span style='color:green'>LOW</span> | TESTOSTERONE (Confidence): <span style='color:green'>HIGH</span>";
+                whisper("这就是 High Power Pose。在演讲前做两分钟，真的会改变你的激素水平。");
+                document.getElementById('btn-1').style.display = 'inline-block';
+            } else {
+                event.currentTarget.classList.add('active');
+                feedback.innerHTML = "CORTISOL (Stress): <span style='color:red'>HIGH</span> | TESTOSTERONE (Confidence): <span style='color:red'>LOW</span>";
+                whisper("低能量姿势会让你感到渺小和焦虑。避免在这个状态下演讲。");
+            }
         }
-        
-        if(!allGood) feedback.style.color = "var(--alert-red)";
-    }
 
-    // Slide 4: Checklist
-    function toggleCheck(el) {
-        el.classList.toggle('checked');
-    }
+        // Slide 2: Mute Analyst
+        // --- Slide 2: The Mute Analyst (Updated Logic) ---
 
-    function finishLesson() {
-        nextSlide(5); CourseEngine.markComplete(24);
-    }
+        const actor = document.getElementById('actor');
+        let currentBehavior = 'IDLE'; // 当前演员在做什么
+        let analysisInterval;
 
-</script>
+        // 启动模拟器（当进入 Slide 2 时调用，或者页面加载后直接运行）
+        function startSimulation() {
+            if (analysisInterval) clearInterval(analysisInterval);
 
+            analysisInterval = setInterval(() => {
+                // 随机决定下一个动作 (0: Move, 1: Gesture, 2: Eye)
+                const actionType = Math.floor(Math.random() * 3);
+
+                // 重置样式
+                actor.className = 'actor-dot';
+
+                if (actionType === 0) {
+                    // 动作：走位 (MOVEMENT)
+                    currentBehavior = 'MOVEMENT';
+                    const x = Math.random() * 80 + 10;
+                    const y = Math.random() * 80 + 10;
+                    actor.style.left = x + '%';
+                    actor.style.top = y + '%';
+                    // 移动时稍微变形
+                    actor.style.transform = 'scale(0.9, 1.1)';
+
+                } else if (actionType === 1) {
+                    // 动作：手势 (GESTURE)
+                    currentBehavior = 'GESTURE';
+                    actor.classList.add('state-gesture');
+                    // 手势时通常站定不动，或者微调位置
+
+                } else {
+                    // 动作：眼神 (EYE)
+                    currentBehavior = 'EYE';
+                    actor.classList.add('state-eye');
+                    // 眼神接触时通常站定
+                }
+
+            }, 2000); // 每2秒切换一次状态
+        }
+
+        // 页面加载后启动
+        startSimulation();
+
+        function logAction(userGuess) {
+            const consoleDiv = document.getElementById('log-output');
+            const timestamp = new Date().toLocaleTimeString().split(' ')[0];
+
+            let msg = "";
+
+            // 核心逻辑：判断用户按键是否匹配当前动作
+            if (userGuess === currentBehavior) {
+                msg = `<span class="success">> [MATCH] 成功捕捉: ${currentBehavior}</span>`;
+                loggedActions++;
+
+                // 成功反馈：闪烁一下
+                document.getElementById('studio-console').style.borderColor = 'var(--neon-green)';
+                setTimeout(() => document.getElementById('studio-console').style.borderColor = 'var(--neon-green)', 200);
+            } else {
+                msg = `<span class="fail">> [ERROR] 误判! 目标正在: ${currentBehavior}</span>`;
+                // 失败反馈：闪烁红色
+                document.getElementById('studio-console').style.borderColor = 'var(--alert-red)';
+                setTimeout(() => document.getElementById('studio-console').style.borderColor = 'var(--neon-green)', 200);
+            }
+
+            consoleDiv.innerHTML += `${timestamp} ${msg}<br>`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+
+            // 进度检查
+            if (loggedActions === 1) whisper("数据流接入正常。请仔细观察蓝点的形态变化。");
+            if (loggedActions >= 5) {
+                document.getElementById('btn-2').style.display = 'inline-block';
+                whisper("样本采集足够。Jamie Oliver 的特点是：移动频繁（高能量）且手势丰富（强调观点）。");
+                clearInterval(analysisInterval); // 停止模拟
+            }
+        }
+
+        // Slide 3: Equalizer
+        function setFader(track, e, id) {
+            const rect = track.getBoundingClientRect();
+            const y = e.clientY - rect.top; // pixel from top
+            const height = rect.height;
+            let percent = 100 - (y / height * 100);
+
+            // Clamp
+            if (percent < 0) percent = 0;
+            if (percent > 100) percent = 100;
+
+            document.getElementById(`thumb-${id}`).style.bottom = `${percent}%`;
+
+            checkMix();
+        }
+
+        function checkMix() {
+            const vol = parseFloat(document.getElementById('thumb-vol').style.bottom);
+            const spd = parseFloat(document.getElementById('thumb-spd').style.bottom);
+            const eye = parseFloat(document.getElementById('thumb-eye').style.bottom);
+            const feedback = document.getElementById('mix-feedback');
+
+            let allGood = true;
+
+            // Target range: 40-70%
+            if (vol < 30) { feedback.innerText = "Volume Too Low: 观众听不见。"; allGood = false; }
+            else if (vol > 80) { feedback.innerText = "Volume Too High: 你在吼叫。"; allGood = false; }
+            else if (spd > 80) { feedback.innerText = "Speed Too Fast: 观众跟不上。"; allGood = false; }
+            else if (eye < 40) { feedback.innerText = "No Eye Contact: 你在读稿子。"; allGood = false; }
+            else {
+                feedback.innerText = "PERFECT MIX: Engaging & Clear.";
+                feedback.style.color = "var(--neon-green)";
+                document.getElementById('btn-3').style.display = 'inline-block';
+            }
+
+            if (!allGood) feedback.style.color = "var(--alert-red)";
+        }
+
+        // Slide 4: Checklist
+        function toggleCheck(el) {
+            el.classList.toggle('checked');
+        }
+
+        function finishLesson() {
+            nextSlide(5); CourseEngine.markComplete(24);
+        }
+
+    </script>
+
+    <script src="scholar_adapter.js"></script>
 </body>
+
 </html>

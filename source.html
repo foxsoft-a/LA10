@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Source Text Library</title>
+    <style>
+        body {
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            /* 剧本字体 */
+            background: #222;
+            color: #ddd;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 侧边栏：章节选择 */
+        .toc {
+            width: 220px;
+            background: #1a1a1a;
+            border-right: 1px solid #333;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .toc h3 {
+            color: #888;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc li {
+            padding: 10px;
+            cursor: pointer;
+            color: #aaa;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .toc li:hover,
+        .toc li.active {
+            color: #fff;
+            background: #333;
+        }
+
+        /* 主视口：双栏阅读 */
+        .reader-view {
+            flex: 1;
+            display: flex;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .column {
+            flex: 1;
+            padding: 40px;
+            border-right: 1px solid #333;
+        }
+
+        .original {
+            color: #e0e0e0;
+        }
+
+        .modern {
+            color: #4a90e2;
+            font-family: sans-serif;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            display: none;
+        }
+
+        /* 默认隐藏现代文 */
+
+        /* 行号 */
+        .line {
+            display: flex;
+            margin-bottom: 5px;
+        }
+
+        .ln {
+            width: 30px;
+            color: #555;
+            font-size: 0.7rem;
+            user-select: none;
+            text-align: right;
+            padding-right: 10px;
+            flex-shrink: 0;
+        }
+
+        /* 优化段落显示 */
+        .txt {
+            flex: 1;
+            text-align: justify;
+            line-height: 1.6;
+            padding-bottom: 10px;
+        }
+
+        /* 区分不同类型的文本 */
+        .line:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* 重点词汇高亮 (用于教学) */
+        .highlight {
+            color: #e74c3c;
+            font-weight: bold;
+            border-bottom: 1px dotted #e74c3c;
+            cursor: help;
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            position: fixed;
+            top: 20px;
+            right: 40px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            z-index: 100;
+        }
+
+        .tool-btn {
+            background: #333;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .tool-btn.active {
+            background: #4a90e2;
+        }
+
+        h2 {
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .speaker {
+            font-weight: bold;
+            color: #ffd700;
+            margin-top: 15px;
+            display: block;
+        }
+
+        .stage-dir {
+            font-style: italic;
+            color: #888;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="toc">
+        <h3>Shakespeare</h3>
+        <ul>
+            <li onclick="loadText('macbeth_1_3')" class="active">Macbeth 1.3 (Prophecy)</li>
+            <li onclick="loadText('macbeth_1_7')">Macbeth 1.7 (Debate)</li>
+            <li onclick="loadText('macbeth_2_1')">Macbeth 2.1 (Dagger)</li>
+            <li onclick="loadText('macbeth_3_1')">Macbeth 3.1 (Fears)</li>
+            <li onclick="loadText('macbeth_5_5')">Macbeth 5.5 (Tomorrow)</li>
+            <li onclick="loadText('sonnet_18')">Sonnet 18</li>
+        </ul>
+        <h3>Historical Speeches</h3>
+        <ul>
+            <li onclick="loadText('jackson_speech')">Andrew Jackson (1830)</li>
+            <li onclick="loadText('douglass_speech')">Frederick Douglass (1852)</li>
+        </ul>
+        <h3>Fiction</h3>
+        <ul>
+            <li onclick="loadText('lottery')">The Lottery</li>
+        </ul>
+    </div>
+
+    <div class="reader-view">
+        <div class="column original" id="col-original">
+            <!-- 原文注入区 -->
+        </div>
+        <div class="column modern" id="col-modern">
+            <!-- 译文注入区 -->
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <button class="tool-btn" onclick="toggleModern()" id="btn-toggle">Show Modern Text</button>
+    </div>
+
+    <script>
+        // 扩展版文献库
+        const library = {
+            // --- L01: Dickens ---
+            'dickens_pip': {
+                title: "Great Expectations (Chapter 1 Excerpt)",
+                lines: [
+                    { ln: 1, text: "My father's family name being Pirrip, and my Christian name Philip, my infant tongue could make of both names nothing longer or more explicit than Pip.", mod: "我父亲姓Pirrip，我的教名是Philip，但我儿时的舌头只能把这两个名字发成Pip。" },
+                    { ln: 5, text: "As I never saw my father or my mother... my first fancies regarding what they were like were unreasonably derived from their tombstones.", mod: "因为我从未见过父母...我对他们模样的最初想象，完全是不讲理地从墓碑上衍生出来的。" }
+                ]
+            },
+
+            // --- L06: Susan Jacoby ---
+            'jacoby_editorial': {
+                title: "The Dumbing of America (Excerpt)",
+                lines: [
+                    { ln: 1, text: "The mind of this country, taught to aim at low objects, eats upon itself.", mod: "这个国家的头脑，被教导去追求低级目标，正在自我吞噬。" },
+                    { ln: 5, text: "The problem is not just that we are ignorant of facts... The problem is that we are increasingly proud of our ignorance.", mod: "问题不仅在于我们对事实一无所知...问题在于我们要越来越以无知为荣。" }
+                ]
+            },
+
+            // --- L12: Sonnets ---
+            'sonnet_18': {
+                title: "Sonnet 18",
+                lines: [
+                    { ln: 1, text: "Shall I compare thee to a summer's day?", mod: "我能否将你比作夏日的一天？" },
+                    { ln: 2, text: "Thou art more lovely and more temperate:", mod: "你却比它更加可爱，更加温婉：" },
+                    { ln: 3, text: "Rough winds do shake the darling buds of May,", mod: "狂风会吹落五月娇嫩的花蕊，" },
+                    { ln: 4, text: "And summer's lease hath all too short a date;", mod: "夏天的租期往往太短，匆匆而退；" },
+                    { ln: 5, text: "Sometime too hot the eye of heaven shines,", mod: "有时天之眼照得太热，" },
+                    { ln: 6, text: "And often is his gold complexion dimm'd;", mod: "他金色的面容常被遮暗；" },
+                    { ln: 7, text: "And every fair from fair sometime declines,", mod: "每一种美都会随时间凋零，" },
+                    { ln: 8, text: "By chance or nature's changing course untrimm'd;", mod: "被机缘或自然的代谢所摧残；" },
+                    { ln: 9, text: "But thy eternal summer shall not fade", mod: "但你永恒的夏天将不会凋谢" },
+                    { ln: 10, text: "Nor lose possession of that fair thou ow'st;", mod: "你拥有的美貌也不会流失；" },
+                    { ln: 11, text: "Nor shall Death brag thou wander'st in his shade,", mod: "死神也无法夸口你在他的阴影里徘徊，" },
+                    { ln: 12, text: "When in eternal lines to time thou grow'st:", mod: "当你在不朽的诗行里与时间同长：" },
+                    { ln: 13, text: "So long as men can breathe or eyes can see,", mod: "只要人能呼吸，眼能看，" },
+                    { ln: 14, text: "So long lives this, and this gives life to thee.", mod: "这诗就将长存，并赋予你生命。" }
+                ]
+            },
+            'sonnet_130': {
+                title: "Sonnet 130",
+                lines: [
+                    { ln: 1, text: "My mistress' eyes are nothing like the sun;", mod: "我爱人的眼睛一点不像太阳；" },
+                    { ln: 2, text: "Coral is far more red than her lips' red;", mod: "珊瑚比她的嘴唇还要红得多；" },
+                    { ln: 3, text: "If snow be white, why then her breasts are dun;", mod: "如果雪是白的，由于她的胸脯是暗褐色的；" },
+                    { ln: 4, text: "If hairs be wires, black wires grow on her head.", mod: "如果发丝是铁丝，她头上长满了黑铁丝。" },
+                    { ln: 13, text: "And yet, by heaven, I think my love as rare", mod: "然而，指天发誓，我认为我的爱人" },
+                    { ln: 14, text: "As any she belied with false compare.", mod: "胜过任何被虚假比喻美化的人。" }
+                ]
+            },
+
+            // --- Macbeth Key Scenes ---
+            'macbeth_1_3': {
+                title: "Macbeth: Act 1, Scene 3 (The Prophecy)",
+                lines: [
+                    { ln: 38, sp: "MACBETH", text: "So foul and fair a day I have not seen.", mod: "我从未见过这样既糟糕又美好的日子。" },
+                    { ln: 39, sp: "BANQUO", text: "How far is't called to Forres? What are these", mod: "到福里斯还有多远？这些是什么人" },
+                    { ln: 40, sp: "", text: "So wither'd and so wild in their attire,", mod: "打扮得这么干瘪又狂野，" },
+                    { ln: 41, sp: "", text: "That look not like the inhabitants o' the earth,", mod: "看起来不像是地上的居民，" },
+                    { ln: 42, sp: "", text: "And yet are on't?", mod: "却偏偏在地上？" },
+                    { ln: 43, sp: "", text: "Live you? or are you aught", mod: "你们活着吗？还是" },
+                    { ln: 44, sp: "", text: "That man may question?", mod: "不可理喻的东西？" },
+                    { ln: 48, sp: "FIRST WITCH", text: "All hail, Macbeth! hail to thee, thane of Glamis!", mod: "万福，麦克白！祝福你，格拉米斯爵士！" },
+                    { ln: 49, sp: "SECOND WITCH", text: "All hail, Macbeth! hail to thee, thane of Cawdor!", mod: "万福，麦克白！祝福你，卡托爵士！" },
+                    { ln: 50, sp: "THIRD WITCH", text: "All hail, Macbeth! that shalt be king hereafter!", mod: "万福，麦克白！你以后将成为国王！" }
+                ]
+            },
+            'macbeth_1_7': {
+                title: "Macbeth: Act 1, Scene 7 (The Debate)",
+                lines: [
+                    { ln: 1, sp: "MACBETH", text: "If it were done when 'tis done, then 'twere well", mod: "如果要干，那就干脆利落地干，那也没什么；" },
+                    { ln: 2, sp: "", text: "It were done quickly: if the assassination", mod: "要是这件暗杀的事情，" },
+                    { ln: 3, sp: "", text: "Could trammel up the consequence, and catch", mod: "可以攫取成功的果实，而把一切后果" },
+                    { ln: 4, sp: "", text: "With his surcease success; that but this blow", mod: "一网打尽；要是这一击" },
+                    { ln: 5, sp: "", text: "Might be the be-all and the end-all here,", mod: "就可以成为绝响，" },
+                    { ln: 6, sp: "", text: "But here, upon this bank and shoal of time,", mod: "不仅在这时间的浅滩上，" },
+                    { ln: 7, sp: "", text: "We'ld jump the life to come. But in these cases", mod: "就是到来生我也甘愿冒一下险。可是" },
+                    { ln: 8, sp: "", text: "We still have judgment here; that we but teach", mod: "我们在这种事情上总要受现世的审判；" },
+                    { ln: 9, sp: "", text: "Bloody instructions, which, being taught, return", mod: "我们定下了血的教训，教会了别人，" },
+                    { ln: 10, sp: "", text: "To plague the inventor: this even-handed justice", mod: "反过来却祸及了始作俑者。" },
+                    { ln: 25, sp: "", text: "I have no spur", mod: "我没有鞭刺" },
+                    { ln: 26, sp: "", text: "To prick the sides of my intent, but only", mod: "来刺激我不振的意向，只有" },
+                    { ln: 27, sp: "", text: "Vaulting ambition, which o'erleaps itself", mod: "那跃跃欲试的野心，不自量力" },
+                    { ln: 28, sp: "", text: "And falls on the other.", mod: "却翻身跌在另一边。" }
+                ]
+            },
+            'macbeth_2_1': {
+                title: "Macbeth: Act 2, Scene 1 (The Dagger Soliloquy)",
+                lines: [
+                    { ln: 33, sp: "MACBETH", text: "Is this a dagger which I see before me,", mod: "我面前这把是匕首吗？" },
+                    { ln: 34, sp: "", text: "The handle toward my hand? Come, let me clutch thee.", mod: "刀柄向着我的手？来，让我抓注你。" },
+                    { ln: 35, sp: "", text: "I have thee not, and yet I see thee still.", mod: "我抓不住你，可是我仍旧看见你。" },
+                    { ln: 36, sp: "", text: "Art thou not, fatal vision, sensible", mod: "你这致命的幻象，难道只能眼见" },
+                    { ln: 37, sp: "", text: "To feeling as to sight? or art thou but", mod: "却不能手摸吗？还是" },
+                    { ln: 38, sp: "", text: "A dagger of the mind, a false creation,", mod: "你不过是头脑中的匕首，一种虚妄的产物，" },
+                    { ln: 39, sp: "", text: "Proceeding from the heat-oppressed brain?", mod: "来自狂热的头脑？" },
+                    { ln: 40, sp: "", text: "I see thee yet, in form as palpable", mod: "我仍旧看见你，你的形状" },
+                    { ln: 41, sp: "", text: "As this which now I draw.", mod: "就像我现在拔出的这一把同样实在。" }
+                ]
+            },
+            'macbeth_3_1': {
+                title: "Macbeth: Act 3, Scene 1 (To be thus...)",
+                lines: [
+                    { ln: 47, sp: "MACBETH", text: "To be thus is nothing;", mod: "单单做到了这一步（成为国王）不算什么；" },
+                    { ln: 48, sp: "", text: "But to be safely thus. Our fears in Banquo", mod: "要稳稳当当地以此为继才算。我对班柯" },
+                    { ln: 49, sp: "", text: "Stick deep; and in his royalty of nature", mod: "怀着深切的恐惧；在他高贵的性格里" },
+                    { ln: 50, sp: "", text: "Reigns that which would be fear'd.", mod: "有着令人畏惧的东西。" }
+                ]
+            },
+            'macbeth_5_5': {
+                title: "Macbeth: Act 5, Scene 5 (Tomorrow)",
+                lines: [
+                    { ln: 17, sp: "MACBETH", text: "She should have died hereafter;", mod: "她反正要死的，" },
+                    { ln: 18, sp: "", text: "There would have been a time for such a word.", mod: "迟早总会有听到这个消息的一天。" },
+                    { ln: 19, sp: "", text: "To-morrow, and to-morrow, and to-morrow,", mod: "明天，明天，再一个明天，" },
+                    { ln: 20, sp: "", text: "Creeps in this petty pace from day to day", mod: "一天接着一天地蹑步前进，" },
+                    { ln: 21, sp: "", text: "To the last syllable of recorded time;", mod: "直到以前一秒钟的时间；" },
+                    { ln: 22, sp: "", text: "And all our yesterdays have lighted fools", mod: "我们要去的昨天，不过替傻子们" },
+                    { ln: 23, sp: "", text: "The way to dusty death. Out, out, brief candle!", mod: "照亮了到死亡的土壤中去的路。熄灭了吧，短促的烛光！" },
+                    { ln: 24, sp: "", text: "Life's but a walking shadow, a poor player", mod: "人生不过是一个行走的影子，一个在舞台上" },
+                    { ln: 25, sp: "", text: "That struts and frets his hour upon the stage", mod: "指手划脚的拙劣的伶人，" },
+                    { ln: 26, sp: "", text: "And then is heard no more: it is a tale", mod: "登场片刻，就在无声无息中悄然退下；" },
+                    { ln: 27, sp: "", text: "Told by an idiot, full of sound and fury,", mod: "它是一个愚人所讲的故事，充满着喧哗和骚动，" },
+                    { ln: 28, sp: "", text: "Signifying nothing.", mod: "却找不到一点意义。" }
+                ]
+            },
+
+            // --- Speeches ---
+            'jackson_speech': {
+                title: "Andrew Jackson: On Indian Removal (1830)",
+                lines: [
+                    { ln: 1, sp: "", text: "It gives me pleasure to announce to Congress that the benevolent policy of the Government, steadily pursued for nearly thirty years, in relation to the removal of the Indians beyond the white settlements is approaching to a happy consummation.", mod: "我很高兴向国会宣布，政府近三十年来坚定推行的关于将印第安人迁移出白人定居点的仁慈政策，即将圆满完成。" },
+                    { ln: 2, sp: "", text: "Two important tribes have accepted the provision made for their removal at the last session of Congress, and it is believed that their example will induce the remaining tribes also to seek the same obvious advantages.", mod: "两个重要的部落已经接受了国会上届会议为他们迁移所做的规定，相信他们的榜样将引导其余部落也去寻求同样的明显利益。" },
+                    { ln: 3, sp: "", text: "The consequences of a speedy removal will be important to the United States, to individual States, and to the Indians themselves. It will separate the Indians from immediate contact with settlements of whites; free them from the power of the States; enable them to pursue happiness in their own way and under their own rude institutions.", mod: "迅速迁移的后果对美国、对各个州以及对印第安人本身都是重要的。它将把印第安人与白人定居点隔离开来；使他们摆脱州的权力；使他们能够按照自己的方式和自己原始的制度去追求幸福。" },
+                    { ln: 4, sp: "", text: "What good man would prefer a country covered with forests and ranged by a few thousand savages to our extensive Republic, studded with cities, towns, and prosperous farms, embellished with all the improvements which art can devise or industry execute?", mod: "有什么好人会喜欢一个森林覆盖、只有几千个野蛮人游荡的国家，而不喜欢我们幅员辽阔的共和国，点缀着城市、城镇和繁荣的农场，装饰着艺术所能设计或工业所能执行的一切改进呢？" }
+                ]
+            },
+            'douglass_speech': {
+                title: "Frederick Douglass: The Fourth of July (1852)",
+                lines: [
+                    { ln: 1, sp: "", text: "What, to the American slave, is your 4th of July? I answer; a day that reveals to him, more than all other days in the year, the gross injustice and cruelty to which he is the constant victim.", mod: "对于美国奴隶来说，你们的7月4日意味着什么？我回答：这一天比一年中其他任何日子都更向他揭示，他作为受害者所遭受的极端不公和残忍。" },
+                    { ln: 2, sp: "", text: "To him, your celebration is a sham; your boasted liberty, an unholy license; your national greatness, swelling vanity; your sounds of rejoicing are empty and heartless;", mod: "对他来说，你们的庆祝是虚伪；你们吹嘘的自由，是不神圣的放纵；你们的国家伟大，是膨胀的虚荣；你们的欢乐之声，是空洞和无情的；" },
+                    { ln: 3, sp: "", text: "your denunciation of tyrants, brass fronted impudence; your shouts of liberty and equality, hollow mockery; your prayers and hymns, your sermons and thanksgivings, with all your religious parade and solemnity, are, to Him, mere bombast, fraud, deception, impiety, and hypocrisy—a thin veil to cover up crimes which would disgrace a nation of savages.", mod: "你们对暴君的谴责，是厚颜无耻的放肆；你们对自由和平等的呼喊，是空洞的嘲弄；你们的祈祷和赞美诗，你们的布道和感恩，连同你们所有的宗教游行和庄严，对他来说，仅仅是夸夸其谈、欺诈、欺骗、不敬和虚伪——一层薄薄的面纱，用来掩盖那些连野蛮国家都会感到羞耻的罪行。" }
+                ]
+            },
+
+            // --- Short Story ---
+            'lottery': {
+                title: "The Lottery (Shirley Jackson)",
+                lines: [
+                    { ln: 1, sp: "", text: "The morning of June 27th was clear and sunny, with the fresh warmth of a full-summer day; the flowers were blossoming profusely and the grass was richly green.", mod: "6月27日的早晨晴朗而阳光明媚，充满了盛夏的新鲜暖意；鲜花盛开，绿草如茵。" },
+                    { ln: 2, sp: "", text: "The people of the village began to gather in the square, between the post office and the bank, around ten o'clock; in some towns there were so many people that the lottery took two days and had to be started on June 26th.", mod: "村民们在十点左右开始聚集在邮局和银行之间的广场上；有些城镇人很多，摸彩需要两天时间，不得不从6月26日开始。" },
+                    { ln: 75, sp: "TESSIE", text: "\"It isn't fair, it isn't right,\" Mrs. Hutchinson screamed, and then they were upon her.", mod: "“这不公平，这不对，”哈钦森太太尖叫着，然后他们就扑向了她。" }
+                ]
+            }
+        };
+
+        function loadText(id) {
+            const data = library[id];
+            if (!data) return;
+
+            // 更新侧边栏高亮
+            document.querySelectorAll('.toc li').forEach(li => li.classList.remove('active'));
+            // 简单匹配onclick...
+            [...document.querySelectorAll('.toc li')].find(li => li.getAttribute('onclick').includes(id)).classList.add('active');
+
+            let htmlOrig = `<h2>${data.title}</h2>`;
+            let htmlMod = `<h2>${data.title} (Modern)</h2>`;
+
+            data.lines.forEach(line => {
+                // Speaker
+                if (line.sp) {
+                    htmlOrig += `<span class="speaker">${line.sp}</span>`;
+                    htmlMod += `<span class="speaker">${line.sp}</span>`;
+                }
+                // Lines
+                htmlOrig += `<div class="line"><div class="ln">${line.ln}</div><div class="txt">${line.text}</div></div>`;
+                htmlMod += `<div class="line"><div class="ln">${line.ln}</div><div class="txt">${line.mod}</div></div>`;
+            });
+
+            document.getElementById('col-original').innerHTML = htmlOrig;
+            document.getElementById('col-modern').innerHTML = htmlMod;
+
+            // 滚动到顶部
+            document.querySelector('.reader-view').scrollTo(0, 0);
+        }
+
+        // Toggle Modern Text Column
+        let modernVisible = false;
+        function toggleModern() {
+            modernVisible = !modernVisible;
+            const col = document.getElementById('col-modern');
+            const btn = document.getElementById('btn-toggle');
+
+            if (modernVisible) {
+                col.style.display = 'block';
+                btn.classList.add('active');
+                btn.innerText = "Hide Modern Text";
+            } else {
+                col.style.display = 'none';
+                btn.classList.remove('active');
+                btn.innerText = "Show Modern Text";
+            }
+        }
+
+        // 初始加载
+        loadText('macbeth_1_3'); // 默认显示第一个
+
+    </script>
+
+</body>
+
+</html>

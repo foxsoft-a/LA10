@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Reader</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+            color: #333;
+            background: #fdfbf7;
+            /* 护眼米色 */
+            margin: 0;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            border-bottom: 2px solid #e94560;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: #4a4a4a;
+            margin-top: 30px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-top: 25px;
+            font-weight: bold;
+        }
+
+        p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        /* 引用块 */
+        blockquote {
+            border-left: 4px solid #e94560;
+            margin: 20px 0;
+            padding-left: 20px;
+            font-style: italic;
+            background: rgba(0, 0, 0, 0.03);
+            padding: 15px;
+        }
+
+        /* 标注工具提示 */
+        #highlighter-tooltip {
+            position: absolute;
+            background: #2c3e50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-family: sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        #highlighter-tooltip::after {
+            content: '▼';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #2c3e50;
+        }
+
+        .highlighted {
+            background-color: #fffacd;
+            border-bottom: 1px solid #f1c40f;
+        }
+
+        .analysis-box {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .analysis-box h4 {
+            margin-top: 0;
+            color: #1565c0;
+        }
+
+        .intro {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: #666;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 动态内容容器 -->
+    <div id="content-area">
+        <!-- 默认加载的内容，JS会替换它 -->
+        <h1>正在加载教材...</h1>
+    </div>
+
+    <!-- 悬浮标注按钮 -->
+    <div id="highlighter-tooltip" onclick="saveHighlight()">🖍 Save to Notebook</div>
+
+    <script>
+        // 扩展版数据
+        const lessonContent = {
+            // --- Phase 1: 概念构建 ---
+            'lesson1.html': `
+            <article class="textbook-chapter">
+                <h1>Unit 10: 影响力的解构 (Deconstructing Influence)</h1>
+                <p class="intro">"No man is an island, entire of itself; every man is a piece of the continent." — John Donne</p>
+                
+                <h3>1. 定义核心概念</h3>
+                <p>在社会学和心理学语境下，<strong>影响力 (Influence)</strong> 被定义为“改变他人行为、态度或信念的能力”。它不同于<strong>权力 (Power)</strong> —— 权力往往涉及强制（Coercion），而影响力往往涉及说服（Persuasion）和潜意识的塑造。</p>
+                
+                <h3>2. 影响力的分类谱系</h3>
+                <p>作为研究员，你需要学会区分以下几种影响力来源：</p>
+                <ul>
+                    <li><strong>规范性影响 (Normative Influence):</strong> 为了被社会群体接纳而改变行为。例如：同伴压力 (Peer Pressure)。我们在 <em>The Lottery</em> 中看到的悲剧正是源于此。</li>
+                    <li><strong>信息性影响 (Informational Influence):</strong> 当我们不确定时，倾向于认为他人（专家或多数人）掌握了正确信息。例如：在危机时刻跟随人群奔跑。</li>
+                    <li><strong>环境影响 (Environmental Influence):</strong> 物理空间如何塑造行为。这将在你的民族志研究 (Ethnography) 中被重点探讨。例如：教室的桌椅摆放方式如何决定了话语权？</li>
+                </ul>
+
+                <div class="analysis-box">
+                    <h4>🧠 Critical Thinking</h4>
+                    <p>思考：当你决定购买某品牌的手机时，是因为它的功能（Logos），还是因为它的品牌形象能提升你的社会地位（Ethos/Pathos）？</p>
+                </div>
+            </article>
+        `,
+
+            'lesson2.html': `
+            <article class="textbook-chapter">
+                <h1>概括与归纳 (Generalization)</h1>
+                <p>在研究影响力时，我们需要从具体案例中提取普遍真理。这就是“归纳法”。</p>
+                <h2>有效 vs 无效</h2>
+                <p><strong>无效归纳 (Invalid):</strong> "所有有影响力的人都是富有的。" (过于绝对，容易被反证)</p>
+                <p><strong>有效归纳 (Valid):</strong> "影响力往往伴随着责任，但并非总是被正确使用。" (基于证据，留有余地)</p>
+            </article>
+        `,
+
+            'lesson5.html': `
+            <article class="textbook-chapter">
+                <h1>修辞三角 (The Rhetorical Triangle)</h1>
+                <p>亚里士多德提出的劝说模型，是所有广告和演讲的基础。</p>
+                <ul>
+                    <li><strong>Ethos (信誉):</strong> 演讲者的人格魅力、专业资格。关键词：可信度。</li>
+                    <li><strong>Pathos (情感):</strong> 诉诸听众的情绪（恐惧、同情、爱国心）。关键词：共鸣。</li>
+                    <li><strong>Logos (逻辑):</strong> 使用数据、事实、逻辑推理。关键词：理性。</li>
+                </ul>
+            </article>
+        `,
+
+            'lesson6.html': `
+            <article class="textbook-chapter">
+                <h1>反智主义的兴起 (The Rise of Anti-Intellectualism)</h1>
+                
+                <h3>1. 历史背景</h3>
+                <p>Susan Jacoby 在她的著作 <em>The Age of American Unreason</em> 中提出了一个尖锐的观点：美国文化正在经历一种危险的突变。从建国初期的崇尚思辨，转变为当下的娱乐至死。</p>
+                
+                <h3>2. 核心论点分析</h3>
+                <p>Jacoby 并没有简单地指责人们“变笨了”，她指出的是一种<strong>态度上的转变</strong>：</p>
+                <blockquote>
+                    "The problem is not just that we are ignorant of facts... The problem is that we are increasingly proud of our ignorance." 
+                </blockquote>
+                <p>这种现象被称为<strong>“无知的傲慢”</strong>。在社交媒体时代，专家的声音被淹没，"我的观点" (Opinion) 被错误地等同于 "经过验证的事实" (Fact)。</p>
+
+                <h3>3. 视频文化 vs 文字文化</h3>
+                <p>Jacoby 认为，影像媒体（Video/Images）鼓励被动接收，而文字阅读（Reading）强制主动思考。当那个我们从文字转向视频时，我们的逻辑推理能力会退化。你在分析 TED 演讲时，是否发现演讲者更依赖视觉冲击而非逻辑推演？</p>
+            </article>
+        `,
+
+            'lesson8.html': `
+            <article class="textbook-chapter">
+                <h1>社会网络理论 (Social Network Theory)</h1>
+                <p>Nicholas Christakis 的研究表明：你不仅受朋友影响，还受“朋友的朋友的朋友”影响（三度影响力规则）。</p>
+                <p>如果你的朋友变胖了，你变胖的几率会增加 57%。这说明行为像病毒一样具有传染性。</p>
+            </article>
+        `,
+
+            // --- Phase 2: 文学深度 (Macbeth) ---
+            'lesson12.html': `
+            <article class="textbook-chapter">
+                <h1>莎士比亚的语言 (Shakespeare's Language)</h1>
+                <p>莎士比亚使用<strong>抑扬格五步格 (Iambic Pentameter)</strong> 来模仿人类心脏跳动的节奏 (da-DUM, da-DUM...)。</p>
+                <h2>十四行诗结构</h2>
+                <p>由三个四行诗 (Quatrains) 和一个对句 (Couplet) 组成。韵脚通常是 ABAB CDCD EFEF GG。</p>
+                <p><strong>Volta (转折):</strong> 通常发生在第9行或最后的对句，诗人的情绪或观点会发生突变。</p>
+            </article>
+        `,
+
+            'lesson13.html': `
+            <article class="textbook-chapter">
+                <h1>麦克白 Act 1: 秩序与混乱</h1>
+                
+                <h3>1. 存在之链 (The Great Chain of Being)</h3>
+                <p>要理解《麦克白》的恐怖，必须理解伊丽莎白时代的世界观。当时的人们相信宇宙是一个严格的等级结构：</p>
+                <ol>
+                    <li><strong>上帝 (God)</strong>: 全知全能。</li>
+                    <li><strong>天使 (Angels)</strong>: 纯粹的精神。</li>
+                    <li><strong>国王 (King)</strong>: 上帝在人间的代理人（Divine Right of Kings）。</li>
+                    <li><strong>贵族 (Nobles)</strong>: 如 Macbeth。</li>
+                    <li><strong>平民 (Commoners)</strong></li>
+                    <li><strong>动物、植物、矿物</strong></li>
+                </ol>
+                <p><strong>关键推论：</strong> 弑君（Regicide）不仅仅是谋杀，它是对宇宙秩序的亵渎。当 Macbeth 杀害 Duncan 时，他不仅违反了法律，他让整个自然界“生病”了。这就是为什么剧中会出现马互相吞噬、猫头鹰在白天捕猎等异象。</p>
+
+                <h3>2. 悖论修辞 (The Rhetoric of Paradox)</h3>
+                <p>女巫的语言核心是<strong>悖论 (Paradox)</strong>："Fair is foul, and foul is fair." 这不仅是文字游戏，它预示了整部剧的主题：<strong>表象与现实的倒置</strong>。看起来忠诚的 Macbeth 其实是叛徒；看起来柔弱的 Lady Macbeth 其实心如钢铁。</p>
+            </article>
+        `,
+
+            'lesson15.html': `
+            <article class="textbook-chapter">
+                <h1>心理学视角：期望效应</h1>
+                
+                <h3>1. 你的大脑在撒谎</h3>
+                <p>行为经济学家 Dan Ariely 的研究表明，我们的感知并非客观。我们的<strong>预期 (Expectation)</strong> 会改写我们的感官体验。如果你预期这杯酒很贵，你的大脑活跃区（眶额皮层）真的会因为“好喝”而亮起来。</p>
+                
+                <h3>2. 应用于 Macbeth</h3>
+                <p>在 Act 2 的“匕首独白”中，Macbeth 看到了并不存在的匕首。这是一个完美的心理学案例：</p>
+                <ul>
+                    <li><strong>高强度的压力 (Stress):</strong> 弑君前的极度紧张。</li>
+                    <li><strong>强烈的心理暗示 (Suggestion):</strong> 女巫的预言和妻子的怂恿。</li>
+                </ul>
+                <p>他的大脑将内心的欲望（Ambition）和恐惧（Fear）投射到了物理世界中。那把匕首是他的<strong>心理现实化</strong>。</p>
+            </article>
+        `,
+
+            'lesson19.html': `
+            <article class="textbook-chapter">
+                <h1>语言的伪装：委婉语 (Euphemism)</h1>
+                
+                <h3>1. 政治中的语言操纵</h3>
+                <p>George Orwell 曾说：“政治语言的设计目的是为了让谎言听起来真实，让谋杀变得可敬。”</p>
+                <p>在 Andrew Jackson 的《印第安人迁移法案》演讲中，注意他如何使用词汇：</p>
+                <ul>
+                    <li>他不说 "Expulsion" (驱逐)，而说 <strong>"Benevolent Policy" (仁慈政策)</strong>。</li>
+                    <li>他不说 "Death of a culture" (文化的消亡)，而说 <strong>"Happy Consummation" (圆满的结局)</strong>。</li>
+                </ul>
+                
+                <h3>2. 文学中的对应</h3>
+                <p>同样，Macbeth 在谈论谋杀 Duncan 时，很少直接说 "Kill" 或 "Murder"。他使用：</p>
+                <ul>
+                    <li>"The deed" (那件事)</li>
+                    <li>"Taking off" (清理)</li>
+                    <li>"It" (它)</li>
+                </ul>
+                <p><strong>结论：</strong> 邪恶往往通过语言的消毒来逃避良心的审判。</p>
+            </article>
+        `,
+
+            'lesson21.html': `
+            <article class="textbook-chapter">
+                <h1>虚无主义 (Nihilism)</h1>
+                <p>在 Act 5 中，Macbeth 得知妻子死讯后，发表了 "Tomorrow, and tomorrow" 独白。</p>
+                <p>他将生命比作：熄灭的蜡烛、行走的影子、拙劣的演员、无意义的故事。这标志着他从“野心勃勃”彻底转向了“虚无主义”——认为人生没有任何意义。</p>
+            </article>
+        `
+        };
+
+        // 1. 初始化：监听 URL 参数或父页面消息来决定显示什么内容
+        // 这里简化为监听 URL hash (例如 reader.html#lesson13.html)
+        function loadContent() {
+            // 如果没有 hash，默认使用 'lesson1.html'，或者显示欢迎页
+            const hash = window.location.hash.substring(1) || 'lesson1.html';
+            const html = lessonContent[hash] || "<h1>Deep Reader</h1><p>当前课程暂无深度阅读材料。请尝试 Lesson 1, 6, 13, 15, 19。</p>";
+            document.getElementById('content-area').innerHTML = html;
+
+            // 滚动到顶部
+            window.scrollTo(0, 0);
+        }
+        window.onhashchange = loadContent; // 监听 hash 变化
+        loadContent(); // 初始加载
+
+        // 2. 核心功能：高亮并保存到 OS 笔记本
+        document.addEventListener('mouseup', function (e) {
+            const selection = window.getSelection();
+            const tooltip = document.getElementById('highlighter-tooltip');
+
+            if (selection.toString().length > 0) {
+                const range = selection.getRangeAt(0);
+                const rect = range.getBoundingClientRect();
+
+                // 显示按钮在选区上方
+                tooltip.style.top = (rect.top + window.scrollY - 35) + 'px';
+                tooltip.style.left = (rect.left + (rect.width / 2) - 40) + 'px';
+                tooltip.style.display = 'block';
+            } else {
+                tooltip.style.display = 'none';
+            }
+        });
+
+        function saveHighlight() {
+            const selection = window.getSelection();
+            const text = selection.toString();
+
+            if (text) {
+                // 给选中的文本加背景色 (视觉反馈 - 临时)
+                // 简单实现：这里略过复杂的 DOM 操纵，直接发送数据
+
+                // 发送给 OS
+                window.parent.postMessage({
+                    source: 'LESSON_FRAME', // 复用通讯协议
+                    type: 'SAVE_ARTIFACT',
+                    lesson: 'Reader',
+                    data: {
+                        tag: 'READING_NOTE',
+                        content: `"${text}"`
+                    }
+                }, '*');
+
+                document.getElementById('highlighter-tooltip').style.display = 'none';
+                // 简单提示
+                const btn = document.getElementById('highlighter-tooltip');
+                // 恢复选区... 其实不需要，用户体验上只要保存了就行。
+                selection.removeAllRanges();
+                // 反馈
+                alert("已保存到笔记本");
+            }
+        }
+    </script>
+
+</body>
+
+</html>

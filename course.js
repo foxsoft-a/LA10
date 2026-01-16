@@ -40,7 +40,7 @@ const CourseEngine = {
             this.saveState();
             console.log(`Lesson ${lessonNumber} marked complete.`);
         }
-        
+
         // Show success UI if on a lesson page
         this.showLessonSuccess(lessonNumber);
     },
@@ -50,7 +50,7 @@ const CourseEngine = {
     },
 
     resetProgress() {
-        if(confirm("Are you sure you want to reset all progress?")) {
+        if (confirm("Are you sure you want to reset all progress?")) {
             this.state.completedLessons = [];
             this.saveState();
             location.reload();
@@ -60,10 +60,19 @@ const CourseEngine = {
     // Navigation
     goToNext(currentLessonNumber) {
         currentLessonNumber = parseInt(currentLessonNumber);
+
+        // Report to Adapter/OS before navigating
+        if (window.parent && window.parent.postMessage) {
+            // We rely on the adapter (scholar_adapter.js) to catch the "markComplete" event 
+            // which determines completion. 
+            // However, we still need to navigate the iframe to the next lesson or HQ.
+        }
+
         if (currentLessonNumber < this.totalLessons) {
             window.location.href = `lesson${currentLessonNumber + 1}.html`;
         } else {
             alert("Congratulations! You have completed the entire Unit.");
+            // In OS mode, we might want to stay put or go to a summary page.
             window.location.href = `index.html`;
         }
     },
@@ -101,7 +110,7 @@ const CourseEngine = {
             circle.innerHTML = `${percent}%`;
             // Optional: Visual indicator (gradient) could be added here
         }
-        
+
         // 3. (Optional) Unlock Logic - add 'locked' class to future lessons?
         // keeping it open for now as per plan visual guidance only.
     },

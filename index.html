@@ -3,408 +3,627 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Unit 10: Influence - Mission Control</title>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10: Influence - Scholar's OS</title>
     <style>
         :root {
-            --bg-color: #1a1a2e;
-            --card-bg: #16213e;
-            --accent: #e94560;
-            --text: #ffffff;
-            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --sidebar-bg: #1e1e24;
+            --main-bg: #f4f4f9;
+            --card-bg: #ffffff;
+            --accent: #4a90e2;
+            --text-dark: #333;
+            --text-light: #aaa;
+            --success: #2ecc71;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        body {
+        body,
+        html {
             margin: 0;
             padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text);
+            height: 100%;
             font-family: var(--font-main);
-            padding-bottom: 40px;
-        }
-
-        /* App Header */
-        header {
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
-            padding: 40px 20px 20px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(5px);
-        }
-
-        h1 {
-            margin: 0;
-            font-size: 1.8rem;
-            letter-spacing: 1px;
-        }
-
-        .subtitle {
-            font-size: 0.9rem;
-            opacity: 0.7;
-            margin-top: 5px;
-        }
-
-        /* Mission Map */
-        .mission-container {
-            padding: 20px;
-            display: grid;
-            gap: 20px;
-        }
-
-        .mission-card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            text-decoration: none;
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s;
-            border-left: 5px solid var(--accent);
-            position: relative;
+            background: var(--main-bg);
             overflow: hidden;
         }
 
-        .mission-card:active {
-            transform: scale(0.98);
+        /* Layout Grid */
+        #app {
+            display: grid;
+            grid-template-columns: 260px 1fr 300px;
+            /* Sidebar | Content | Notebook */
+            height: 100vh;
         }
 
-        .card-content h3 {
-            margin: 0 0 5px 0;
-            font-size: 1.1rem;
+        /* 1. Sidebar: The Syllabus & Skill Tree */
+        aside.sidebar {
+            background: var(--sidebar-bg);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid #333;
         }
 
-        .card-content p {
-            margin: 0;
-            font-size: 0.8rem;
-            opacity: 0.6;
-        }
-
-        .icon {
-            font-size: 1.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-
-        /* Visual Style Variants per Topic */
-        .style-detective {
-            border-color: #f1c40f;
-        }
-
-        /* Lesson 1 */
-        .style-lab {
-            border-color: #00f2ff;
-        }
-
-        /* Lesson 5 */
-        .style-theater {
-            border-color: #8b0000;
-        }
-
-        /* Lesson 13 */
-        .style-court {
-            border-color: #2c3e50;
-        }
-
-        /* Lesson 23 */
-
-        /* Progress Bar (Fake for visual) */
-        .progress-circle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background: var(--accent);
-            border-radius: 50%;
-            box-shadow: 0 5px 20px rgba(233, 69, 96, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .brand {
+            font-size: 1.2rem;
             font-weight: bold;
-            font-size: 0.8rem;
-            z-index: 100;
+            margin-bottom: 30px;
+            color: var(--accent);
+            letter-spacing: 1px;
         }
 
-        /* Completed State */
-        .mission-card.completed {
-            border-left-color: #2ecc71;
-            opacity: 0.8;
+        .module-group {
+            margin-bottom: 25px;
         }
 
-        .check-mark {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #2ecc71;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
+        .module-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .lesson-link {
             display: flex;
             align-items: center;
-            justify-content: center;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        .lesson-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .lesson-link.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+        }
+
+        .lesson-link.locked {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .lesson-check {
+            margin-right: 8px;
+            font-weight: bold;
+            color: var(--success);
+            display: none;
+        }
+
+        .lesson-link.completed .lesson-check {
+            display: inline;
+        }
+
+        /* Skill Badges (Micro-credentials) */
+        .skill-tracker {
+            margin-top: 40px;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+        }
+
+        .skill-bar {
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .skill-fill {
+            height: 100%;
+            background: var(--success);
+            width: 0%;
+            transition: width 1s;
+        }
+
+        .skill-item {
+            margin-bottom: 15px;
             font-size: 0.8rem;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 2. Main Stage: The Interactive Lesson */
+        main.stage {
+            position: relative;
+            background: #000;
+            /* iframe container */
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* 3. The Smart Notebook (Persistent Knowledge) */
+        aside.notebook {
+            background: var(--card-bg);
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .notebook-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            background: #fafafa;
+            font-weight: bold;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notebook-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            font-family: 'Georgia', serif;
+            /* Academic feel */
+            line-height: 1.6;
+            color: #444;
+        }
+
+        .note-entry {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .note-tag {
+            font-size: 0.7rem;
+            background: #eee;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .smart-insight {
+            background: #fff8e1;
+            border-left: 3px solid #ffc107;
+            padding: 10px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        @keyframes flash {
+            0% {
+                background-color: var(--success);
+            }
+
+            100% {
+                background-color: transparent;
+            }
+        }
+
+        /* Context Menu (Simulation) */
+        .context-bar {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: flex;
+            gap: 20px;
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            font-size: 0.9rem;
+        }
+
+        .mode-btn {
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .mode-btn:hover,
+        .mode-btn.active {
+            opacity: 1;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Contextual Bridge Alerts */
+        @keyframes flash-alert {
+            0% {
+                background-color: rgba(0, 0, 0, 0.8);
+                box-shadow: 0 0 0 red;
+            }
+
+            50% {
+                background-color: #e74c3c;
+                box-shadow: 0 0 20px #e74c3c;
+            }
+
+            100% {
+                background-color: rgba(0, 0, 0, 0.8);
+                box-shadow: 0 0 0 red;
+            }
+        }
+
+        .mode-btn.alert {
+            animation: flash-alert 1s infinite;
+            border-color: #e74c3c;
+        }
+
+        /* Split View Frame */
+        #split-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
         }
     </style>
-    <script src="course.js"></script>
 </head>
 
 <body>
 
-    <header>
-        <h1>UNIT 10</h1>
-        <div class="subtitle">INFLUENCE IN THE WORLD AROUND US</div>
-    </header>
+    <div id="app">
+        <!-- 1. Navigation & Skills -->
+        <aside class="sidebar">
+            <div class="brand">🎓 SCHOLAR OS</div>
 
-    <div class="mission-container">
-        <!-- Link to Lesson 1 -->
-        <a href="lesson1.html" class="mission-card style-detective">
-            <div class="card-content">
-                <h3>01. The Detective</h3>
-                <p>Pre-Assessment & Concepts</p>
+            <div class="module-group">
+                <div class="module-title">Part I: Deconstruction</div>
+                <div class="lesson-link active"
+                    onclick="loadLesson('lesson1.html', 'Unit 10.1: The Detective\'s Exam', 1)">
+                    <span class="lesson-check">✓</span> <span>01. The Detective's Exam</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson2.html', 'Unit 10.2: The Mind Lab', 2)">
+                    <span class="lesson-check">✓</span> <span>02. The Mind Lab</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson3.html', 'Unit 10.3: The Frequency Lab', 3)">
+                    <span class="lesson-check">✓</span> <span>03. The Frequency Lab</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson4.html', 'Unit 10.4: The Newsroom', 4)">
+                    <span class="lesson-check">✓</span> <span>04. The Newsroom</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson5.html', 'Unit 10.5: The Persuasion Lab', 5)">
+                    <span class="lesson-check">✓</span> <span>05. The Persuasion Lab</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson6.html', 'Unit 10.6: The Temple of Reason', 6)">
+                    <span class="lesson-check">✓</span> <span>06. The Temple of Reason</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson7.html', 'Unit 10.7: The Biographer\'s Suite', 7)">
+                    <span class="lesson-check">✓</span> <span>07. The Biographer's Suite</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson8.html', 'Unit 10.8: The Nexus', 8)">
+                    <span class="lesson-check">✓</span> <span>08. The Nexus</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson9.html', 'Unit 10.9: The Debate Arena', 9)">
+                    <span class="lesson-check">✓</span> <span>09. The Debate Arena</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson10.html', 'Unit 10.10: Museum of Echoes', 10)">
+                    <span class="lesson-check">✓</span> <span>10. Museum of Echoes</span>
+                </div>
             </div>
-            <div class="icon">🕵️</div>
-        </a>
 
-        <!-- Link to Lesson 2 -->
-        <a href="lesson2.html" class="mission-card style-lab">
-            <div class="card-content">
-                <h3>02. The Mind Lab</h3>
-                <p>Examples & Generalizations</p>
+            <div class="module-group">
+                <div class="module-title">Part II: Literary Analysis</div>
+                <div class="lesson-link"
+                    onclick="loadLesson('lesson11.html', 'Unit 10.11: The Architect of History', 11)">
+                    <span class="lesson-check">✓</span> <span>11. The Architect of History</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson12.html', 'Unit 10.12: The Bard\'s Workshop', 12)">
+                    <span class="lesson-check">✓</span> <span>12. The Bard's Workshop</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson13.html', 'Unit 10.13: The Heath', 13)">
+                    <span class="lesson-check">✓</span> <span>13. The Heath</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson14.html', 'Unit 10.14: The Sonnet Workshop', 14)">
+                    <span class="lesson-check">✓</span> <span>14. The Sonnet Workshop</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson15.html', 'Unit 10.15: Hall of Mirrors', 15)">
+                    <span class="lesson-check">✓</span> <span>15. Hall of Mirrors</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson16.html', 'Unit 10.16: The Black Box', 16)">
+                    <span class="lesson-check">✓</span> <span>16. The Black Box</span>
+                </div>
+                <div class="lesson-link"
+                    onclick="loadLesson('lesson17.html', 'Unit 10.17: The Director\'s Studio', 17)">
+                    <span class="lesson-check">✓</span> <span>17. The Director's Studio</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson18.html', 'Unit 10.18: The Observatory', 18)">
+                    <span class="lesson-check">✓</span> <span>18. The Observatory</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson19.html', 'Unit 10.19: The Alchemy of Evil', 19)">
+                    <span class="lesson-check">✓</span> <span>19. The Alchemy of Evil</span>
+                </div>
             </div>
-            <div class="icon">🧠</div>
-        </a>
 
-        <!-- Link to Lesson 3 -->
-        <a href="lesson3.html" class="mission-card style-lab">
-            <div class="card-content">
-                <h3>03. The Frequency Lab</h3>
-                <p>Podcast Lab & Signal Tuning</p>
+            <div class="module-group">
+                <div class="module-title">Part III: Synthesis & Creation</div>
+                <div class="lesson-link" onclick="loadLesson('lesson20.html', 'Unit 10.20: Mission Strategy', 20)">
+                    <span class="lesson-check">✓</span> <span>20. Mission Strategy</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson21.html', 'Unit 10.21: The Hall of Echoes', 21)">
+                    <span class="lesson-check">✓</span> <span>21. The Hall of Echoes</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson22.html', 'Unit 10.22: The Round Table', 22)">
+                    <span class="lesson-check">✓</span> <span>22. The Round Table</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson23.html', 'Unit 10.23: The High Court', 23)">
+                    <span class="lesson-check">✓</span> <span>23. The High Court</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson24.html', 'Unit 10.24: Mocap Studio', 24)">
+                    <span class="lesson-check">✓</span> <span>24. Mocap Studio</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson25.html', 'Unit 10.25: The Main Stage', 25)">
+                    <span class="lesson-check">✓</span> <span>25. The Main Stage</span>
+                </div>
+                <div class="lesson-link" onclick="loadLesson('lesson26.html', 'Unit 10.26: The Final Archive', 26)">
+                    <span class="lesson-check">✓</span> <span>26. The Final Archive</span>
+                </div>
             </div>
-            <div class="icon">📶</div>
-        </a>
 
-        <!-- Link to Lesson 4 -->
-        <a href="lesson4.html" class="mission-card style-lab">
-            <div class="card-content">
-                <h3>04. The Newsroom</h3>
-                <p>Producer's Desk & Influence</p>
+            <div class="skill-tracker">
+                <div class="module-title">ACADEMIC MASTERY</div>
+
+                <div class="skill-item">
+                    <div>Textual Evidence (RL.1)</div>
+                    <div class="skill-bar">
+                        <div class="skill-fill" style="width: 10%" id="skill-rl1"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div>Rhetorical Analysis (RI.6)</div>
+                    <div class="skill-bar">
+                        <div class="skill-fill" style="width: 5%" id="skill-ri6"></div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div>Synthesis & Connections (W.9)</div>
+                    <div class="skill-bar">
+                        <div class="skill-fill" style="width: 0%" id="skill-w9"></div>
+                    </div>
+                </div>
             </div>
-            <div class="icon">📰</div>
-        </a>
 
-        <!-- Link to Lesson 5 -->
-        <a href="lesson5.html" class="mission-card style-lab">
-            <div class="card-content">
-                <h3>05. Persuasion Lab</h3>
-                <p>Rhetorical Devices & HUD</p>
+            <div style="margin-top:20px; font-size:0.8rem; color:#666;">
+                DEBUG: <button onclick="localStorage.clear(); location.reload();">Reset All Progress</button>
             </div>
-            <div class="icon">🧪</div>
-        </a>
+        </aside>
 
-        <!-- Link to Lesson 6 -->
-        <a href="lesson6.html" class="mission-card style-lab">
-            <div class="card-content">
-                <h3>06. The Temple of Reason</h3>
-                <p>Confronting Anti-Intellectualism</p>
+        <!-- 2. Interactive Content -->
+        <main class="stage">
+            <!-- Floating Context Bar for Mode Switching -->
+            <div class="context-bar">
+                <div class="mode-btn active" onclick="switchMode('interactive')">🎮 INTERACTIVE MODE</div>
+                <div class="mode-btn" onclick="switchMode('reader')">📖 DEEP READER</div>
+                <div class="mode-btn" onclick="switchMode('source')">📜 SOURCE TEXT</div>
+                <div class="mode-btn" onclick="toggleSplitView()" id="btn-split">🖥️ SPLIT VIEW</div>
             </div>
-            <div class="icon">🏛️</div>
-        </a>
 
-        <!-- Link to Lesson 7 -->
-        <a href="lesson7.html" class="mission-card style-lab">
-            <div class="card-content">
-                <h3>07. The Biographer's Suite</h3>
-                <p>Lives of Influence</p>
+            <!-- The Iframe that loads our previous html files -->
+            <iframe id="main-frame" src="lesson1.html"></iframe>
+        </main>
+
+        <!-- 3. The "Brain" (Persistent Notebook) -->
+        <aside class="notebook">
+            <div class="notebook-header">
+                <span>MY FIELD NOTES</span>
+                <span style="font-size:0.8rem; color:var(--accent);">AUTO-SAVED</span>
             </div>
-            <div class="icon">👤</div>
-        </a>
+            <div class="notebook-content" id="notebook-body">
+                <!-- Simulated accumulated knowledge -->
+                <div class="note-entry">
+                    <span class="note-tag">SYSTEM</span>
+                    <p>Welcome to Scholar's OS. Your insights will be collected here.</p>
+                </div>
 
-        <!-- Link to Lesson 8 -->
-        <a href="lesson8.html" class="mission-card style-lab">
-            <div class="card-content">
-                <h3>08. The Nexus</h3>
-                <p>Invisible Influence & Data Analysis</p>
+                <div class="note-entry" id="dynamic-note">
+                    <span class="note-tag">CURRENT SESSION</span>
+                    <p class="placeholder" style="color:#999; font-style:italic;">Waiting for input from current
+                        lesson...</p>
+                </div>
             </div>
-            <div class="icon">🔗</div>
-        </a>
-
-        <!-- Link to Lesson 9 -->
-        <a href="lesson9.html" class="mission-card style-lab">
-            <div class="card-content">
-                <h3>09. The Debate Arena</h3>
-                <p>Gender Segregation & STEM</p>
-            </div>
-            <div class="icon">⚔️</div>
-        </a>
-
-        <!-- Link to Lesson 10 -->
-        <a href="lesson10.html" class="mission-card style-lab">
-            <div class="card-content">
-                <h3>10. Museum of Echoes</h3>
-                <p>Historical Influence</p>
-            </div>
-            <div class="icon">🏛️</div>
-        </a>
-
-        <!-- Link to Lesson 11 -->
-        <a href="lesson11.html" class="mission-card style-lab">
-            <div class="card-content">
-                <h3>11. The Architect of History</h3>
-                <p>Shaping the Past</p>
-            </div>
-            <div class="icon">🏗️</div>
-        </a>
-
-        <!-- Link to Lesson 12 -->
-        <a href="lesson12.html" class="mission-card style-theater">
-            <div class="card-content">
-                <h3>12. Bard's Workshop</h3>
-                <p>Shakespeare's Language</p>
-            </div>
-            <div class="icon">✒️</div>
-        </a>
-
-        <!-- Link to Lesson 13 -->
-        <a href="lesson13.html" class="mission-card style-theater">
-            <div class="card-content">
-                <h3>13. The Heath</h3>
-                <p>Macbeth Act I & Supernatural</p>
-            </div>
-            <div class="icon">🔮</div>
-        </a>
-
-        <!-- Link to Lesson 14 -->
-        <a href="lesson14.html" class="mission-card style-theater">
-            <div class="card-content">
-                <h3>14. The Sonnet Workshop</h3>
-                <p>Poetic Form and Meaning</p>
-            </div>
-            <div class="icon">📜</div>
-        </a>
-
-        <!-- Link to Lesson 15 -->
-        <a href="lesson15.html" class="mission-card style-theater">
-            <div class="card-content">
-                <h3>15. Hall of Mirrors</h3>
-                <p>Identity and Reflection</p>
-            </div>
-            <div class="icon">🪞</div>
-        </a>
-
-        <!-- Link to Lesson 16 -->
-        <a href="lesson16.html" class="mission-card style-theater">
-            <div class="card-content">
-                <h3>16. The Black Box</h3>
-                <p>Hidden Processes</p>
-            </div>
-            <div class="icon">⬛</div>
-        </a>
-
-        <!-- Link to Lesson 17 -->
-        <a href="lesson17.html" class="mission-card style-theater">
-            <div class="card-content">
-                <h3>17. The Director's Studio</h3>
-                <p>Staging Influence</p>
-            </div>
-            <div class="icon">🎬</div>
-        </a>
-
-        <!-- Link to Lesson 18 -->
-        <a href="lesson18.html" class="mission-card style-theater">
-            <div class="card-content">
-                <h3>18. The Observatory</h3>
-                <p>Watching the World</p>
-            </div>
-            <div class="icon">🔭</div>
-        </a>
-
-        <!-- Link to Lesson 19 -->
-        <a href="lesson19.html" class="mission-card style-theater">
-            <div class="card-content">
-                <h3>19. The Alchemy of Evil</h3>
-                <p>Transforming Intent</p>
-            </div>
-            <div class="icon">⚗️</div>
-        </a>
-
-        <!-- Link to Lesson 20 -->
-        <a href="lesson20.html" class="mission-card style-court">
-            <div class="card-content">
-                <h3>20. Mission Strategy</h3>
-                <p>Strategic Planning</p>
-            </div>
-            <div class="icon">🎯</div>
-        </a>
-
-        <!-- Link to Lesson 21 -->
-        <a href="lesson21.html" class="mission-card style-court">
-            <div class="card-content">
-                <h3>21. The Hall of Echoes</h3>
-                <p>Resonance and Repetition</p>
-            </div>
-            <div class="icon">🗣️</div>
-        </a>
-
-        <!-- Link to Lesson 22 -->
-        <a href="lesson22.html" class="mission-card style-court">
-            <div class="card-content">
-                <h3>22. The Round Table</h3>
-                <p>Collaboration and Debate</p>
-            </div>
-            <div class="icon">⭕</div>
-        </a>
-
-        <!-- Link to Lesson 23 -->
-        <a href="lesson23.html" class="mission-card style-court">
-            <div class="card-content">
-                <h3>23. High Court</h3>
-                <p>Formal Assessment Essay</p>
-            </div>
-            <div class="icon">⚖️</div>
-        </a>
-
-        <!-- Link to Lesson 24 -->
-        <a href="lesson24.html" class="mission-card style-court">
-            <div class="card-content">
-                <h3>24. Mocap Studio</h3>
-                <p>Action and Influence</p>
-            </div>
-            <div class="icon">🕴️</div>
-        </a>
-
-        <!-- Link to Lesson 25 -->
-        <a href="lesson25.html" class="mission-card style-court">
-            <div class="card-content">
-                <h3>25. The Main Stage</h3>
-                <p>Final Performance</p>
-            </div>
-            <div class="icon">🎭</div>
-        </a>
-
-        <!-- Link to Lesson 26 -->
-        <a href="lesson26.html" class="mission-card style-court">
-            <div class="card-content">
-                <h3>26. Final Archive</h3>
-                <p>Post-Assessment</p>
-            </div>
-            <div class="icon">🗄️</div>
-        </a>
-
+        </aside>
     </div>
 
-    <div class="progress-circle">GO</div>
+    <script>
+        // Initialize State
+        const state = {
+            completedLessons: JSON.parse(localStorage.getItem('scholar_completed') || '[]'),
+            artifacts: JSON.parse(localStorage.getItem('scholar_artifacts') || '[]'),
+            mastery: { rl1: 10, ri6: 5, w9: 0 }
+        };
+
+        // Render Initial State
+        state.completedLessons.forEach(markVisualComplete);
+        state.artifacts.forEach(renderArtifact);
+
+        let currentLessonID = 'lesson1.html'; // Default
+
+        function loadLesson(url, title, id) {
+            currentLessonID = url;
+
+            // Update Active Link
+            document.querySelectorAll('.lesson-link').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Reset to Interactive Mode first
+            switchMode('interactive');
+
+            // Update Notebook Context
+            const dynamicNote = document.getElementById('dynamic-note');
+            dynamicNote.innerHTML = `
+            <span class="note-tag">NOW LEARNING: ${title}</span>
+            <p>Ready to capture key insights...</p>
+        `;
+        }
+
+        function switchMode(mode) {
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            // Find the button clicked - slightly brittle if called manually but works for UI clicks
+            // We will match by text content or onclick attribute to be safe or just use querySelector
+            const buttons = document.querySelectorAll('.mode-btn');
+            if (mode === 'interactive') buttons[0].classList.add('active');
+            if (mode === 'reader') buttons[1].classList.add('active');
+            if (mode === 'source') buttons[2].classList.add('active');
+
+            const frame = document.getElementById('main-frame');
+            frame.style.opacity = 0;
+
+            setTimeout(() => {
+                if (mode === 'interactive') {
+                    frame.src = currentLessonID;
+                } else if (mode === 'reader') {
+                    frame.src = `reader.html#${currentLessonID}`;
+                } else if (mode === 'source') {
+                    frame.src = 'source.html';
+                }
+                frame.style.opacity = 1;
+            }, 100);
+        }
+
+        function markVisualComplete(id) {
+            // Find link with onclick containing the id
+            // This is a bit loose but works for this demo
+            // Better would be data-id attributes
+            const links = document.querySelectorAll('.lesson-link');
+            links.forEach(link => {
+                if (link.getAttribute('onclick').includes(`, ${id})`)) {
+                    link.classList.add('completed');
+                }
+            });
+        }
+
+        function saveArtifact(data) {
+            state.artifacts.push(data);
+            localStorage.setItem('scholar_artifacts', JSON.stringify(state.artifacts));
+            renderArtifact(data);
+        }
+
+        function renderArtifact(data, prepend = true) {
+            const noteBody = document.getElementById('notebook-body');
+            const newCard = document.createElement('div');
+            newCard.classList.add('note-entry');
+            newCard.innerHTML = `
+            <span class="note-tag">FROM: ${data.lesson || 'Unknown'}</span>
+            <span class="note-tag" style="background:#e3f2fd; color:#1565c0;">${data.tag || 'NOTE'}</span>
+            <div style="margin-top:5px; padding:10px; background:#fff; border:1px solid #ddd;">
+                ${data.content}
+            </div>
+        `;
+            // Insert after the first dynamic note? Or just append?
+            // Let's insert after the static ones, but before the end?
+            // Actually prepend is better for "Newest first" excluding the Dynamic Note container
+            // But for this simple implementation, let's just prepend to body
+            if (prepend) {
+                newCard.style.animation = "flash 1s";
+                noteBody.insertBefore(newCard, noteBody.children[2]); // Insert after welcome and dynamic notes? No, dynamic is static place.
+                // Simplified: insert after dynamic note
+                const dynamic = document.getElementById('dynamic-note');
+                noteBody.insertBefore(newCard, dynamic.nextSibling);
+            }
+        }
+
+        // Message Listener from Adapter
+        window.addEventListener('message', function (event) {
+            if (!event.data || event.data.source !== 'LESSON_FRAME') return;
+
+            const { type, data, lesson } = event.data;
+
+            if (type === 'PROGRESS_UPDATE') {
+                console.log(`Lesson ${lesson} Progress: ${data.percent}%`);
+                // Could animate the skill bar slightly
+            }
+
+            if (type === 'LESSON_COMPLETE') {
+                const id = data.lessonNumber;
+                if (!state.completedLessons.includes(id)) {
+                    state.completedLessons.push(id);
+                    localStorage.setItem('scholar_completed', JSON.stringify(state.completedLessons));
+                    markVisualComplete(id);
+
+                    // Boost Skills
+                    const el = document.getElementById('skill-rl1');
+                    const w = parseInt(el.style.width);
+                    el.style.width = (w + 10) + '%';
+                }
+            }
+
+            if (type === 'SAVE_ARTIFACT') {
+                saveArtifact({ ...data, lesson: lesson });
+            }
+
+            // Contextual Bridges
+            if (type === 'SWITCH_TO_SOURCE') {
+                switchMode('source');
+                const frame = document.getElementById('main-frame');
+                setTimeout(() => {
+                    frame.contentWindow.postMessage({
+                        type: 'SCROLL_TO_TEXT',
+                        targetId: data.targetId
+                    }, '*');
+                }, 800);
+            }
+
+            if (type === 'REQUEST_SPLIT_VIEW') {
+                if (!document.getElementById('split-frame')) {
+                    toggleSplitView();
+                }
+                // Optionally load specific text if passed
+                if (data && data.defaultText) {
+                    setTimeout(() => {
+                        const splitFrame = document.getElementById('split-frame');
+                        if (splitFrame) {
+                            // Wait for load? Simpler to just retry or wait long
+                            // Better: source.html listens for a message
+                            splitFrame.contentWindow.postMessage({
+                                type: 'SCROLL_TO_TEXT',
+                                targetId: data.defaultText
+                            }, '*');
+                        }
+                    }, 1500);
+                }
+            }
+
+            if (type === 'request_attention') { // lowercase to match potential python script/convention or just defensive
+                const btn = document.querySelectorAll('.mode-btn')[2]; // Source btn
+                if (btn) btn.classList.add('alert');
+            }
+        });
+
+        function toggleSplitView() {
+            const app = document.getElementById('app');
+            const stage = document.querySelector('main.stage');
+            const btn = document.getElementById('btn-split');
+
+            if (!document.getElementById('split-frame')) {
+                const splitFrame = document.createElement('iframe');
+                splitFrame.id = 'split-frame';
+                splitFrame.src = 'source.html';
+                splitFrame.style.borderLeft = '2px solid #333';
+
+                app.style.gridTemplateColumns = '260px 1fr 1fr 300px';
+                stage.after(splitFrame);
+                btn.classList.add('active');
+            } else {
+                document.getElementById('split-frame').remove();
+                app.style.gridTemplateColumns = '260px 1fr 300px';
+                btn.classList.remove('active');
+            }
+        }
+    </script>
 
 </body>
 
