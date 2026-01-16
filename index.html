@@ -554,10 +554,35 @@
                     localStorage.setItem('scholar_completed', JSON.stringify(state.completedLessons));
                     markVisualComplete(id);
 
-                    // Boost Skills
-                    const el = document.getElementById('skill-rl1');
-                    const w = parseInt(el.style.width);
-                    el.style.width = (w + 10) + '%';
+                    // Boost Skills Dynamically
+                    const skillMap = {
+                        '1': ['rl1'],
+                        '2': ['rl1'],
+                        '3': ['rl1'],
+                        '6': ['ri6'],
+                        '12': ['rl1', 'ri6'],
+                        '15': ['rl1'],
+                        '16': ['w9'],
+                        '19': ['ri6', 'w9'],
+                        '23': ['w9', 'rl1'],
+                        '24': ['ri6'] // Presentation skills mapped to Rhetoric
+                    };
+
+                    const targetSkills = skillMap[id] || ['rl1']; // Default to RL.1 if unknown
+
+                    targetSkills.forEach(sid => {
+                        const el = document.getElementById('skill-' + sid);
+                        if (el) {
+                            let w = parseInt(el.style.width) || 0;
+                            // Animate growth
+                            w = Math.min(100, w + 20);
+                            el.style.width = w + '%';
+
+                            // Visual flair
+                            el.style.backgroundColor = '#fff';
+                            setTimeout(() => el.style.backgroundColor = 'var(--accent-cyan)', 300);
+                        }
+                    });
                 }
             }
 
