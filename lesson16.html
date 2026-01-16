@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10 Lesson 16: The Black Box</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --box-color: #000000;
+            --paper-color: #f0f0f0;
+            --text-color: #dcdcdc;
+            --accent-red: #8b0000;
+            --highlight: #ffd700;
+            --font-serif: 'Georgia', serif;
+            --font-mono: 'Courier New', monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-serif);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+        }
+
+        #main-container {
+            width: 90%;
+            max-width: 900px;
+            min-height: 85vh;
+            border: 1px solid #333;
+            padding: 40px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background-color: rgba(20, 20, 20, 0.95);
+            box-shadow: 0 0 60px rgba(0,0,0,0.8);
+        }
+
+        /* The Box Visual */
+        .black-box-icon {
+            width: 60px;
+            height: 60px;
+            background: #000;
+            border: 2px solid #333;
+            margin: 0 auto 20px;
+            box-shadow: 5px 5px 0 #333;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--text-color);
+        }
+
+        /* Slides */
+        .slide {
+            display: none;
+            flex: 1;
+            animation: fadeUp 0.8s ease-out;
+        }
+        .slide.active { display: block; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Slide 1: Quote Puzzle */
+        .puzzle-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 40px 0;
+            min-height: 100px;
+            padding: 20px;
+            border: 1px dashed #444;
+        }
+
+        .word-tile {
+            background: var(--paper-color);
+            color: #000;
+            padding: 10px 20px;
+            cursor: grab;
+            font-weight: bold;
+            font-family: var(--font-mono);
+            user-select: none;
+        }
+
+        .word-tile.placed {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        /* Slide 2: The Lottery Simulation */
+        .lottery-stage {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .paper-slip {
+            width: 100px;
+            height: 60px;
+            background: #fff;
+            display: inline-block;
+            margin: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+            color: #000;
+            font-family: var(--font-mono);
+            line-height: 60px;
+            font-weight: bold;
+            border: 1px solid #ccc;
+        }
+
+        .paper-slip:hover { transform: translateY(-5px); }
+        
+        .paper-slip.revealed {
+            transform: rotateX(180deg); /* Simple flip effect simulation */
+            background: #eee;
+        }
+
+        .black-spot {
+            width: 20px;
+            height: 20px;
+            background: #000;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        .revealed .black-spot { display: block; }
+
+        /* Slide 3: Macbeth Analysis */
+        .quote-block {
+            background: #000;
+            border-left: 4px solid var(--accent-red);
+            padding: 20px;
+            font-style: italic;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #aaa;
+        }
+
+        .analysis-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .option-card {
+            background: #222;
+            padding: 20px;
+            border: 1px solid #444;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .option-card:hover { background: #333; }
+        .option-card.selected { border-color: var(--accent-red); background: #1a0505; }
+
+        /* Slide 4: Venn Diagram (Text) */
+        .venn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .venn-circle {
+            flex: 1;
+            padding: 20px;
+            border: 2px solid #444;
+            border-radius: 10px;
+            margin: 0 10px;
+            min-height: 200px;
+        }
+
+        .venn-item {
+            background: #333;
+            margin: 5px 0;
+            padding: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn {
+            background: transparent;
+            border: 1px solid var(--text-color);
+            color: var(--text-color);
+            padding: 10px 30px;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 30px;
+            text-transform: uppercase;
+        }
+
+        .btn:hover { background: var(--text-color); color: var(--bg-color); }
+
+        /* Oracle Whisper */
+        #oracle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background: #000;
+            border: 1px solid var(--accent-red);
+            padding: 15px;
+            display: none;
+            z-index: 100;
+            font-size: 0.9rem;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.3);
+        }
+        
+        #oracle strong { color: var(--accent-red); display: block; margin-bottom: 5px; }
+
+    </style>
+    <script src="course.js"></script>
+</head>
+<body>
+    <a href="index.html" style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+<div id="main-container">
+    <div class="black-box-icon"></div>
+    <header>
+        <h1>THE BLACK BOX</h1>
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #666;">UNIT 10.16: AMBITION & TRADITION</div>
+    </header>
+
+    <!-- Slide 1: Hook (Puzzle) -->
+    <div class="slide active" id="slide-1">
+        <h2>01. 定义野心 (Defining Ambition)</h2>
+        <p>拿破仑·波拿巴（Napoleon Bonaparte）曾这样描述野心。请点击词语，将其按正确顺序排列，还原这句名言。</p>
+        
+        <div class="puzzle-area" id="drop-zone">
+            <!-- Words will be dropped here -->
+        </div>
+
+        <div id="word-bank" style="text-align:center;">
+            <span class="word-tile" onclick="moveWord(this)">Ambition</span>
+            <span class="word-tile" onclick="moveWord(this)">is</span>
+            <span class="word-tile" onclick="moveWord(this)">but</span>
+            <span class="word-tile" onclick="moveWord(this)">avarice</span>
+            <span class="word-tile" onclick="moveWord(this)">on</span>
+            <span class="word-tile" onclick="moveWord(this)">stilts</span>
+        </div>
+
+        <button class="btn" id="btn-slide-1" style="display:none;" onclick="nextSlide(2)">进入村庄 >></button>
+    </div>
+
+    <!-- Slide 2: The Lottery (Simulation) -->
+    <div class="slide" id="slide-2">
+        <h2>02. 盲目的仪式 (The Ritual)</h2>
+        <p>欢迎来到 Shirley Jackson 笔下的村庄。今天是“摸彩日”。</p>
+        <p>这个仪式维持了社会的“稳定”。你也是村民之一。<b>请抽取一张纸条。</b></p>
+        
+        <div class="lottery-stage" id="lottery-box">
+            <div class="paper-slip" onclick="drawLottery(this)">DRAW</div>
+            <div class="paper-slip" onclick="drawLottery(this)">DRAW</div>
+            <div class="paper-slip" onclick="drawLottery(this)">DRAW</div>
+            <div class="paper-slip" onclick="drawLottery(this)">DRAW</div>
+            <div class="paper-slip" onclick="drawLottery(this)">DRAW</div>
+        </div>
+
+        <div id="lottery-result" style="margin-top:20px; font-style:italic; min-height:40px;"></div>
+        
+        <button class="btn" id="btn-slide-2" style="display:none;" onclick="nextSlide(3)">前往苏格兰王宫 >></button>
+    </div>
+
+    <!-- Slide 3: Macbeth Analysis (Soliloquy) -->
+    <div class="slide" id="slide-3">
+        <h2>03. 不安全的王冠 (The Uneasy Crown)</h2>
+        <p>在 Act III Scene 1，麦克白已经成为了国王。但他并不快乐。</p>
+        <div class="quote-block">
+            "To be thus is nothing,<br>
+            But to be safely thus."
+        </div>
+        <p><b>任务：</b> 这句话揭示了野心的悖论。请选择对这句话最准确的解读：</p>
+
+        <div class="analysis-options">
+            <div class="option-card" onclick="checkAnalysis(1)">
+                <b>A. 贪婪 (Greed)</b><br>
+                他觉得现在的王位还不够大，他想要征服更多的土地。
+            </div>
+            <div class="option-card" onclick="checkAnalysis(2)">
+                <b>B. 不安全感 (Insecurity)</b><br>
+                只要王位受到威胁（如 Banquo 的存在），当下的王位就毫无意义。
+            </div>
+            <div class="option-card" onclick="checkAnalysis(3)">
+                <b>C. 后悔 (Regret)</b><br>
+                他意识到杀害邓肯是错误的，想放弃王位。
+            </div>
+            <div class="option-card" onclick="checkAnalysis(4)">
+                <b>D. 骄傲 (Pride)</b><br>
+                他认为没有任何人配得上挑战他的权威。
+            </div>
+        </div>
+
+        <button class="btn" id="btn-slide-3" style="display:none;" onclick="nextSlide(4)">开始比较 >></button>
+    </div>
+
+    <!-- Slide 4: Synthesis -->
+    <div class="slide" id="slide-4">
+        <h2>04. 影响力的阴暗面 (Synthesis)</h2>
+        <p>比较《麦克白》与《摸彩》。它们都展示了影响力如何导致悲剧。</p>
+        <p><b>任务：</b> 点击下列概念，将其归类为 <b>Mob Mentality (群体盲从)</b> 或 <b>Individual Ambition (个人野心)</b>。</p>
+
+        <div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px;">
+            <span class="word-tile" onclick="classify(this)">Tessie Hutchinson (Scapegoat)</span>
+            <span class="word-tile" onclick="classify(this)">Killing Banquo</span>
+            <span class="word-tile" onclick="classify(this)">"It's not fair!"</span>
+            <span class="word-tile" onclick="classify(this)">Prophecy</span>
+        </div>
+
+        <div class="venn-container">
+            <div class="venn-circle" id="venn-mob">
+                <h3 style="text-align:center; color:#888;">The Lottery<br>(群体/传统)</h3>
+            </div>
+            <div class="venn-circle" id="venn-ind">
+                <h3 style="text-align:center; color:var(--accent-red);">Macbeth<br>(个人/欲望)</h3>
+            </div>
+        </div>
+
+        <button class="btn" onclick="finishLesson()">课程完成</button>
+    </div>
+
+    <!-- Slide 5: End -->
+    <div class="slide" id="slide-5">
+        <div style="text-align: center; margin-top: 100px;">
+            <div style="font-size: 4rem; color: var(--text-color);">💀</div>
+            <h1>THE BOX IS CLOSED</h1>
+            <p>你已经探索了野心的本质：它像踩高跷的贪婪，既高高在上，又岌岌可危。</p>
+            <p>同时也看到了盲目传统如何制造无辜的受害者。</p>
+            <p><b>Homework:</b> 完成 Act III 的 Double-Entry Log。</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Oracle Whisper -->
+<div id="oracle">
+    <strong>👁️ The Oracle:</strong>
+    <p id="oracle-text">...</p>
+</div>
+
+<script>
+    // State
+    let currentSlide = 1;
+    let puzzleOrder = [];
+    const correctPuzzle = ["Ambition", "is", "but", "avarice", "on", "stilts"];
+
+    // Helper: Whisper
+    function whisper(msg) {
+        const box = document.getElementById('oracle');
+        document.getElementById('oracle-text').innerText = msg;
+        box.style.display = 'block';
+        setTimeout(() => box.style.display = 'none', 6000);
+    }
+
+    function nextSlide(n) {
+        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+        document.getElementById(`slide-${n}`).classList.add('active');
+    }
+
+    // Slide 1: Puzzle
+    function moveWord(el) {
+        const zone = document.getElementById('drop-zone');
+        const bank = document.getElementById('word-bank');
+        
+        if(el.parentElement === bank) {
+            zone.appendChild(el);
+            puzzleOrder.push(el.innerText);
+        } else {
+            bank.appendChild(el);
+            puzzleOrder = puzzleOrder.filter(w => w !== el.innerText);
+        }
+
+        checkPuzzle();
+    }
+
+    function checkPuzzle() {
+        const currentString = puzzleOrder.join(" ");
+        const correctString = correctPuzzle.join(" ");
+        
+        if(currentString === correctString) {
+            document.getElementById('btn-slide-1').style.display = 'inline-block';
+            whisper("正确。拿破仑认为‘野心’只是披着伪装、踩着高跷的‘贪婪’。它让人看起来高大，但也容易摔倒。");
+        }
+    }
+
+    // Slide 2: Lottery
+    let lotteryClicked = false;
+    function drawLottery(el) {
+        if(lotteryClicked) return;
+        
+        // Randomly decide if this is the black spot (1 in 5 chance, but let's force one for drama if it's the last one)
+        // For visual effect, let's just make the clicked one safe or not based on simple math
+        const isVictim = Math.random() < 0.3; // 30% chance to die for dramatic effect in demo
+        
+        el.classList.add('revealed');
+        lotteryClicked = true;
+
+        const resultText = document.getElementById('lottery-result');
+
+        if(isVictim) {
+            el.innerHTML = "<div class='black-spot'></div>";
+            el.style.background = "#fff";
+            resultText.innerHTML = "<span style='color:var(--accent-red)'>你抽到了黑点。</span> 村民们正在捡起石头。这就是作为替罪羊（Scapegoat）的感觉：孤独与恐惧。";
+        } else {
+            el.innerHTML = "";
+            resultText.innerHTML = "是一张白纸。你松了一口气。但你转身拿起了石头准备砸向别人。这就是旁观者的共谋。";
+        }
+
+        document.getElementById('btn-slide-2').style.display = 'inline-block';
+    }
+
+    // Slide 3: Macbeth Analysis
+    function checkAnalysis(n) {
+        document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+        // logic handled in click visually
+        
+        if(n === 2) {
+            whisper("正确。'Safely' 是关键词。如果没有安全感，王位（Thus）就什么都不是。这就是野心带来的焦虑。");
+            document.getElementById('btn-slide-3').style.display = 'inline-block';
+        } else {
+            whisper("再读一遍。重点在于 'Safely'（安全）。他现在虽然是国王，但他感觉到了什么？");
+        }
+    }
+
+    // Slide 4: Classification
+    function classify(el) {
+        const text = el.innerText;
+        const mobBox = document.getElementById('venn-mob');
+        const indBox = document.getElementById('venn-ind');
+
+        if(text.includes("Tessie") || text.includes("fair")) {
+            mobBox.appendChild(el);
+            whisper("Tessie 是群体暴力的受害者。'It's not fair' 是她在绝望中的呼喊。");
+        } else {
+            indBox.appendChild(el);
+            whisper("这是麦克白的个人选择。虽然有预言，但扣动扳机（谋杀 Banquo）的是他的个人野心。");
+        }
+    }
+
+    function finishLesson() {
+        nextSlide(5); CourseEngine.markComplete(16);
+    }
+
+</script>
+
+</body>
+</html>

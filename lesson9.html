@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10 Lesson 9: The Debate Arena</title>
+    <style>
+        :root {
+            --bg-color: #ecf0f1;
+            --aff-blue: #2980b9;
+            --neg-red: #c0392b;
+            --neutral-grey: #7f8c8d;
+            --card-bg: #ffffff;
+            --font-main: 'Helvetica Neue', Arial, sans-serif;
+            --font-display: 'Impact', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+
+        /* Arena Container */
+        #arena {
+            width: 95%;
+            max-width: 1000px;
+            background: white;
+            height: 90vh;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Scoreboard Header */
+        .scoreboard {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 5px solid #f1c40f;
+        }
+
+        .vs-logo {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            background: #f1c40f;
+            color: #2c3e50;
+            padding: 5px 15px;
+            border-radius: 5px;
+            transform: skew(-10deg);
+        }
+
+        .topic-banner {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        /* Slides */
+        .slide {
+            display: none;
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 { border-left: 5px solid var(--aff-blue); padding-left: 15px; margin-top: 0; }
+
+        /* Slide 1: Hook */
+        .quote-card {
+            background: #f8f9fa;
+            border-left: 5px solid var(--neg-red);
+            padding: 30px;
+            font-size: 1.5rem;
+            font-style: italic;
+            margin: 40px 0;
+            position: relative;
+        }
+        
+        .quote-card::before {
+            content: '“';
+            position: absolute;
+            top: -20px;
+            left: 10px;
+            font-size: 5rem;
+            color: rgba(0,0,0,0.1);
+        }
+
+        /* Slide 2: Evidence Sorting */
+        .sort-container {
+            display: flex;
+            gap: 20px;
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        .deck {
+            flex: 1;
+            background: #dfe6e9;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            border: 2px dashed #bdc3c7;
+        }
+
+        .drop-zone {
+            flex: 1;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #zone-aff { border-color: var(--aff-blue); background: rgba(41, 128, 185, 0.1); }
+        #zone-neg { border-color: var(--neg-red); background: rgba(192, 57, 43, 0.1); }
+
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: grab;
+            font-size: 0.9rem;
+            width: 90%;
+            user-select: none;
+        }
+        
+        .card:active { cursor: grabbing; }
+
+        /* Slide 3: Flowchart */
+        .flow-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 50px;
+            position: relative;
+        }
+
+        .flow-step {
+            background: white;
+            border: 2px solid #2c3e50;
+            padding: 20px;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-weight: bold;
+            z-index: 2;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .flow-step:hover { background: #f1c40f; transform: scale(1.1); }
+        .flow-step.active { background: #2c3e50; color: white; }
+
+        .flow-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: #bdc3c7;
+            z-index: 1;
+        }
+
+        .step-desc {
+            margin-top: 30px;
+            padding: 20px;
+            background: #eee;
+            border-radius: 5px;
+            display: none;
+        }
+
+        /* Slide 4: Rebuttal Simulator */
+        .podium {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        .opponent-screen {
+            background: #34495e;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .opponent-screen::after {
+            content: 'OPPONENT (NEGATIVE)';
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: var(--neg-red);
+            padding: 2px 10px;
+            font-size: 0.8rem;
+            border-radius: 3px;
+        }
+
+        .player-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .rebuttal-btn {
+            background: white;
+            border: 2px solid var(--aff-blue);
+            padding: 15px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+
+        .rebuttal-btn:hover { background: var(--aff-blue); color: white; }
+
+        /* General UI */
+        .btn {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        
+        .btn:hover { background-color: #34495e; }
+
+        /* Coach */
+        #coach-overlay {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-left: 5px solid #f1c40f;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            width: 300px;
+            display: none;
+            z-index: 100;
+        }
+
+    </style>
+    <script src="course.js"></script>
+</head>
+<body>
+    <a href="index.html" style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+<div id="arena">
+    <div class="scoreboard">
+        <div>UNIT 10.9</div>
+        <div class="vs-logo">VS</div>
+        <div class="topic-banner">TOPIC: Gender Segregation in STEM</div>
+    </div>
+
+    <!-- Slide 1: Hook -->
+    <div class="slide active" id="slide-1">
+        <h2>Phase 1: Position Statement</h2>
+        <p>在开始辩论之前，我们需要理解“个性”与“影响力”的关系。Beatrix Potter 曾说过：</p>
+        <div class="quote-card">
+            "I hold that a strongly marked personality can influence descendants for generations."
+        </div>
+        <p><b>思考：</b> 在辩论中，逻辑（Logos）固然重要，但辩手的人格魅力（Ethos）往往决定了谁能赢得观众。</p>
+        <p>今天的议题是：<b>“中学数学和科学课应该按性别分班吗？”</b></p>
+        <button class="btn" onclick="nextSlide(2)">进入资料室 (Research)</button>
+    </div>
+
+    <!-- Slide 2: Evidence Sorting -->
+    <div class="slide" id="slide-2">
+        <h2>Phase 2: Evidence Sorting (证据分类)</h2>
+        <p>作为战略家，你需要整理混乱的证据卡。将它们拖入正确的阵营。</p>
+        <p><b>Tips:</b> Affirmative = 支持分班; Negative = 反对分班。</p>
+
+        <div class="sort-container">
+            <div class="drop-zone" id="zone-aff" ondrop="drop(event, 'aff')" ondragover="allowDrop(event)">
+                <h3 style="color:var(--aff-blue); text-align:center;">AFFIRMATIVE (正方)</h3>
+            </div>
+            
+            <div class="deck" id="card-deck">
+                <div class="card" draggable="true" ondragstart="drag(event)" id="c1" data-side="aff">研究表明，没有男生在场时，女生的参与度更高。</div>
+                <div class="card" draggable="true" ondragstart="drag(event)" id="c2" data-side="neg">现实世界是不分性别的，学校应该模拟真实社会。</div>
+                <div class="card" draggable="true" ondragstart="drag(event)" id="c3" data-side="aff">男孩和女孩的大脑发育速度不同，分班教学更有效。</div>
+                <div class="card" draggable="true" ondragstart="drag(event)" id="c4" data-side="neg">隔离会加深性别刻板印象（Stereotypes）。</div>
+            </div>
+
+            <div class="drop-zone" id="zone-neg" ondrop="drop(event, 'neg')" ondragover="allowDrop(event)">
+                <h3 style="color:var(--neg-red); text-align:center;">NEGATIVE (反方)</h3>
+            </div>
+        </div>
+        
+        <button class="btn" id="btn-slide-2" style="display:none" onclick="nextSlide(3)">证据整理完毕 >></button>
+    </div>
+
+    <!-- Slide 3: Debate Structure -->
+    <div class="slide" id="slide-3">
+        <h2>Phase 3: The Flow (辩论流程)</h2>
+        <p>辩论不是吵架，它有严谨的结构。点击下方的节点，学习每个环节的任务。</p>
+        
+        <div class="flow-container">
+            <div class="flow-line"></div>
+            <div class="flow-step" onclick="showStep(1)">1. Opening<br>(立论)</div>
+            <div class="flow-step" onclick="showStep(2)">2. Rebuttal<br>(反驳)</div>
+            <div class="flow-step" onclick="showStep(3)">3. Closing<br>(总结)</div>
+        </div>
+
+        <div id="desc-1" class="step-desc">
+            <b>Opening Statement (3 mins):</b> 陈述核心观点。不要攻击对手，只专注于构建自己的逻辑大厦（A, B, and C）。
+        </div>
+        <div id="desc-2" class="step-desc">
+            <b>Rebuttal (3 mins):</b> 最精彩的部分！倾听对手的漏洞，用证据进行反击。不要人身攻击。
+        </div>
+        <div id="desc-3" class="step-desc">
+            <b>Closing Summary (2 mins):</b> 不要引入新观点。告诉裁判为什么你赢了。总结核心冲突点（Clash Points）。
+        </div>
+
+        <button class="btn" id="btn-slide-3" style="display:none" onclick="nextSlide(4)">进入模拟实战 >></button>
+    </div>
+
+    <!-- Slide 4: Simulation -->
+    <div class="slide" id="slide-4">
+        <h2>Phase 4: Counter-Strike (反驳模拟)</h2>
+        <p>你现在代表<b>正方 (Affirmative)</b>。反方刚刚结束发言。请选择最有效的反驳策略。</p>
+        
+        <div class="podium">
+            <div class="opponent-screen">
+                <h3>反方论点：</h3>
+                <p>“将男女分开是倒退。如果我们在学校里把他们分开，他们毕业后进入职场时，将无法学会如何与异性同事合作。这会损害他们的社交能力。”</p>
+            </div>
+            
+            <div class="player-controls">
+                <h3>选择你的反驳 (Rebuttal):</h3>
+                <div class="rebuttal-btn" onclick="checkRebuttal(1)">
+                    A. “你说的不对。你根本不懂教育心理学，分班显然更好。”
+                </div>
+                <div class="rebuttal-btn" onclick="checkRebuttal(2)">
+                    B. “我方承认社交很重要，但数学课的目标是学习数学，而不是社交。我们可以通过课外活动来培养社交能力，而不牺牲学术效率。”
+                </div>
+                <div class="rebuttal-btn" onclick="checkRebuttal(3)">
+                    C. “是的，社交能力确实很重要。但是分班也有好处。”
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Reflection -->
+    <div class="slide" id="slide-5">
+        <div style="text-align: center; margin-top: 50px;">
+            <div style="font-size: 4rem; color: #f1c40f;">🏆</div>
+            <h1>DEBATE CONCLUDED</h1>
+            <p>你已经完成了这一轮的思维训练。</p>
+            <p>记住：辩论的目的不是“打败”对手，而是通过对抗让真理（Truth）越辩越明。</p>
+            <p><b>Homework:</b> 课后请针对这个话题写一篇 reflection，分析你自己的立场是否在研究后发生了改变。</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Coach Whisper -->
+<div id="coach-overlay">
+    <strong>👨‍⚖️ Coach's Whisper:</strong>
+    <p id="coach-text">Waiting...</p>
+</div>
+
+<script>
+    // State
+    let currentSlide = 1;
+    let sortedCount = 0;
+
+    // Helper
+    function whisper(msg) {
+        const overlay = document.getElementById('coach-overlay');
+        document.getElementById('coach-text').innerText = msg;
+        overlay.style.display = 'block';
+        setTimeout(() => overlay.style.display = 'none', 6000);
+    }
+
+    function nextSlide(n) {
+        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+        document.getElementById(`slide-${n}`).classList.add('active');
+    }
+
+    // Slide 2: Drag & Drop
+    function allowDrop(ev) { ev.preventDefault(); }
+    
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+        ev.dataTransfer.setData("side", ev.target.dataset.side);
+    }
+    
+    function drop(ev, targetSide) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        var cardSide = ev.dataTransfer.getData("side");
+        
+        if (cardSide === targetSide) {
+            ev.target.appendChild(document.getElementById(data));
+            whisper("分类正确。这是一个强有力的论据。");
+            sortedCount++;
+            if(sortedCount === 4) {
+                document.getElementById('btn-slide-2').style.display = 'inline-block';
+                whisper("资料库整理完毕。准备好构建你的逻辑流了吗？");
+            }
+        } else {
+            whisper("这个论据似乎属于另一方。再读一遍：它是在支持分班还是反对？");
+        }
+    }
+
+    // Slide 3: Flowchart
+    function showStep(n) {
+        document.querySelectorAll('.step-desc').forEach(d => d.style.display = 'none');
+        document.querySelectorAll('.flow-step').forEach(s => s.classList.remove('active'));
+        
+        document.getElementById(`desc-${n}`).style.display = 'block';
+        // Highlight active step visual (pseudo logic)
+        // In real DOM interaction
+        document.getElementById('btn-slide-3').style.display = 'inline-block';
+    }
+
+    // Slide 4: Simulation
+    function checkRebuttal(choice) {
+        if(choice === 1) {
+            whisper("这是‘人身攻击 (Ad Hominem)’谬误。攻击对手的能力而不是观点，这是无效的反驳。");
+        } else if (choice === 3) {
+            whisper("这种反驳太软弱了。你承认了对方的观点，却没有给出足够强力的反击（Counter-point）。");
+        } else if (choice === 2) {
+            whisper("精彩的反驳！你使用了‘区分 (Distinction)’策略——区分了‘学术目标’和‘社交目标’，并提出了替代方案（课外活动）。这是逻辑的胜利。");
+            setTimeout(() => nextSlide(5); CourseEngine.markComplete(9), 4000);
+        }
+    }
+
+</script>
+
+</body>
+</html>

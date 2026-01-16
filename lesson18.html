@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10 Lesson 18: The Observatory</title>
+    <style>
+        :root {
+            --bg-color: #001510;
+            --terminal-green: #00ff41;
+            --terminal-dim: #008f11;
+            --alert-red: #ff3333;
+            --scan-line: rgba(0, 255, 65, 0.1);
+            --font-mono: 'Courier New', Courier, monospace;
+            --font-ui: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--terminal-green);
+            font-family: var(--font-mono);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* CRT Effect Background */
+        .crt-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Main Interface */
+        #ops-terminal {
+            width: 90%;
+            max-width: 1000px;
+            min-height: 85vh;
+            border: 2px solid var(--terminal-green);
+            background-color: rgba(0, 20, 0, 0.9);
+            box-shadow: 0 0 20px var(--terminal-green), inset 0 0 50px rgba(0, 255, 65, 0.1);
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        /* Header */
+        .hud-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed var(--terminal-dim);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .mission-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .status-badge {
+            border: 1px solid var(--terminal-green);
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* Slides */
+        .slide {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            animation: scanIn 0.5s ease-out;
+        }
+        .slide.active { display: block; }
+
+        @keyframes scanIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 { border-left: 10px solid var(--terminal-green); padding-left: 15px; margin-top: 0; }
+
+        /* Slide 1: Decoder */
+        .decoder-box {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 40px 0;
+            align-items: center;
+        }
+
+        .code-block {
+            border: 1px solid var(--terminal-dim);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 200px;
+        }
+
+        .code-block:hover { background: var(--terminal-dim); color: #000; }
+        .code-block.solved { border-color: var(--terminal-green); background: var(--terminal-green); color: #000; }
+
+        .definition-display {
+            text-align: center;
+            font-size: 1.2rem;
+            min-height: 50px;
+            margin-top: 20px;
+            font-style: italic;
+        }
+
+        /* Slide 2: Micro-Scope */
+        .radar-screen {
+            width: 100%;
+            height: 300px;
+            border: 1px solid var(--terminal-dim);
+            background: radial-gradient(circle, rgba(0,50,0,1) 0%, rgba(0,20,0,1) 100%);
+            position: relative;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .radar-line {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 2px;
+            background: var(--terminal-green);
+            transform-origin: 0 0;
+            animation: radarSpin 4s infinite linear;
+            box-shadow: 0 0 10px var(--terminal-green);
+        }
+
+        @keyframes radarSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .blip {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--terminal-green);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .blip:hover { transform: scale(2); box-shadow: 0 0 15px var(--terminal-green); }
+        
+        .blip-label {
+            position: absolute;
+            font-size: 0.8rem;
+            color: var(--terminal-green);
+            white-space: nowrap;
+            top: -20px;
+            left: -10px;
+            display: none;
+        }
+        .blip:hover .blip-label { display: block; }
+
+        /* Slide 3: Feasibility Filter */
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .location-card {
+            border: 1px dashed var(--terminal-dim);
+            padding: 15px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .location-card:hover { border-color: var(--terminal-green); background: rgba(0, 255, 65, 0.05); }
+        
+        .location-card.rejected { border-color: var(--alert-red); color: var(--alert-red); opacity: 0.5; text-decoration: line-through; }
+        .location-card.accepted { border-color: var(--terminal-green); background: var(--terminal-green); color: #000; font-weight: bold; }
+
+        /* Slide 4: Mission Log */
+        .log-entry {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--terminal-dim);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .input-field {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--terminal-green);
+            color: var(--terminal-green);
+            font-family: var(--font-mono);
+            width: 100%;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+        .input-field:focus { outline: none; box-shadow: 0 5px 10px -5px var(--terminal-green); }
+
+        /* Buttons */
+        .btn {
+            background: transparent;
+            border: 2px solid var(--terminal-green);
+            color: var(--terminal-green);
+            padding: 10px 30px;
+            font-family: var(--font-mono);
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .btn:hover { background: var(--terminal-green); color: #000; box-shadow: 0 0 20px var(--terminal-green); }
+
+        /* Drone Coach */
+        #drone-feed {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background: #000;
+            border: 1px solid var(--terminal-green);
+            padding: 15px;
+            font-size: 0.8rem;
+            display: none;
+            z-index: 10;
+        }
+
+        #drone-feed strong { display: block; border-bottom: 1px solid var(--terminal-dim); margin-bottom: 5px; }
+
+    </style>
+    <script src="course.js"></script>
+</head>
+<body>
+    <a href="index.html" style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+<div class="crt-lines"></div>
+
+<div id="ops-terminal">
+    <div class="hud-header">
+        <div class="mission-title">PROJECT: ETHNOGRAPHY</div>
+        <div class="status-badge">REC ●</div>
+    </div>
+
+    <!-- Slide 1: Definition -->
+    <div class="slide active" id="slide-1">
+        <h2>Step 01: Decrypt Protocol</h2>
+        <p>特工，你需要先理解任务代号 "ETHNOGRAPHY"。这是一种源自人类学（Anthropology）的研究方法。</p>
+        <p>点击下方的词根模块，解锁其含义。</p>
+        
+        <div class="decoder-box">
+            <div class="code-block" onclick="revealDef(this, 'Ethno-', 'People/Culture (人/文化)')">Ethno-</div>
+            <div class="code-block" onclick="revealDef(this, '-graphy', 'Writing/Description (书写/描述)')">-graphy</div>
+        </div>
+
+        <div class="definition-display" id="def-text">[ WAITING FOR DECRYPTION ]</div>
+        
+        <button class="btn" id="btn-slide-1" style="display:none;" onclick="nextSlide(2)">Access Granted >></button>
+    </div>
+
+    <!-- Slide 2: Micro-Scope -->
+    <div class="slide" id="slide-2">
+        <h2>Step 02: Target Acquisition (Micro-culture)</h2>
+        <p>我们的雷达扫描到了不同的人群。你的任务是研究<b>微观文化 (Micro-culture)</b>。</p>
+        <p>微观文化是在宏观文化（如“美国人”）之下，拥有独特规范、语言和行为的小群体。</p>
+        <p><b>任务：</b> 点击雷达上的<b>绿色光点</b>，识别哪些是合适的“微观文化”。</p>
+
+        <div class="radar-screen">
+            <div class="radar-line"></div>
+            <!-- Targets -->
+            <div class="blip" style="top:20%; left:30%;" onclick="scanTarget(this, true, 'Chess Club (象棋俱乐部)')">
+                <div class="blip-label">Chess Club</div>
+            </div>
+            <div class="blip" style="top:70%; left:60%;" onclick="scanTarget(this, false, 'Teenagers (青少年 - 太宽泛)')">
+                <div class="blip-label">Teenagers</div>
+            </div>
+            <div class="blip" style="top:40%; left:80%;" onclick="scanTarget(this, true, 'Starbucks Baristas (星巴克咖啡师)')">
+                <div class="blip-label">Baristas</div>
+            </div>
+            <div class="blip" style="top:80%; left:20%;" onclick="scanTarget(this, false, 'Humans (人类 - 宏观)')">
+                <div class="blip-label">Humans</div>
+            </div>
+            <div class="blip" style="top:30%; left:50%;" onclick="scanTarget(this, true, 'Local Gym Regulars (健身房常客)')">
+                <div class="blip-label">Gym Rats</div>
+            </div>
+        </div>
+
+        <button class="btn" id="btn-slide-2" style="display:none;" onclick="nextSlide(3)">目标已确认 >></button>
+    </div>
+
+    <!-- Slide 3: Feasibility Filter -->
+    <div class="slide" id="slide-3">
+        <h2>Step 03: Parameter Check (SPARK)</h2>
+        <p>并非所有地点都适合观察。根据 <b>SPARK 流程</b>，我们需要设定<b>参数 (Parameters)</b>：</p>
+        <ul>
+            <li><b>Access:</b> 你能合法进入吗？</li>
+            <li><b>Observable:</b> 人们是否会有互动？</li>
+            <li><b>Re-observable:</b> 你能去至少3次吗？</li>
+        </ul>
+        <p><b>任务：</b> 点击下列地点。如果它符合参数，标记为<b>绿色</b>；如果不符合，标记为<b>红色</b>。</p>
+
+        <div class="location-grid">
+            <div class="location-card" onclick="checkLocation(this, false, 'Access Denied: 除非你是会员或员工。')">
+                A. 医院手术室 (Operating Room)
+            </div>
+            <div class="location-card" onclick="checkLocation(this, true, 'Approved: 公共场所，互动频繁，易于回访。')">
+                B. 学校食堂午餐排队处 (Lunch Line)
+            </div>
+            <div class="location-card" onclick="checkLocation(this, false, 'Low Interaction: 每个人都在睡觉或独处。')">
+                C. 你的卧室 (My Bedroom)
+            </div>
+            <div class="location-card" onclick="checkLocation(this, true, 'Approved: 独特的亚文化，容易观察。')">
+                D. 滑板公园 (Skate Park)
+            </div>
+        </div>
+
+        <button class="btn" id="btn-slide-3" style="display:none;" onclick="nextSlide(4)">制定计划 >></button>
+    </div>
+
+    <!-- Slide 4: Proposal -->
+    <div class="slide" id="slide-4">
+        <h2>Step 04: Mission Proposal</h2>
+        <p>你已经选定了目标。现在生成任务简报。</p>
+        <p><b>Prompt:</b> 你要观察的是什么“影响 (Influence)”？环境如何影响情绪？</p>
+
+        <div class="log-entry">
+            <label>TARGET LOCATION (地点):</label>
+            <input type="text" class="input-field" id="mission-loc" placeholder="e.g. Local Coffee Shop">
+            
+            <label>MICRO-CULTURE (群体):</label>
+            <input type="text" class="input-field" id="mission-group" placeholder="e.g. Remote Workers / Students">
+            
+            <label>HYPOTHESIS (假设 - 环境如何影响他们?):</label>
+            <input type="text" class="input-field" id="mission-hyp" placeholder="e.g. The quiet jazz music makes them focus but stay isolated...">
+        </div>
+
+        <button class="btn" onclick="submitMission()">提交任务简报</button>
+    </div>
+
+    <!-- Slide 5: End -->
+    <div class="slide" id="slide-5">
+        <div style="text-align: center; margin-top: 100px;">
+            <div style="font-size: 4rem;">📡</div>
+            <h1>MISSION ACTIVE</h1>
+            <p>观察任务已启动。</p>
+            <p>接下来的一周，请携带你的“Field Notes”前往该地点至少3次。</p>
+            <p>记住：你是观察者，不要打扰生态系统。</p>
+            <p style="color: #666; margin-top: 20px;">Unit 10.18 Complete</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Drone Feed (Coach) -->
+<div id="drone-feed">
+    <strong>🚁 AI DRONE:</strong>
+    <div id="drone-msg">Scanning sector...</div>
+</div>
+
+<script>
+    // State
+    let currentSlide = 1;
+    let decodedParts = 0;
+    let validTargetsFound = 0;
+    let locationsChecked = 0;
+
+    // Helper: Whisper
+    function whisper(msg) {
+        const box = document.getElementById('drone-feed');
+        document.getElementById('drone-msg').innerText = msg;
+        box.style.display = 'block';
+        setTimeout(() => box.style.display = 'none', 6000);
+    }
+
+    function nextSlide(n) {
+        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+        document.getElementById(`slide-${n}`).classList.add('active');
+    }
+
+    // Slide 1: Decoder
+    function revealDef(el, root, meaning) {
+        if(el.classList.contains('solved')) return;
+        
+        el.innerHTML = `${root}<br><span style="font-size:0.8rem">${meaning}</span>`;
+        el.classList.add('solved');
+        decodedParts++;
+
+        if(decodedParts === 2) {
+            document.getElementById('def-text').innerHTML = "Ethnography = <span style='color:#00ff41'>Writing about People & Culture</span>";
+            document.getElementById('btn-slide-1').style.display = 'inline-block';
+            whisper("解码成功。民族志就是对特定人群文化的书面描述。");
+        }
+    }
+
+    // Slide 2: Radar
+    function scanTarget(el, isValid, name) {
+        const label = el.querySelector('.blip-label');
+        label.style.display = 'block';
+        label.innerText = name;
+        
+        if(isValid) {
+            el.style.backgroundColor = '#fff';
+            el.style.boxShadow = '0 0 20px #fff';
+            validTargetsFound++;
+            whisper(`目标锁定：${name}。这是一个很好的微观文化，因为它有特定的规则和行为模式。`);
+            
+            if(validTargetsFound >= 1) { // Allow progress after finding at least one good target
+                document.getElementById('btn-slide-2').style.display = 'inline-block';
+            }
+        } else {
+            el.style.backgroundColor = '#ff3333';
+            whisper(`目标无效：${name}。范围太大或没有特定的互动模式。`);
+        }
+    }
+
+    // Slide 3: Filter
+    function checkLocation(el, isApproved, reason) {
+        if(el.classList.contains('checked')) return;
+        
+        if(isApproved) {
+            el.classList.add('accepted');
+            el.innerHTML += `<br><br>[ ${reason} ]`;
+            whisper("地点确认。这是一个可行的观察点。");
+        } else {
+            el.classList.add('rejected');
+            el.innerHTML += `<br><br>[ REJECTED: ${reason} ]`;
+            whisper("地点驳回。这不符合 SPARK 的参数设定。");
+        }
+        el.classList.add('checked');
+        locationsChecked++;
+
+        if(locationsChecked >= 2) {
+             document.getElementById('btn-slide-3').style.display = 'inline-block';
+        }
+    }
+
+    // Slide 4: Proposal
+    function submitMission() {
+        const loc = document.getElementById('mission-loc').value;
+        const hyp = document.getElementById('mission-hyp').value;
+        
+        if(loc.length > 2 && hyp.length > 5) {
+            nextSlide(5); CourseEngine.markComplete(18);
+        } else {
+            whisper("数据不完整。请填写你的目标地点和假设。");
+        }
+    }
+
+</script>
+
+</body>
+</html>

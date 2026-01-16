@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Unit 10: Influence - Mission Control</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --card-bg: #16213e;
+            --accent: #e94560;
+            --text: #ffffff;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text);
+            font-family: var(--font-main);
+            padding-bottom: 40px;
+        }
+
+        /* App Header */
+        header {
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+            padding: 40px 20px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        /* Mission Map */
+        .mission-container {
+            padding: 20px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .mission-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
+            border-left: 5px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mission-card:active {
+            transform: scale(0.98);
+        }
+
+        .card-content h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+        }
+
+        .card-content p {
+            margin: 0;
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        .icon {
+            font-size: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        /* Visual Style Variants per Topic */
+        .style-detective {
+            border-color: #f1c40f;
+        }
+
+        /* Lesson 1 */
+        .style-lab {
+            border-color: #00f2ff;
+        }
+
+        /* Lesson 5 */
+        .style-theater {
+            border-color: #8b0000;
+        }
+
+        /* Lesson 13 */
+        .style-court {
+            border-color: #2c3e50;
+        }
+
+        /* Lesson 23 */
+
+        /* Progress Bar (Fake for visual) */
+        .progress-circle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 5px 20px rgba(233, 69, 96, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            z-index: 100;
+        }
+
+        /* Completed State */
+        .mission-card.completed {
+            border-left-color: #2ecc71;
+            opacity: 0.8;
+        }
+
+        .check-mark {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #2ecc71;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+    <script src="course.js"></script>
+</head>
+
+<body>
+
+    <header>
+        <h1>UNIT 10</h1>
+        <div class="subtitle">INFLUENCE IN THE WORLD AROUND US</div>
+    </header>
+
+    <div class="mission-container">
+        <!-- Link to Lesson 1 -->
+        <a href="lesson1.html" class="mission-card style-detective">
+            <div class="card-content">
+                <h3>01. The Detective</h3>
+                <p>Pre-Assessment & Concepts</p>
+            </div>
+            <div class="icon">🕵️</div>
+        </a>
+
+        <!-- Link to Lesson 2 -->
+        <a href="lesson2.html" class="mission-card style-lab">
+            <div class="card-content">
+                <h3>02. The Mind Lab</h3>
+                <p>Examples & Generalizations</p>
+            </div>
+            <div class="icon">🧠</div>
+        </a>
+
+        <!-- Link to Lesson 3 -->
+        <a href="lesson3.html" class="mission-card style-lab">
+            <div class="card-content">
+                <h3>03. The Frequency Lab</h3>
+                <p>Podcast Lab & Signal Tuning</p>
+            </div>
+            <div class="icon">📶</div>
+        </a>
+
+        <!-- Link to Lesson 4 -->
+        <a href="lesson4.html" class="mission-card style-lab">
+            <div class="card-content">
+                <h3>04. The Newsroom</h3>
+                <p>Producer's Desk & Influence</p>
+            </div>
+            <div class="icon">📰</div>
+        </a>
+
+        <!-- Link to Lesson 5 -->
+        <a href="lesson5.html" class="mission-card style-lab">
+            <div class="card-content">
+                <h3>05. Persuasion Lab</h3>
+                <p>Rhetorical Devices & HUD</p>
+            </div>
+            <div class="icon">🧪</div>
+        </a>
+
+        <!-- Link to Lesson 6 -->
+        <a href="lesson6.html" class="mission-card style-lab">
+            <div class="card-content">
+                <h3>06. The Temple of Reason</h3>
+                <p>Confronting Anti-Intellectualism</p>
+            </div>
+            <div class="icon">🏛️</div>
+        </a>
+
+        <!-- Link to Lesson 7 -->
+        <a href="lesson7.html" class="mission-card style-lab">
+            <div class="card-content">
+                <h3>07. The Biographer's Suite</h3>
+                <p>Lives of Influence</p>
+            </div>
+            <div class="icon">👤</div>
+        </a>
+
+        <!-- Link to Lesson 8 -->
+        <a href="lesson8.html" class="mission-card style-lab">
+            <div class="card-content">
+                <h3>08. The Nexus</h3>
+                <p>Invisible Influence & Data Analysis</p>
+            </div>
+            <div class="icon">🔗</div>
+        </a>
+
+        <!-- Link to Lesson 9 -->
+        <a href="lesson9.html" class="mission-card style-lab">
+            <div class="card-content">
+                <h3>09. The Debate Arena</h3>
+                <p>Gender Segregation & STEM</p>
+            </div>
+            <div class="icon">⚔️</div>
+        </a>
+
+        <!-- Link to Lesson 10 -->
+        <a href="lesson10.html" class="mission-card style-lab">
+            <div class="card-content">
+                <h3>10. Museum of Echoes</h3>
+                <p>Historical Influence</p>
+            </div>
+            <div class="icon">🏛️</div>
+        </a>
+
+        <!-- Link to Lesson 11 -->
+        <a href="lesson11.html" class="mission-card style-lab">
+            <div class="card-content">
+                <h3>11. The Architect of History</h3>
+                <p>Shaping the Past</p>
+            </div>
+            <div class="icon">🏗️</div>
+        </a>
+
+        <!-- Link to Lesson 12 -->
+        <a href="lesson12.html" class="mission-card style-theater">
+            <div class="card-content">
+                <h3>12. Bard's Workshop</h3>
+                <p>Shakespeare's Language</p>
+            </div>
+            <div class="icon">✒️</div>
+        </a>
+
+        <!-- Link to Lesson 13 -->
+        <a href="lesson13.html" class="mission-card style-theater">
+            <div class="card-content">
+                <h3>13. The Heath</h3>
+                <p>Macbeth Act I & Supernatural</p>
+            </div>
+            <div class="icon">🔮</div>
+        </a>
+
+        <!-- Link to Lesson 14 -->
+        <a href="lesson14.html" class="mission-card style-theater">
+            <div class="card-content">
+                <h3>14. The Sonnet Workshop</h3>
+                <p>Poetic Form and Meaning</p>
+            </div>
+            <div class="icon">📜</div>
+        </a>
+
+        <!-- Link to Lesson 15 -->
+        <a href="lesson15.html" class="mission-card style-theater">
+            <div class="card-content">
+                <h3>15. Hall of Mirrors</h3>
+                <p>Identity and Reflection</p>
+            </div>
+            <div class="icon">🪞</div>
+        </a>
+
+        <!-- Link to Lesson 16 -->
+        <a href="lesson16.html" class="mission-card style-theater">
+            <div class="card-content">
+                <h3>16. The Black Box</h3>
+                <p>Hidden Processes</p>
+            </div>
+            <div class="icon">⬛</div>
+        </a>
+
+        <!-- Link to Lesson 17 -->
+        <a href="lesson17.html" class="mission-card style-theater">
+            <div class="card-content">
+                <h3>17. The Director's Studio</h3>
+                <p>Staging Influence</p>
+            </div>
+            <div class="icon">🎬</div>
+        </a>
+
+        <!-- Link to Lesson 18 -->
+        <a href="lesson18.html" class="mission-card style-theater">
+            <div class="card-content">
+                <h3>18. The Observatory</h3>
+                <p>Watching the World</p>
+            </div>
+            <div class="icon">🔭</div>
+        </a>
+
+        <!-- Link to Lesson 19 -->
+        <a href="lesson19.html" class="mission-card style-theater">
+            <div class="card-content">
+                <h3>19. The Alchemy of Evil</h3>
+                <p>Transforming Intent</p>
+            </div>
+            <div class="icon">⚗️</div>
+        </a>
+
+        <!-- Link to Lesson 20 -->
+        <a href="lesson20.html" class="mission-card style-court">
+            <div class="card-content">
+                <h3>20. Mission Strategy</h3>
+                <p>Strategic Planning</p>
+            </div>
+            <div class="icon">🎯</div>
+        </a>
+
+        <!-- Link to Lesson 21 -->
+        <a href="lesson21.html" class="mission-card style-court">
+            <div class="card-content">
+                <h3>21. The Hall of Echoes</h3>
+                <p>Resonance and Repetition</p>
+            </div>
+            <div class="icon">🗣️</div>
+        </a>
+
+        <!-- Link to Lesson 22 -->
+        <a href="lesson22.html" class="mission-card style-court">
+            <div class="card-content">
+                <h3>22. The Round Table</h3>
+                <p>Collaboration and Debate</p>
+            </div>
+            <div class="icon">⭕</div>
+        </a>
+
+        <!-- Link to Lesson 23 -->
+        <a href="lesson23.html" class="mission-card style-court">
+            <div class="card-content">
+                <h3>23. High Court</h3>
+                <p>Formal Assessment Essay</p>
+            </div>
+            <div class="icon">⚖️</div>
+        </a>
+
+        <!-- Link to Lesson 24 -->
+        <a href="lesson24.html" class="mission-card style-court">
+            <div class="card-content">
+                <h3>24. Mocap Studio</h3>
+                <p>Action and Influence</p>
+            </div>
+            <div class="icon">🕴️</div>
+        </a>
+
+        <!-- Link to Lesson 25 -->
+        <a href="lesson25.html" class="mission-card style-court">
+            <div class="card-content">
+                <h3>25. The Main Stage</h3>
+                <p>Final Performance</p>
+            </div>
+            <div class="icon">🎭</div>
+        </a>
+
+        <!-- Link to Lesson 26 -->
+        <a href="lesson26.html" class="mission-card style-court">
+            <div class="card-content">
+                <h3>26. Final Archive</h3>
+                <p>Post-Assessment</p>
+            </div>
+            <div class="icon">🗄️</div>
+        </a>
+
+    </div>
+
+    <div class="progress-circle">GO</div>
+
+</body>
+
+</html>

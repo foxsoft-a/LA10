@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10 Lesson 13: The Heath</title>
+    <style>
+        :root {
+            --bg-color: #0a0f0d;
+            --mist-color: rgba(169, 175, 168, 0.1);
+            --text-color: #d1d5db;
+            --accent-green: #3b5249;
+            --accent-blood: #720e1e;
+            --glow: #a4c3b2;
+            --font-main: 'Georgia', serif;
+            --font-gothic: 'Courier New', monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Fog Animation */
+        .fog-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .fog-img {
+            position: absolute;
+            height: 100vh;
+            width: 300vw;
+            background: url('https://raw.githubusercontent.com/danielstuart14/CSS_FOG_ANIMATION/master/fog1.png') repeat-x;
+            background-size: contain;
+            animation: fog 60s linear infinite;
+            opacity: 0.3;
+        }
+        .fog-img-2 {
+            background: url('https://raw.githubusercontent.com/danielstuart14/CSS_FOG_ANIMATION/master/fog2.png') repeat-x;
+            background-size: contain;
+            animation: fog 40s linear infinite;
+            z-index: 1;
+            opacity: 0.2;
+        }
+
+        @keyframes fog {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-200vw, 0, 0); }
+        }
+
+        /* Main Container */
+        #heath-container {
+            width: 90%;
+            max-width: 900px;
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid #333;
+            box-shadow: 0 0 50px #000;
+            min-height: 85vh;
+            position: relative;
+            z-index: 2;
+            padding: 40px;
+            backdrop-filter: blur(5px);
+            border-top: 5px solid var(--accent-green);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--glow);
+            text-shadow: 0 0 10px rgba(164, 195, 178, 0.5);
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 1s ease;
+        }
+        .slide.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Slide 1: Painting Reveal */
+        .painting-frame {
+            width: 100%;
+            height: 400px;
+            background-color: #000;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #444;
+            cursor: none; /* Hide default cursor */
+        }
+
+        .painting-image {
+            width: 100%;
+            height: 100%;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/50/MacbethAndBanquo-Witches.jpg');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.1) grayscale(0.8);
+            transition: filter 0.1s;
+        }
+
+        /* Torch Light Effect */
+        .torch-light {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255,160,50,0.3) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: overlay;
+            z-index: 10;
+        }
+
+        /* Slide 2: Paradox Decoder */
+        .riddle-box {
+            background: rgba(0,0,0,0.5);
+            padding: 30px;
+            border-left: 4px solid var(--accent-blood);
+            font-family: var(--font-gothic);
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .draggable-word {
+            display: inline-block;
+            background: #333;
+            padding: 5px 10px;
+            margin: 5px;
+            cursor: grab;
+            border: 1px solid #555;
+        }
+
+        .drop-target {
+            display: inline-block;
+            width: 80px;
+            height: 30px;
+            border-bottom: 2px dashed var(--glow);
+            vertical-align: bottom;
+            margin: 0 5px;
+            text-align: center;
+            color: var(--glow);
+        }
+
+        /* Slide 3: Director's Cut */
+        .film-strip {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .film-cell {
+            flex: 1;
+            background: #222;
+            padding: 15px;
+            border: 1px solid #444;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0.6;
+        }
+
+        .film-cell:hover { opacity: 1; border-color: var(--glow); }
+        .film-cell.selected { opacity: 1; border-color: var(--accent-blood); background: #2a1a1a; }
+
+        .director-notes {
+            margin-top: 20px;
+            padding: 15px;
+            background: #111;
+            border-left: 2px solid var(--glow);
+            font-style: italic;
+            display: none;
+        }
+
+        /* Slide 4: Scale of Influence */
+        .scale-container {
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        input[type=range] {
+            width: 80%;
+            -webkit-appearance: none;
+            background: linear-gradient(90deg, var(--accent-green) 0%, var(--accent-blood) 100%);
+            height: 10px;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            box-shadow: 0 0 10px #fff;
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 10px auto;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        /* Buttons */
+        .btn {
+            background: transparent;
+            border: 1px solid var(--glow);
+            color: var(--glow);
+            padding: 12px 30px;
+            font-family: var(--font-gothic);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn:hover {
+            background: var(--glow);
+            color: #000;
+            box-shadow: 0 0 20px rgba(164, 195, 178, 0.4);
+        }
+
+        /* Weird Sisters (Coach) */
+        #witch-whisper {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background: rgba(0,0,0,0.9);
+            border: 1px solid var(--accent-blood);
+            color: #ddd;
+            padding: 20px;
+            font-family: var(--font-gothic);
+            font-size: 0.9rem;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 0 30px rgba(114, 14, 30, 0.3);
+        }
+
+        #witch-whisper::before {
+            content: '🔮 THE SISTERS SAY:';
+            display: block;
+            color: var(--accent-blood);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+    </style>
+    <script src="course.js"></script>
+</head>
+<body>
+    <a href="index.html" style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+<div class="fog-container">
+    <div class="fog-img"></div>
+    <div class="fog-img-2"></div>
+</div>
+
+<div id="heath-container">
+    <header>
+        <h1>THE HEATH</h1>
+        <div style="color: #666; font-size: 0.9rem; margin-top: 5px;">UNIT 10.13 // SUPERNATURAL INFLUENCE</div>
+    </header>
+
+    <!-- Slide 1: The Vision (Art) -->
+    <div class="slide active" id="slide-1">
+        <h2>Part I: The Vision</h2>
+        <p>我们在荒原上发现了一幅名为 <i>Macbeth and Banquo Meeting the Witches</i> 的画作（夏塞里奥绘）。但它被黑暗笼罩。</p>
+        <p><b>任务：</b> 移动鼠标（火把）来探索画作。找到并点击画面中最明亮、也是最邪恶的部分——女巫。</p>
+        
+        <div class="painting-frame" id="art-frame" onmousemove="moveTorch(event)" onclick="checkClick(event)">
+            <div class="painting-image" id="art-img"></div>
+            <div class="torch-light" id="torch"></div>
+        </div>
+        <p style="text-align: center; font-size: 0.8rem; color: #555;">(Click the witches to proceed)</p>
+    </div>
+
+    <!-- Slide 2: The Paradox (Text) -->
+    <div class="slide" id="slide-2">
+        <h2>Part II: The Paradox</h2>
+        <p>女巫的话充满了矛盾（Paradox）。麦克白的第一句台词竟然与女巫产生了共鸣（Echo）。</p>
+        <p><b>任务：</b> 将下列词语拖入正确的位置，还原这句奠定全剧基调的台词。</p>
+
+        <div class="riddle-box">
+            "So <span class="drop-target" ondrop="drop(event)" ondragover="allowDrop(event)" id="slot1"></span> and <span class="drop-target" ondrop="drop(event)" ondragover="allowDrop(event)" id="slot2"></span> a day I have not seen."
+        </div>
+
+        <div style="text-align: center;">
+            <span class="draggable-word" draggable="true" ondragstart="drag(event)" id="w1">fair</span>
+            <span class="draggable-word" draggable="true" ondragstart="drag(event)" id="w2">dark</span>
+            <span class="draggable-word" draggable="true" ondragstart="drag(event)" id="w3">foul</span>
+            <span class="draggable-word" draggable="true" ondragstart="drag(event)" id="w4">bright</span>
+        </div>
+
+        <button class="btn" onclick="checkRiddle()" style="display:none;" id="btn-slide-2">打破咒语</button>
+    </div>
+
+    <!-- Slide 3: The Director (Video Analysis) -->
+    <div class="slide" id="slide-3">
+        <h2>Part III: The Director's Eye</h2>
+        <p>不同的导演对“超自然影响力”有不同的解读。点击下列胶片，查看不同版本的 Act 1, Scene 1。</p>
+        <p><b>任务：</b> 哪一个版本最能体现“心理上的恐惧（Psychological Horror）”而不是单纯的视觉惊悚？</p>
+
+        <div class="film-strip">
+            <div class="film-cell" onclick="selectFilm(1)">
+                <h3>Version A</h3>
+                <p>Polanski (1971)</p>
+                <div style="font-size:0.8rem; color:#666;">血腥、泥泞、极其写实。女巫看起来像普通的乞丐老妇。</div>
+            </div>
+            <div class="film-cell" onclick="selectFilm(2)">
+                <h3>Version B</h3>
+                <p>Rupert Goold (2010)</p>
+                <div style="font-size:0.8rem; color:#666;">现代背景，苏联风格。女巫是恐怖的护士，在一个停尸房里。</div>
+            </div>
+            <div class="film-cell" onclick="selectFilm(3)">
+                <h3>Version C</h3>
+                <p>Kurzel (2015)</p>
+                <div style="font-size:0.8rem; color:#666;">缓慢、大气、迷雾缭绕。女巫看起来像大地的一部分，甚至带着孩子。</div>
+            </div>
+        </div>
+
+        <div id="note-1" class="director-notes">
+            Polanski 强调战争的残酷和现实的肮脏。这里的“影响力”是赤裸裸的邪恶。
+        </div>
+        <div id="note-2" class="director-notes">
+            Goold 将超自然转化为“心理变态”。这种影响力来自于对死亡和医疗的恐惧，非常现代的心理恐惧。
+        </div>
+        <div id="note-3" class="director-notes">
+            Kurzel 强调命运和自然。女巫仿佛是荒原的灵魂。这种影响力是静默而不可避免的。
+        </div>
+
+        <button class="btn" id="btn-slide-3" style="display:none;" onclick="nextSlide(4)">选定版本 >></button>
+    </div>
+
+    <!-- Slide 4: Soliloquy (Internal Influence) -->
+    <div class="slide" id="slide-4">
+        <h2>Part IV: The Internal Scale</h2>
+        <p>在 Act 1, Scene 3 中，麦克白听到预言后陷入了沉思（Aside）。此时，超自然的影响力正在他内心发酵。</p>
+        <p><b>任务：</b> 阅读这段独白。移动滑块，分析此刻麦克白的心理状态是更偏向“恐惧”还是“野心”？</p>
+
+        <div style="background:#111; padding:20px; border:1px solid #444; font-family:var(--font-gothic); font-size:0.9rem;">
+            "This supernatural soliciting<br>
+            Cannot be ill, cannot be good...<br>
+            If good, why do I yield to that suggestion<br>
+            Whose horrid image doth unfix my hair<br>
+            And make my seated heart knock at my ribs..."
+        </div>
+
+        <div class="scale-container">
+            <div class="scale-labels">
+                <span>FEAR (恐惧)</span>
+                <span>AMBITION (野心)</span>
+            </div>
+            <input type="range" min="0" max="100" value="50" id="emotion-scale" oninput="analyzeScale()">
+            <p id="scale-feedback" style="height: 20px; color: var(--glow); margin-top:10px;"></p>
+        </div>
+
+        <div id="final-task" style="display:none;">
+            <p><b>Reflection:</b> 这种“既非善也非恶”的状态，正是被影响者最脆弱的时刻。</p>
+            <button class="btn" onclick="finishLesson()">离开荒原</button>
+        </div>
+    </div>
+
+    <!-- Slide 5: End -->
+    <div class="slide" id="slide-5">
+        <div style="text-align: center; margin-top: 100px;">
+            <div style="font-size: 4rem;">🔮</div>
+            <h1 style="color: var(--accent-blood);">PROPHECY SEALED</h1>
+            <p>你已经见证了超自然力量如何植入麦克白的心中。</p>
+            <p>正如夏塞里奥的画作所示，女巫只是指路人，真正走上那条路的是麦克白自己。</p>
+            <p style="color: #666; margin-top: 20px;">Unit 10.13 Complete</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Weird Sisters -->
+<div id="witch-whisper">
+    <div id="witch-text">The fog is lifting...</div>
+</div>
+
+<script>
+    // State
+    let currentSlide = 1;
+
+    // Helper: Whisper
+    function whisper(msg) {
+        const box = document.getElementById('witch-whisper');
+        document.getElementById('witch-text').innerText = msg;
+        box.style.display = 'block';
+        setTimeout(() => box.style.display = 'none', 6000);
+    }
+
+    function nextSlide(n) {
+        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+        document.getElementById(`slide-${n}`).classList.add('active');
+    }
+
+    // Slide 1: Painting Logic
+    function moveTorch(e) {
+        const frame = document.getElementById('art-frame');
+        const torch = document.getElementById('torch');
+        const img = document.getElementById('art-img');
+        
+        const rect = frame.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        torch.style.left = x + 'px';
+        torch.style.top = y + 'px';
+
+        // Dynamic brightness around cursor logic requires canvas or complex masking.
+        // For simple CSS implementation, we'll just check hover zones or rely on the visual metaphor.
+        // Let's use a simpler visual cue:
+        // When hovering right side (witches), brighten image slightly
+        if(x > rect.width * 0.6) {
+            img.style.filter = "brightness(0.8) grayscale(0.5)";
+        } else {
+            img.style.filter = "brightness(0.1) grayscale(0.8)";
+        }
+    }
+
+    function checkClick(e) {
+        const frame = document.getElementById('art-frame');
+        const rect = frame.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        
+        // Witches are on the right side of the painting
+        if(x > rect.width * 0.6) {
+            whisper("你看见了她们... 她们在召唤。注意 Banquo 和 Macbeth 的不同反应：Macbeth 被吸引，而 Banquo 感到恐惧。");
+            setTimeout(() => nextSlide(2), 3000);
+        } else {
+            whisper("这是 Macbeth 和 Banquo。向右看... 黑暗中有什么？");
+        }
+    }
+
+    // Slide 2: Riddle Logic
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+    
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        ev.target.innerText = document.getElementById(data).innerText;
+        ev.target.style.borderBottom = "none";
+        ev.target.style.color = "#a4c3b2";
+        
+        checkRiddleCompletion();
+    }
+
+    function checkRiddleCompletion() {
+        const s1 = document.getElementById('slot1').innerText;
+        const s2 = document.getElementById('slot2').innerText;
+        
+        if(s1 && s2) {
+            document.getElementById('btn-slide-2').style.display = 'inline-block';
+        }
+    }
+
+    function checkRiddle() {
+        const s1 = document.getElementById('slot1').innerText;
+        const s2 = document.getElementById('slot2').innerText;
+        
+        // Ideally "foul and fair" (order matters in Shakespeare: So foul and fair a day...)
+        if(s1 === 'foul' && s2 === 'fair') {
+            whisper("正是如此。‘既糟糕又美好’。这种矛盾（Paradox）暗示了秩序的混乱。Macbeth 的话回应了女巫的咒语。");
+            setTimeout(() => nextSlide(3), 4000);
+        } else {
+            whisper("顺序很重要。Macbeth 先感受到了天气的恶劣(foul)，又因胜利而感到美好(fair)。再试一次。");
+            // Reset for UX
+            document.getElementById('slot1').innerText = "";
+            document.getElementById('slot2').innerText = "";
+        }
+    }
+
+    // Slide 3: Director Logic
+    function selectFilm(n) {
+        document.querySelectorAll('.film-cell').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('.film-cell')[n-1].classList.add('selected');
+        
+        document.querySelectorAll('.director-notes').forEach(d => d.style.display = 'none');
+        document.getElementById(`note-${n}`).style.display = 'block';
+        
+        document.getElementById('btn-slide-3').style.display = 'inline-block';
+        
+        if(n === 2) {
+            whisper("Rupert Goold 的版本确实令人毛骨悚然。将战场改为医院，将预言改为病态的谵妄，这是一种极具创意的‘心理恐惧’。");
+        }
+    }
+
+    // Slide 4: Scale Logic
+    function analyzeScale() {
+        const val = document.getElementById('emotion-scale').value;
+        const feedback = document.getElementById('scale-feedback');
+        
+        if(val < 30) {
+            feedback.innerText = "Current State: Terrified (恐惧)";
+        } else if (val > 70) {
+            feedback.innerText = "Current State: Ruthless (野心)";
+        } else {
+            feedback.innerText = "Current State: Conflicted (矛盾)";
+        }
+
+        // Unlock after interaction
+        document.getElementById('final-task').style.display = 'block';
+    }
+
+    function finishLesson() {
+        nextSlide(5); CourseEngine.markComplete(13);
+    }
+
+</script>
+
+</body>
+</html>

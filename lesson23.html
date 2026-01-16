@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10 Lesson 23: The High Court</title>
+    <style>
+        :root {
+            --bg-wood: #3e2723;
+            --paper-legal: #fff9c4; /* Legal pad yellow */
+            --ink-blue: #000080;
+            --stamp-red: #c0392b;
+            --gold-trim: #ffd700;
+            --font-legal: 'Courier Prime', 'Courier New', monospace;
+            --font-serif: 'Georgia', serif;
+        }
+
+        body {
+            background-color: var(--bg-wood);
+            color: #2c3e50;
+            font-family: var(--font-serif);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: repeating-linear-gradient(90deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 20px, transparent 20px, transparent 40px);
+        }
+
+        /* The Case File */
+        #court-docket {
+            width: 90%;
+            max-width: 1000px;
+            min-height: 90vh;
+            background-color: #f5f5f5;
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            border-left: 20px solid #2c3e50; /* Binder spine */
+        }
+
+        /* Header */
+        header {
+            background: #2c3e50;
+            color: var(--gold-trim);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid var(--gold-trim);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Slides */
+        .slide {
+            display: none;
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            animation: pageFlip 0.6s ease;
+        }
+        .slide.active { display: block; }
+
+        @keyframes pageFlip {
+            from { opacity: 0; transform: rotateY(-10deg); transform-origin: left; }
+            to { opacity: 1; transform: rotateY(0); }
+        }
+
+        /* Slide 1: Defendant Selection */
+        .mugshot-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+        }
+
+        .mugshot {
+            width: 200px;
+            border: 2px solid #555;
+            background: #fff;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .mugshot:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .mugshot.selected { border-color: var(--stamp-red); background: #ffebee; }
+        
+        .mugshot.selected::after {
+            content: 'GUILTY';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            color: var(--stamp-red);
+            font-size: 2rem;
+            font-weight: bold;
+            border: 4px solid var(--stamp-red);
+            padding: 5px 10px;
+            opacity: 0.8;
+        }
+
+        .mug-img {
+            width: 100%;
+            height: 150px;
+            background: #ddd;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #555;
+        }
+
+        /* Slide 2: Indictment Builder (Thesis) */
+        .legal-form {
+            background: var(--paper-legal);
+            padding: 30px;
+            border: 1px solid #ccc;
+            font-family: var(--font-legal);
+            font-size: 1.1rem;
+            line-height: 2;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .fill-blank {
+            border: none;
+            border-bottom: 2px solid #000;
+            background: transparent;
+            font-family: inherit;
+            font-size: inherit;
+            width: 200px;
+            text-align: center;
+            color: var(--ink-blue);
+            font-weight: bold;
+        }
+        
+        .fill-blank:focus { outline: none; border-bottom-color: var(--stamp-red); }
+
+        /* Slide 3: Evidence Locker (Citation) */
+        .evidence-desk {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .evidence-bag {
+            border: 2px dashed #999;
+            padding: 20px;
+            background: rgba(0,0,0,0.05);
+            min-height: 200px;
+        }
+
+        .citation-card {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-family: var(--font-legal);
+            font-size: 0.9rem;
+        }
+
+        .citation-card.error { border-left: 5px solid var(--stamp-red); }
+        .citation-card.fixed { border-left: 5px solid green; background: #e8f5e9; }
+
+        /* Slide 4: Verdict Writer */
+        .writer-layout {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 20px;
+            height: 500px;
+        }
+
+        textarea.legal-pad {
+            width: 100%;
+            height: 100%;
+            background: var(--paper-legal);
+            border: 1px solid #ccc;
+            padding: 20px;
+            font-family: var(--font-legal);
+            font-size: 1rem;
+            line-height: 1.5;
+            background-image: linear-gradient(#999 1px, transparent 1px);
+            background-size: 100% 1.5em;
+            resize: none;
+            color: var(--ink-blue);
+        }
+
+        .checklist {
+            background: #fff;
+            padding: 15px;
+            border: 1px solid #ccc;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            opacity: 0.5;
+        }
+        .check-item.checked { opacity: 1; color: green; font-weight: bold; }
+
+        /* Buttons */
+        .btn-gavel {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-family: var(--font-serif);
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 30px;
+            border-bottom: 4px solid #1a252f;
+            transition: all 0.1s;
+        }
+
+        .btn-gavel:active { transform: translateY(4px); border-bottom: none; }
+
+        /* Judge Coach */
+        #judge-bench {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background: #2c3e50;
+            color: #fff;
+            padding: 15px;
+            border-top: 5px solid var(--gold-trim);
+            border-radius: 5px 5px 0 0;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+        }
+
+    </style>
+    <script src="course.js"></script>
+</head>
+<body>
+    <a href="index.html" style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+<div id="court-docket">
+    <header>
+        <div style="font-weight:bold;">CASE #10-23</div>
+        <h1>The High Court</h1>
+        <div style="font-family:var(--font-legal);">HON. STUDENT PRESIDING</div>
+    </header>
+
+    <!-- Slide 1: Defendant Selection -->
+    <div class="slide active" id="slide-1">
+        <h2>Phase 1: Identify the Accused (被告确认)</h2>
+        <p>作为首席检察官，你需要决定谁对 Macbeth 的悲剧负主要责任。</p>
+        <p><b>任务：</b> 选择你的被告。这将决定你的整篇论文方向。</p>
+        
+        <div class="mugshot-container">
+            <div class="mugshot" onclick="selectDefendant('Macbeth')">
+                <div class="mug-img">👑</div>
+                <h3>Macbeth</h3>
+                <p>Cause: Ambition</p>
+            </div>
+            <div class="mugshot" onclick="selectDefendant('Lady Macbeth')">
+                <div class="mug-img">👸</div>
+                <h3>Lady Macbeth</h3>
+                <p>Cause: Manipulation</p>
+            </div>
+            <div class="mugshot" onclick="selectDefendant('The Witches')">
+                <div class="mug-img">🔮</div>
+                <h3>The Witches</h3>
+                <p>Cause: Fate/Deception</p>
+            </div>
+        </div>
+
+        <button class="btn-gavel" id="btn-1" style="display:none;" onclick="nextSlide(2)">Confirm Defendant</button>
+    </div>
+
+    <!-- Slide 2: Indictment Builder -->
+    <div class="slide" id="slide-2">
+        <h2>Phase 2: Draft the Indictment (Thesis)</h2>
+        <p>一份好的起诉书（Essay）需要一个清晰的论点。请填空完成你的 Thesis Statement。</p>
+        
+        <div class="legal-form">
+            The High Court finds <input type="text" class="fill-blank" id="inp-defendant" readonly> solely responsible for the tragedy.<br><br>
+            
+            This is proven by their act of <input type="text" class="fill-blank" id="inp-crime" placeholder="e.g. murdering Duncan">,<br>
+            
+            their motivation of <input type="text" class="fill-blank" id="inp-motive" placeholder="e.g. unchecked ambition">,<br>
+            
+            and their inability to <input type="text" class="fill-blank" id="inp-fail" placeholder="e.g. resist temptation">.<br><br>
+            
+            Therefore, the court sentences them to <input type="text" class="fill-blank" id="inp-sentence" placeholder="e.g. eternal shame">.
+        </div>
+
+        <button class="btn-gavel" onclick="checkThesis()">File Indictment</button>
+    </div>
+
+    <!-- Slide 3: Evidence Locker -->
+    <div class="slide" id="slide-3">
+        <h2>Phase 3: Evidence Processing (Citation)</h2>
+        <p>你的证据（Quotes）格式混乱。这是不被法庭接受的。</p>
+        <p><b>任务：</b> 点击错误的引用格式，将其修复为正确的 MLA 格式。 (Act.Scene.Lines)</p>
+
+        <div class="evidence-desk">
+            <div id="evidence-list">
+                <div class="citation-card error" onclick="fixCitation(this, '(1.7.25-28)')">
+                    "I have no spur to prick the sides of my intent." <br><b>(Act 1, Scene 7, Line 25)</b>
+                </div>
+                <div class="citation-card error" onclick="fixCitation(this, '(3.4.122)')">
+                    "It will have blood; they say, blood will have blood." <br><b>(Page 89)</b>
+                </div>
+                <div class="citation-card error" onclick="fixCitation(this, '(5.5.19-20)')">
+                    "To-morrow, and to-morrow, and to-morrow..." <br><b>(Shakespeare 5.5)</b>
+                </div>
+            </div>
+            
+            <div class="evidence-bag">
+                <h3>💼 Admissible Evidence</h3>
+                <p style="font-size:0.8rem; color:#666;">Fixed citations will appear here.</p>
+                <div id="fixed-container"></div>
+            </div>
+        </div>
+
+        <button class="btn-gavel" id="btn-3" style="display:none;" onclick="nextSlide(4)">Proceed to Trial</button>
+    </div>
+
+    <!-- Slide 4: Verdict Writer -->
+    <div class="slide" id="slide-4">
+        <h2>Phase 4: The Final Verdict (Essay Draft)</h2>
+        <p>现在，整合你的起诉书和证据，写下最终判决。</p>
+        
+        <div class="writer-layout">
+            <textarea class="legal-pad" id="essay-pad" placeholder="Start your opening statement here..." oninput="checkProgress()"></textarea>
+            
+            <div class="checklist">
+                <h4>👨‍⚖️ Judge's Checklist</h4>
+                <div class="check-item" id="chk-thesis">⬜ Thesis Statement</div>
+                <div class="check-item" id="chk-len">⬜ Length (>100 words)</div>
+                <div class="check-item" id="chk-cite">⬜ Citations Included</div>
+                <div class="check-item" id="chk-conc">⬜ Sentencing (Conclusion)</div>
+            </div>
+        </div>
+
+        <button class="btn-gavel" onclick="finishTrial()">Subit Final Verdict</button>
+    </div>
+
+    <!-- Slide 5: End -->
+    <div class="slide" id="slide-5">
+        <div style="text-align: center; margin-top: 100px;">
+            <div style="font-size: 5rem;">⚖️</div>
+            <h1 style="color: #2c3e50;">CASE CLOSED</h1>
+            <p>你的论证已被记录在案。</p>
+            <p>请截图保存你的 "Verdict"，并将其作为正式作业提交。</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Judge Whisper -->
+<div id="judge-bench">
+    <strong>👨‍⚖️ The Judge:</strong>
+    <div id="judge-text">Order in the court!</div>
+</div>
+
+<script>
+    // State
+    let currentSlide = 1;
+    let selectedDef = "";
+    let fixedCount = 0;
+
+    // Helper: Whisper
+    function whisper(msg) {
+        const box = document.getElementById('judge-bench');
+        document.getElementById('judge-text').innerText = msg;
+        box.style.display = 'block';
+        setTimeout(() => box.style.display = 'none', 6000);
+    }
+
+    function nextSlide(n) {
+        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+        document.getElementById(`slide-${n}`).classList.add('active');
+    }
+
+    // Slide 1: Defendant
+    function selectDefendant(name) {
+        document.querySelectorAll('.mugshot').forEach(m => m.classList.remove('selected'));
+        // Find clicked element logic simplified for demo
+        event.currentTarget.classList.add('selected');
+        
+        selectedDef = name;
+        document.getElementById('inp-defendant').value = name;
+        document.getElementById('btn-1').style.display = 'inline-block';
+        
+        whisper(`被告 ${name} 已确认。准备好你的起诉书。`);
+    }
+
+    // Slide 2: Thesis
+    function checkThesis() {
+        const crime = document.getElementById('inp-crime').value;
+        const motive = document.getElementById('inp-motive').value;
+        const sentence = document.getElementById('inp-sentence').value;
+
+        if(crime && motive && sentence) {
+            whisper("起诉书逻辑清晰。‘判决 (Sentencing)’ 部分是本次论文的创意亮点，请务必在结论中强调。");
+            nextSlide(3);
+        } else {
+            whisper("起诉书不完整。法庭需要知道具体的罪行、动机和拟定的惩罚。");
+        }
+    }
+
+    // Slide 3: Citation Fixer
+    function fixCitation(el, correctFormat) {
+        if(el.classList.contains('fixed')) return;
+
+        el.classList.remove('error');
+        el.classList.add('fixed');
+        // Extract quote text only
+        const quote = el.innerText.split('"')[1];
+        el.innerHTML = `"${quote}" <br><b>${correctFormat}</b>`;
+        
+        document.getElementById('fixed-container').appendChild(el);
+        
+        fixedCount++;
+        if(fixedCount === 3) {
+            document.getElementById('btn-3').style.display = 'inline-block';
+            whisper("证据链完整。记住 MLA 格式：(Act.Scene.Lines)。无需页码。");
+        }
+    }
+
+    // Slide 4: Writing Check
+    function checkProgress() {
+        const text = document.getElementById('essay-pad').value;
+        
+        // Thesis Check (simple length check for demo)
+        if(text.length > 20) document.getElementById('chk-thesis').classList.add('checked');
+        
+        // Length Check
+        if(text.length > 100) document.getElementById('chk-len').classList.add('checked');
+        
+        // Citation Check (regex for parenthesis)
+        if(/\(.*\)/.test(text)) document.getElementById('chk-cite').classList.add('checked');
+        
+        // Conclusion Check (keyword)
+        if(text.toLowerCase().includes('conclus') || text.toLowerCase().includes('sentence') || text.toLowerCase().includes('therefore')) {
+            document.getElementById('chk-conc').classList.add('checked');
+        }
+    }
+
+    function finishTrial() {
+        const text = document.getElementById('essay-pad').value;
+        if(text.length > 50) {
+            nextSlide(5); CourseEngine.markComplete(23);
+        } else {
+            whisper("检察官，你的陈词太短了。法庭不接受简略的判决。");
+        }
+    }
+
+</script>
+
+</body>
+</html>

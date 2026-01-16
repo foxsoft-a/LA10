@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10 Lesson 14: The Sonnet Workshop</title>
+    <style>
+        :root {
+            --bg-parchment: #f0e6d2;
+            --ink-color: #2b2b2b;
+            --accent-quill: #8b4513;
+            --accent-gold: #c5a059;
+            --highlight-rhythm: #e74c3c;
+            --font-main: 'Georgia', serif;
+            --font-hand: 'Courier New', monospace;
+        }
+
+        body {
+            background-color: #3e2723;
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--ink-color);
+            background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+        }
+
+        /* Workshop Container */
+        #workshop {
+            width: 95%;
+            max-width: 950px;
+            background-color: var(--bg-parchment);
+            min-height: 90vh;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 100px rgba(139, 69, 19, 0.1);
+            border: 8px double var(--accent-quill);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Ink Splatters decoration */
+        #workshop::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--ink-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            letter-spacing: 2px;
+            color: var(--accent-quill);
+            text-transform: uppercase;
+        }
+
+        /* Slides */
+        .slide {
+            display: none;
+            flex: 1;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        .slide.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Slide 1: Sentence Anatomy */
+        .anatomy-table {
+            background: rgba(255,255,255,0.6);
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            line-height: 2;
+        }
+
+        .anatomy-word {
+            display: inline-block;
+            padding: 2px 5px;
+            margin: 0 2px;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .anatomy-word:hover { background-color: rgba(139, 69, 19, 0.1); border-bottom-color: var(--accent-quill); }
+        .anatomy-word.selected { background-color: var(--accent-quill); color: white; border-radius: 3px; }
+
+        .tool-panel {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        .tool-btn {
+            padding: 5px 15px;
+            border: 1px solid var(--ink-color);
+            background: transparent;
+            cursor: pointer;
+            font-family: var(--font-hand);
+        }
+        .tool-btn.active { background: var(--ink-color); color: white; }
+
+        /* Slide 2: Rhythm Hero */
+        .beat-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 40px 0;
+            font-size: 1.5rem;
+            font-family: var(--font-hand);
+        }
+
+        .syllable {
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.1s;
+            user-select: none;
+        }
+
+        .syllable.stressed {
+            background-color: var(--highlight-rhythm);
+            color: white;
+            border-color: var(--highlight-rhythm);
+            transform: scale(1.2);
+            font-weight: bold;
+        }
+
+        /* Slide 3: Rhyme Builder (Puzzle) */
+        .puzzle-board {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .puzzle-slots {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .rhyme-slot {
+            height: 40px;
+            border: 2px dashed #999;
+            background: rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            padding-left: 20px;
+            font-family: var(--font-hand);
+            position: relative;
+        }
+
+        .rhyme-slot::after {
+            content: attr(data-rhyme);
+            position: absolute;
+            right: 10px;
+            color: var(--accent-quill);
+            font-weight: bold;
+        }
+
+        .puzzle-pieces {
+            flex: 1;
+            background: rgba(0,0,0,0.1);
+            padding: 10px;
+        }
+
+        .piece {
+            background: white;
+            padding: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #ccc;
+            cursor: grab;
+            font-size: 0.9rem;
+        }
+
+        /* Slide 4: Composer */
+        .composer-desk {
+            display: grid;
+            grid-template-columns: 40px 1fr 40px;
+            gap: 10px;
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .line-input {
+            width: 100%;
+            border: none;
+            border-bottom: 1px dashed #ccc;
+            font-family: var(--font-hand);
+            font-size: 1rem;
+            padding: 5px;
+        }
+        
+        .line-input:focus { outline: none; border-bottom: 2px solid var(--accent-quill); background: #fafafa; }
+
+        .line-num { text-align: right; color: #999; font-size: 0.8rem; padding-top: 8px; }
+        .rhyme-hint { color: var(--accent-quill); font-weight: bold; padding-top: 8px; }
+
+        /* General UI */
+        .btn {
+            background-color: var(--accent-quill);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-family: var(--font-main);
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            align-self: center;
+            transition: all 0.3s;
+        }
+
+        .btn:hover { transform: scale(1.05); background-color: #5d2e0c; }
+
+        /* Bard's Whisper */
+        #bard-whisper {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background: #2b2b2b;
+            color: #f0e6d2;
+            padding: 15px;
+            border: 2px solid var(--accent-gold);
+            font-family: var(--font-main);
+            font-style: italic;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+    </style>
+    <script src="course.js"></script>
+</head>
+<body>
+    <a href="index.html" style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+<div id="workshop">
+    <header>
+        <h1>The Sonnet Workshop</h1>
+        <div style="font-family: var(--font-hand);">UNIT 10.14 // CRAFTING STRUCTURE</div>
+    </header>
+
+    <!-- Slide 1: Hook (Sentence Analysis) -->
+    <div class="slide active" id="slide-1">
+        <h2>Task 01: Sentence Anatomy (语法解剖)</h2>
+        <p>在写诗之前，我们先从散文开始。Scott Adams 说过一句关于影响力的话。</p>
+        <p>请选择 <b>Subject (主语)</b> 工具，然后点击句子中的主语部分。</p>
+        
+        <div class="tool-panel">
+            <button class="tool-btn active" id="tool-subj" onclick="setTool('subj')">Subject (主语)</button>
+            <button class="tool-btn" id="tool-pred" onclick="setTool('pred')">Predicate (谓语)</button>
+        </div>
+
+        <div class="anatomy-table">
+            <span class="anatomy-word" onclick="analyze(this)">You</span> 
+            <span class="anatomy-word" onclick="analyze(this)">don't</span> 
+            <span class="anatomy-word" onclick="analyze(this)">have</span> 
+            <span class="anatomy-word" onclick="analyze(this)">to</span> 
+            <span class="anatomy-word" onclick="analyze(this)">be</span> 
+            <span class="anatomy-word" onclick="analyze(this)">a</span> 
+            <span class="anatomy-word" onclick="analyze(this)">"person of influence"</span> 
+            <span class="anatomy-word" onclick="analyze(this)">to</span> 
+            <span class="anatomy-word" onclick="analyze(this)">be</span> 
+            <span class="anatomy-word" onclick="analyze(this)">influential.</span>
+        </div>
+
+        <button class="btn" onclick="checkSlide1()">结构确认</button>
+    </div>
+
+    <!-- Slide 2: Rhythm (Iambic) -->
+    <div class="slide" id="slide-2">
+        <h2>Task 02: The Heartbeat (抑扬格)</h2>
+        <p>莎士比亚的诗句听起来像心跳：da-DUM, da-DUM, da-DUM...</p>
+        <p>这就是<b>抑扬格五步格 (Iambic Pentameter)</b>。请点击下方的音节，把<b>重音 (Stressed)</b> 的部分标记为红色。</p>
+        
+        <div class="beat-container">
+            <div class="syllable" onclick="toggleBeat(this)">Shall</div>
+            <div class="syllable" onclick="toggleBeat(this)">I</div>
+            <div class="syllable" onclick="toggleBeat(this)">com</div>
+            <div class="syllable" onclick="toggleBeat(this)">pare</div>
+            <div class="syllable" onclick="toggleBeat(this)">thee</div>
+            <div class="syllable" onclick="toggleBeat(this)">to</div>
+            <div class="syllable" onclick="toggleBeat(this)">a</div>
+            <div class="syllable" onclick="toggleBeat(this)">sum</div>
+            <div class="syllable" onclick="toggleBeat(this)">mer's</div>
+            <div class="syllable" onclick="toggleBeat(this)">day?</div>
+        </div>
+
+        <button class="btn" id="btn-slide-2" style="display:none;" onclick="nextSlide(3)">节奏正确</button>
+    </div>
+
+    <!-- Slide 3: Structure (Rhyme Scheme) -->
+    <div class="slide" id="slide-3">
+        <h2>Task 03: The Blueprint (韵脚结构)</h2>
+        <p>莎士比亚十四行诗遵循严格的结构：<b>ABAB CDCD EFEF GG</b>。</p>
+        <p>请将右侧的诗句（来自 <i>Romeo and Juliet</i>）拖入左侧正确的插槽，使其韵脚匹配。</p>
+
+        <div class="puzzle-board">
+            <div class="puzzle-slots">
+                <div class="rhyme-slot" data-rhyme="A" ondrop="drop(event)" ondragover="allowDrop(event)" id="slot-1"></div>
+                <div class="rhyme-slot" data-rhyme="B" ondrop="drop(event)" ondragover="allowDrop(event)" id="slot-2"></div>
+                <div class="rhyme-slot" data-rhyme="A" ondrop="drop(event)" ondragover="allowDrop(event)" id="slot-3"></div>
+                <div class="rhyme-slot" data-rhyme="B" ondrop="drop(event)" ondragover="allowDrop(event)" id="slot-4"></div>
+            </div>
+            <div class="puzzle-pieces">
+                <div class="piece" draggable="true" ondragstart="drag(event)" id="p1">If I profane with my unworthiest hand (hand)</div>
+                <div class="piece" draggable="true" ondragstart="drag(event)" id="p2">To smooth that rough touch with a tender kiss. (kiss)</div>
+                <div class="piece" draggable="true" ondragstart="drag(event)" id="p3">This holy shrine, the gentle fine is this: (this)</div>
+                <div class="piece" draggable="true" ondragstart="drag(event)" id="p4">My lips, two blushing pilgrims, ready stand (stand)</div>
+            </div>
+        </div>
+
+        <button class="btn" onclick="checkSlide3()">验证蓝图</button>
+    </div>
+
+    <!-- Slide 4: Composition -->
+    <div class="slide" id="slide-4">
+        <h2>Task 04: The Composer (创作)</h2>
+        <p>现在，轮到你拿起羽毛笔了。请写一首十四行诗，关于<b>“影响力 (Influence)”</b>。</p>
+        <p>你可以不写满14行，但必须尝试写出第一个四行诗（Quatrain），韵脚为 ABAB。</p>
+
+        <div class="composer-desk">
+            <!-- Quatrain 1 -->
+            <div class="line-num">1</div><input class="line-input" placeholder="Line 1 (ends with sound A)"><div class="rhyme-hint">A</div>
+            <div class="line-num">2</div><input class="line-input" placeholder="Line 2 (ends with sound B)"><div class="rhyme-hint">B</div>
+            <div class="line-num">3</div><input class="line-input" placeholder="Line 3 (rhymes with A)"><div class="rhyme-hint">A</div>
+            <div class="line-num">4</div><input class="line-input" placeholder="Line 4 (rhymes with B)"><div class="rhyme-hint">B</div>
+            
+            <!-- Quatrain 2 -->
+            <div class="line-num">5</div><input class="line-input" placeholder="..."><div class="rhyme-hint">C</div>
+            <div class="line-num">6</div><input class="line-input" placeholder="..."><div class="rhyme-hint">D</div>
+            <div class="line-num">7</div><input class="line-input" placeholder="..."><div class="rhyme-hint">C</div>
+            <div class="line-num">8</div><input class="line-input" placeholder="..."><div class="rhyme-hint">D</div>
+
+            <!-- ... simplified for UI space -->
+        </div>
+
+        <button class="btn" onclick="finishLesson()">提交手稿</button>
+    </div>
+
+    <!-- Slide 5: End -->
+    <div class="slide" id="slide-5">
+        <div style="text-align: center; margin-top: 50px;">
+            <div style="font-size: 4rem;">✒️</div>
+            <h1>POETRY IN MOTION</h1>
+            <p>你已经掌握了十四行诗的心跳与骨架。</p>
+            <p>请在课后完成整首诗的创作。记住，形式限制了你，但也解放了你。</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Bard's Whisper -->
+<div id="bard-whisper">
+    <strong>🖋️ The Bard Says:</strong>
+    <p id="bard-text">...</p>
+</div>
+
+<script>
+    // State
+    let currentSlide = 1;
+    let currentTool = 'subj';
+
+    // Helper: Whisper
+    function whisper(msg) {
+        const box = document.getElementById('bard-whisper');
+        document.getElementById('bard-text').innerText = msg;
+        box.style.display = 'block';
+        setTimeout(() => box.style.display = 'none', 6000);
+    }
+
+    function nextSlide(n) {
+        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+        document.getElementById(`slide-${n}`).classList.add('active');
+    }
+
+    // Slide 1: Sentence Anatomy
+    function setTool(tool) {
+        currentTool = tool;
+        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`tool-${tool}`).classList.add('active');
+    }
+
+    function analyze(el) {
+        // Simple logic for demo: "You" is subject
+        const text = el.innerText.replace(/"/g, '');
+        
+        if (currentTool === 'subj') {
+            if (text === 'You') {
+                el.classList.add('selected');
+                whisper("正确。‘You’ 是这个句子的主语。");
+            } else {
+                whisper("再试一次。谁是执行动作的人？");
+            }
+        } else if (currentTool === 'pred') {
+            if (text === "don't" || text === "have") {
+                el.classList.add('selected');
+                whisper("正确。这就是谓语部分。");
+            }
+        }
+    }
+
+    function checkSlide1() {
+        // Ideally check if correct words selected.
+        whisper("解剖完成。理解句子结构有助于你掌控诗歌的节奏。");
+        nextSlide(2);
+    }
+
+    // Slide 2: Rhythm Hero
+    function toggleBeat(el) {
+        el.classList.toggle('stressed');
+        checkRhythm();
+    }
+
+    function checkRhythm() {
+        // I - pare - to - sum - day (indices 1, 3, 5, 7, 9) should be stressed
+        const syllables = document.querySelectorAll('.syllable');
+        let correct = true;
+        
+        // Expected pattern: 0 1 0 1 0 1 0 1 0 1 (0=unstressed, 1=stressed)
+        const pattern = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1];
+        
+        syllables.forEach((s, i) => {
+            const isStressed = s.classList.contains('stressed');
+            if((pattern[i] === 1 && !isStressed) || (pattern[i] === 0 && isStressed)) {
+                correct = false;
+            }
+        });
+
+        if(correct) {
+            document.getElementById('btn-slide-2').style.display = 'inline-block';
+            whisper("完美的心跳！da-DUM da-DUM... 这就是五步格的魔力。");
+        }
+    }
+
+    // Slide 3: Rhyme Drag & Drop
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+    
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        var slot = ev.target;
+        if(slot.classList.contains('rhyme-slot') && slot.childNodes.length === 0) {
+            slot.appendChild(document.getElementById(data));
+        }
+    }
+
+    function checkSlide3() {
+        // Pattern: A(hand) B(this) A(stand) B(kiss) -- Wait, no
+        // A: hand, stand
+        // B: this, kiss
+        // Romeo & Juliet text:
+        // A: hand
+        // B: this
+        // A: stand
+        // B: kiss
+        
+        const s1 = document.getElementById('slot-1').innerText; // A
+        const s2 = document.getElementById('slot-2').innerText; // B
+        const s3 = document.getElementById('slot-3').innerText; // A
+        const s4 = document.getElementById('slot-4').innerText; // B
+        
+        // Check contents (simplified)
+        if(s1.includes('hand') && s3.includes('stand') && s2.includes('this') && s4.includes('kiss')) {
+             whisper("结构完美。ABAB 韵脚构建完成。");
+             nextSlide(4);
+        } else if (s1.includes('hand') && s3.includes('stand')) {
+             whisper("A韵脚正确（hand/stand），但B韵脚似乎不对。");
+        } else {
+             whisper("请确保行尾的单词押韵。A配A，B配B。");
+        }
+    }
+
+    // Slide 4
+    function finishLesson() {
+        const line1 = document.querySelector('.line-input').value;
+        if(line1.length > 5) {
+            nextSlide(5); CourseEngine.markComplete(14);
+        } else {
+            whisper("诗人，请至少写下一行诗句。");
+        }
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10 Lesson 10: Museum of Echoes</title>
+    <style>
+        :root {
+            --bg-color: #1c1c1c;
+            --text-gold: #d4af37;
+            --text-white: #f5f5f5;
+            --accent-red: #800000;
+            --museum-card: #2a2a2a;
+            --font-serif: 'Georgia', 'Times New Roman', serif;
+            --font-sans: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            font-family: var(--font-sans);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://www.transparenttextures.com/patterns/black-marble.png');
+        }
+
+        /* Main Container */
+        #museum-hall {
+            width: 90%;
+            max-width: 1000px;
+            min-height: 85vh;
+            border: 2px solid var(--text-gold);
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            border-bottom: 1px solid var(--text-gold);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-family: var(--font-serif);
+            color: var(--text-gold);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            font-family: var(--font-serif);
+            font-style: italic;
+            color: #888;
+            margin-top: 10px;
+        }
+
+        /* Slides */
+        .slide {
+            display: none;
+            animation: fadeReveal 1s ease;
+        }
+        .slide.active { display: block; }
+
+        @keyframes fadeReveal {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Interactive: Inscription Restoration */
+        .plaque {
+            background: #000;
+            border: 4px ridge var(--text-gold);
+            padding: 30px;
+            font-family: var(--font-serif);
+            font-size: 1.4rem;
+            line-height: 1.8;
+            text-align: center;
+            color: #ccc;
+            margin: 0 auto;
+            max-width: 800px;
+        }
+
+        .clickable-space {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-bottom: 2px solid var(--text-gold);
+            margin: 0 5px;
+            cursor: pointer;
+            text-align: center;
+            color: var(--text-gold);
+            transition: all 0.3s;
+        }
+        
+        .clickable-space:hover { background: rgba(212, 175, 55, 0.2); }
+
+        /* Interactive: Rhetoric Scanner */
+        .speech-doc {
+            background: #f4e4bc; /* Old paper */
+            color: #111;
+            padding: 30px;
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            border-radius: 2px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+            max-height: 400px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .scan-sentence {
+            cursor: pointer;
+            padding: 2px 5px;
+            transition: background 0.3s;
+        }
+
+        .scan-sentence:hover { background: rgba(128, 0, 0, 0.1); }
+        .scan-sentence.highlighted { background: var(--accent-red); color: white; }
+
+        /* Interactive: Paul's Model (Curator's Desk) */
+        .blueprint-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .blueprint-box {
+            border: 1px solid #444;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .blueprint-box h3 { color: var(--text-gold); margin-top: 0; font-family: var(--font-sans); font-size: 1rem; }
+        
+        select, textarea {
+            width: 100%;
+            background: #222;
+            border: 1px solid #555;
+            color: #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: var(--font-sans);
+        }
+
+        /* Interactive: Archive Carousel */
+        .archive-gallery {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+        }
+
+        .bust-card {
+            min-width: 200px;
+            background: var(--museum-card);
+            border: 1px solid #444;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .bust-card:hover { transform: translateY(-10px); border-color: var(--text-gold); }
+        
+        .bust-icon { font-size: 3rem; margin-bottom: 10px; display: block; }
+
+        /* Curator (Coach) */
+        #curator-box {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background: #2c2c2c;
+            border: 2px solid var(--text-gold);
+            padding: 15px;
+            display: none;
+            z-index: 100;
+            font-family: var(--font-serif);
+        }
+
+        #curator-box strong { color: var(--text-gold); display: block; margin-bottom: 5px; }
+
+        /* UI Buttons */
+        .btn {
+            background: transparent;
+            border: 1px solid var(--text-gold);
+            color: var(--text-gold);
+            padding: 10px 30px;
+            font-size: 1rem;
+            margin-top: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: var(--font-serif);
+            letter-spacing: 1px;
+        }
+
+        .btn:hover { background: var(--text-gold); color: #000; }
+
+    </style>
+    <script src="course.js"></script>
+</head>
+<body>
+    <a href="index.html" style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+<div id="museum-hall">
+    <header>
+        <h1>Museum of Echoes</h1>
+        <div class="subtitle">Unit 10.10: Historical Influence // Frederick Douglass</div>
+    </header>
+
+    <!-- Slide 1: Inscription Restoration -->
+    <div class="slide active" id="slide-1">
+        <h2>Exhibit 01: The Damaged Inscription</h2>
+        <p>欢迎来到回声博物馆。在这里，我们研究那些改变了历史轨迹的声音。</p>
+        <p>入口处的这块铭牌受损了。它是 Megan Whalen Turner 关于“改变思想”的名言。请点击空缺处插入逗号（Comma），恢复它的含义。</p>
+        
+        <div class="plaque">
+            “Sometimes<span class="clickable-space" onclick="toggleComma(this)"></span> if you want to change a man's mind<span class="clickable-space" onclick="toggleComma(this)"></span> you have to change the mind of the man next to him first.” <br>
+            <div style="font-size: 1rem; margin-top: 20px; font-style: italic;">— The King of Attolia</div>
+        </div>
+
+        <button class="btn" onclick="checkSlide1()">Submit Restoration</button>
+    </div>
+
+    <!-- Slide 2: Rhetoric Analysis -->
+    <div class="slide" id="slide-2">
+        <h2>Exhibit 02: The Voice of Abolition</h2>
+        <p>1852年7月5日，Frederick Douglass 发表了演讲 "What to the Slave is the Fourth of July?"。</p>
+        <p>这不仅仅是演讲，这是武器。他使用了<b>反讽 (Irony)</b> —— 对着庆祝自由的白人观众，谈论奴隶的锁链。</p>
+        <p><b>任务：</b> 启动扫描仪。点击演讲稿中那些<b>表达愤怒、讽刺或质问</b>的句子（Irony/Pathos）。找出至少3处。</p>
+
+        <div class="speech-doc">
+            <span class="scan-sentence" onclick="scan(this)">Fellow-citizens, pardon me, allow me to ask, why am I called upon to speak here to-day?</span>
+            <span class="scan-sentence" onclick="scan(this)">What have I, or those I represent, to do with your national independence?</span>
+            <span class="scan-sentence" onclick="scan(this)">Are the great principles of political freedom and of natural justice, embodied in that Declaration of Independence, extended to us?</span>
+            <span class="scan-sentence" onclick="scan(this)">I am not included within the pale of this glorious anniversary!</span>
+            <span class="scan-sentence" onclick="scan(this)">Your high independence only reveals the immeasurable distance between us.</span>
+            <span class="scan-sentence" onclick="scan(this)">The blessings in which you, this day, rejoice, are not enjoyed in common.</span>
+            <span class="scan-sentence" onclick="scan(this)">The rich inheritance of justice, liberty, prosperity and independence, bequeathed by your fathers, is shared by you, not by me.</span>
+            <span class="scan-sentence" onclick="scan(this)">The sunlight that brought life and healing to you, has brought stripes and death to me.</span>
+            <span class="scan-sentence" onclick="scan(this)">This Fourth of July is yours, not mine. You may rejoice, I must mourn.</span>
+        </div>
+
+        <button class="btn" onclick="checkSlide2()">Analyze Data</button>
+    </div>
+
+    <!-- Slide 3: Paul's Model -->
+    <div class="slide" id="slide-3">
+        <h2>Exhibit 03: The Curator's Blueprint</h2>
+        <p>为了理解这篇演讲的深层结构，我们需要运用 <b>Paul's Reasoning Model</b>。</p>
+        <p>作为策展人，请为这篇演讲填写分析档案。</p>
+
+        <div class="blueprint-grid">
+            <div class="blueprint-box">
+                <h3>1. PURPOSE (目的)</h3>
+                <p style="font-size:0.9rem; color:#aaa">Douglass 发表演讲的真实目的是什么？</p>
+                <select id="sel-purpose">
+                    <option value="">Choose...</option>
+                    <option value="A">为了庆祝美国独立日的历史意义。</option>
+                    <option value="B">为了揭露美国价值观的虚伪并呼吁废奴。</option>
+                    <option value="C">为了感谢邀请他演讲的协会。</option>
+                </select>
+            </div>
+            <div class="blueprint-box">
+                <h3>2. AUDIENCE (听众)</h3>
+                <p style="font-size:0.9rem; color:#aaa">他在对谁说话？</p>
+                <select id="sel-audience">
+                    <option value="">Choose...</option>
+                    <option value="A">其他的黑人奴隶。</option>
+                    <option value="B">白人废奴主义者和普通美国公民。</option>
+                </select>
+            </div>
+            <div class="blueprint-box">
+                <h3>3. TONE (基调)</h3>
+                <p style="font-size:0.9rem; color:#aaa">演讲的情感色彩是怎样的？</p>
+                <select id="sel-tone">
+                    <option value="">Choose...</option>
+                    <option value="A">快乐且充满庆祝氛围。</option>
+                    <option value="B">愤怒、讽刺、严肃且充满控诉。</option>
+                </select>
+            </div>
+            <div class="blueprint-box">
+                <h3>4. IMPLICATION (影响)</h3>
+                <p style="font-size:0.9rem; color:#aaa">如果听众接受了他的观点，后果是什么？</p>
+                <textarea id="txt-implication" rows="2" placeholder="Write your thought... (e.g. They would have to take action...)"></textarea>
+            </div>
+        </div>
+
+        <button class="btn" onclick="checkSlide3()">Archive Analysis</button>
+    </div>
+
+    <!-- Slide 4: Research Prep -->
+    <div class="slide" id="slide-4">
+        <h2>Exhibit 04: The Archive (Research Prep)</h2>
+        <p>历史不仅仅是关于过去，更是关于谁影响了谁。</p>
+        <p><b>任务：</b> 浏览下列历史人物。点击他们，查看他们“受到的影响 (Influenced By)”和“产生的影响 (Influenced)”。你需要为你的 Homework 选择一个研究对象。</p>
+
+        <div class="archive-gallery">
+            <div class="bust-card" onclick="revealInfo('susan')">
+                <span class="bust-icon">⚖️</span>
+                <h3>Susan B. Anthony</h3>
+                <p>Suffragist</p>
+            </div>
+            <div class="bust-card" onclick="revealInfo('edison')">
+                <span class="bust-icon">💡</span>
+                <h3>Thomas Edison</h3>
+                <p>Inventor</p>
+            </div>
+            <div class="bust-card" onclick="revealInfo('mlk')">
+                <span class="bust-icon">🎤</span>
+                <h3>Martin Luther King Jr.</h3>
+                <p>Civil Rights Leader</p>
+            </div>
+            <div class="bust-card" onclick="revealInfo('neil')">
+                <span class="bust-icon">🚀</span>
+                <h3>Neil Armstrong</h3>
+                <p>Astronaut</p>
+            </div>
+        </div>
+
+        <div id="info-display" style="margin-top:20px; padding:20px; border:1px dashed var(--text-gold); display:none;">
+            <h3 id="info-name" style="color:var(--text-gold)"></h3>
+            <p><b>Influenced By:</b> <span id="info-by"></span></p>
+            <p><b>Influence On History:</b> <span id="info-on"></span></p>
+            <button class="btn" onclick="finishMuseum()">Select for Research Project</button>
+        </div>
+    </div>
+
+    <!-- Slide 5: Exit -->
+    <div class="slide" id="slide-5">
+        <div style="text-align:center; margin-top:100px;">
+            <div style="font-size:4rem; color:var(--text-gold)">📜</div>
+            <h1>RESEARCH APPROVED</h1>
+            <p>你已完成历史人物的影响力初步分析。</p>
+            <p><b>Homework:</b> 请针对你刚才选择的人物，开始收集5-7个可靠来源（MLA格式）。下节课我们将深入研究他们的生平。</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Curator Whisper -->
+<div id="curator-box">
+    <strong>🧐 Curator's Note:</strong>
+    <p id="curator-text">Observe carefully...</p>
+</div>
+
+<script>
+    // State
+    let currentSlide = 1;
+
+    // Helper: Curator Whisper
+    function whisper(text) {
+        const box = document.getElementById('curator-box');
+        document.getElementById('curator-text').innerText = text;
+        box.style.display = 'block';
+        setTimeout(() => box.style.display = 'none', 6000);
+    }
+
+    function nextSlide(n) {
+        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+        document.getElementById(`slide-${n}`).classList.add('active');
+    }
+
+    // Slide 1: Inscription
+    function toggleComma(el) {
+        if(el.innerText === ',') {
+            el.innerText = '';
+        } else {
+            el.innerText = ',';
+        }
+    }
+
+    function checkSlide1() {
+        const spaces = document.querySelectorAll('.clickable-space');
+        if(spaces[0].innerText === ',' && spaces[1].innerText === ',') {
+            whisper("修复成功。这两个逗号对于划分条件状语从句和强调节奏至关重要。");
+            setTimeout(() => nextSlide(2), 2500);
+        } else {
+            whisper("铭文看起来还不太对劲。在 'Sometimes' 之后和 'mind' 之后试着加上逗号。");
+        }
+    }
+
+    // Slide 2: Rhetoric Scanner
+    function scan(el) {
+        el.classList.toggle('highlighted');
+    }
+
+    function checkSlide2() {
+        const highlighted = document.querySelectorAll('.scan-sentence.highlighted');
+        // Any selection of powerful sentences is "good", but let's look for quantity
+        if(highlighted.length >= 3) {
+            whisper("你捕捉到了他的怒火。Douglass 使用反问句（Rhetorical Questions）和强烈的对比（Sunlight vs. Death）来震撼听众。这是 Pathos 的巅峰。");
+            setTimeout(() => nextSlide(3), 4000);
+        } else {
+            whisper("继续扫描。寻找那些使用‘你们(You)’和‘我(I)’进行强烈对比的句子。");
+        }
+    }
+
+    // Slide 3: Paul's Model
+    function checkSlide3() {
+        const p = document.getElementById('sel-purpose').value;
+        const a = document.getElementById('sel-audience').value;
+        const t = document.getElementById('sel-tone').value;
+        const imp = document.getElementById('txt-implication').value;
+
+        if(p === 'B' && a === 'B' && t === 'B' && imp.length > 5) {
+            whisper("分析精准。Douglass 并没有来庆祝，而是来‘揭露’。这种勇气本身就是一种巨大的影响力。");
+            nextSlide(4);
+        } else {
+            whisper("请重新检查你的分析。Douglass 的演讲在当时是非常激进和充满对抗性的。");
+        }
+    }
+
+    // Slide 4: Archive
+    const db = {
+        'susan': {
+            name: "Susan B. Anthony",
+            by: "Quaker belief in equality; Frederick Douglass (friendship).",
+            on: "Paved the way for the 19th Amendment (Women's Vote)."
+        },
+        'edison': {
+            name: "Thomas Edison",
+            by: "Industrial revolution needs; Loss of hearing (focused concentration).",
+            on: "Created the modern electric world; Influenced Tesla and Ford."
+        },
+        'mlk': {
+            name: "Martin Luther King Jr.",
+            by: "Gandhi (Non-violence); Thoreau (Civil Disobedience); The Bible.",
+            on: "The Civil Rights Act; Changed the moral conscience of America."
+        },
+        'neil': {
+            name: "Neil Armstrong",
+            by: "Cold War Space Race; Wright Brothers.",
+            on: "Inspired generations to look at the stars; 'One small step for man'."
+        }
+    };
+
+    function revealInfo(key) {
+        const info = db[key];
+        document.getElementById('info-name').innerText = info.name;
+        document.getElementById('info-by').innerText = info.by;
+        document.getElementById('info-on').innerText = info.on;
+        document.getElementById('info-display').style.display = 'block';
+        
+        whisper(`很好的选择。${info.name} 既是影响力的产物，也是影响力的源泉。`);
+    }
+
+    function finishMuseum() {
+        nextSlide(5); CourseEngine.markComplete(10);
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10: Influence - The Detective's Exam</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1d;
+            --paper-color: #f5f0e1;
+            --text-color: #2c3e50;
+            --accent-red: #c0392b;
+            --accent-gold: #f1c40f;
+            --highlight: #e67e22;
+            --font-main: 'Helvetica Neue', Arial, sans-serif;
+            --font-typewriter: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        /* Container: The Case File */
+        #app-container {
+            width: 90%;
+            max-width: 900px;
+            background-color: var(--paper-color);
+            min-height: 80vh;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            padding: 40px;
+            border-radius: 5px;
+            background-image: linear-gradient(var(--paper-color) 2px, transparent 2px),
+                linear-gradient(90deg, var(--paper-color) 2px, transparent 2px),
+                linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+            background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+            background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+        }
+
+        /* Paperclip Effect */
+        #app-container::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50px;
+            width: 40px;
+            height: 80px;
+            border: 5px solid #95a5a6;
+            border-radius: 20px;
+            z-index: 10;
+            border-bottom: none;
+        }
+
+        /* Stamp */
+        .stamp {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            border: 3px solid var(--accent-red);
+            color: var(--accent-red);
+            padding: 10px;
+            font-family: var(--font-typewriter);
+            font-weight: bold;
+            font-size: 1.2rem;
+            transform: rotate(-15deg);
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        /* Slides */
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: var(--font-typewriter);
+            color: #2c2c2c;
+            border-bottom: 2px solid #2c2c2c;
+            padding-bottom: 10px;
+        }
+
+        p {
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        /* Interactive Elements */
+        .btn {
+            background-color: #2c2c2c;
+            color: var(--paper-color);
+            border: none;
+            padding: 10px 20px;
+            font-family: var(--font-typewriter);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-red);
+            transform: scale(1.05);
+        }
+
+        .input-area {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: var(--font-typewriter);
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px dashed #2c2c2c;
+            font-size: 1rem;
+        }
+
+        /* Coach's Whisper (Feedback) */
+        #coach-whisper {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background-color: #34495e;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            font-size: 0.9rem;
+            display: none;
+            z-index: 100;
+            border-left: 5px solid var(--accent-gold);
+        }
+
+        #coach-whisper h4 {
+            margin: 0 0 5px 0;
+            color: var(--accent-gold);
+            font-family: var(--font-typewriter);
+        }
+
+        /* Specific Interactions */
+
+        /* Drag & Drop Zone */
+        .drop-zone {
+            border: 2px dashed #aaa;
+            padding: 20px;
+            min-height: 100px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .draggable {
+            background: #e0e0e0;
+            padding: 5px 10px;
+            margin: 5px;
+            display: inline-block;
+            cursor: grab;
+            font-family: var(--font-typewriter);
+            border: 1px solid #999;
+        }
+
+        /* Grammar Fixing */
+        .grammar-text span {
+            cursor: pointer;
+            padding: 2px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .grammar-text span:hover {
+            background-color: rgba(230, 126, 34, 0.2);
+        }
+
+        .grammar-error {
+            /* Hidden marker for JS logic */
+        }
+
+        .fixed {
+            color: var(--accent-red);
+            font-weight: bold;
+            text-decoration: line-through;
+        }
+
+        .correction {
+            color: green;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        /* Reading Analysis */
+        .text-passage {
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            background: white;
+            padding: 20px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .highlightable-sentence {
+            cursor: pointer;
+        }
+
+        .highlightable-sentence:hover {
+            background-color: #f9e79f;
+        }
+
+        .highlighted {
+            background-color: var(--accent-gold);
+        }
+
+        /* Progress Bar */
+        #progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 5px;
+            background: var(--accent-red);
+            width: 0%;
+            transition: width 0.5s;
+        }
+    </style>
+    </style>
+    <script src="course.js"></script>
+</head>
+
+<body>
+    <a href="index.html"
+        style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+    <div id="app-container">
+        <div class="stamp">Top Secret: Assessment</div>
+
+        <!-- Slide 1: Welcome / Hook -->
+        <div class="slide active" id="slide-1">
+            <h1>侦探入职测试：影响力档案</h1>
+            <p>欢迎来到档案局。在开始处理复杂的“人类影响力”案件（Phase II Unit 10）之前，我们需要评估你的核心能力。</p>
+            <p>你的任务是分析三份档案：一份破损的文法报告、一份关于孤儿的证词、以及一份自我陈述。</p>
+            <div style="margin-top: 30px; border: 1px solid #333; padding: 20px;">
+                <h3>任务 01: 定义目标</h3>
+                <p>在他人的思想或行动上产生效果，这就是“Influence”。</p>
+                <p>请将下列条目拖入正确的档案盒中，区分它们是<b>外部影响</b>还是<b>内部影响</b>。</p>
+
+                <div id="source-container" class="drop-zone">
+                    <span class="draggable" draggable="true" id="d1">同伴压力 (Peers)</span>
+                    <span class="draggable" draggable="true" id="d2">个人价值观 (Values)</span>
+                    <span class="draggable" draggable="true" id="d3">社交媒体 (Media)</span>
+                    <span class="draggable" draggable="true" id="d4">野心 (Ambition)</span>
+                </div>
+
+                <div style="display:flex; gap:20px;">
+                    <div style="flex:1;">
+                        <h4>外部影响 (External)</h4>
+                        <div class="drop-zone" id="drop-external"></div>
+                    </div>
+                    <div style="flex:1;">
+                        <h4>内部影响 (Internal)</h4>
+                        <div class="drop-zone" id="drop-internal"></div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn" onclick="checkSlide1()">提交档案</button>
+        </div>
+
+        <!-- Slide 2: Grammar - The Corrupted Text -->
+        <div class="slide" id="slide-2">
+            <h2>案件 01: 破损的文法报告</h2>
+            <p><b>来源：</b> 关于查尔斯·狄更斯（Charles Dickens）的档案。</p>
+            <p><b>任务：</b> 这段文字充满了文法错误。作为资优生，你需要找出其中的<b>3处</b>关键错误（点击单词即可标记）。</p>
+
+            <div class="text-passage grammar-text" style="font-family: var(--font-typewriter); line-height: 2.0;">
+                <span onclick="checkGrammar(this, false)">After</span> <span
+                    onclick="checkGrammar(this, false)">his</span> <span
+                    onclick="checkGrammar(this, false)">fathers'</span> <span
+                    onclick="checkGrammar(this, false)">imprisonment</span> <span
+                    onclick="checkGrammar(this, false)">for</span> <span onclick="checkGrammar(this, false)">debt</span>
+                <span onclick="checkGrammar(this, false)">Charles</span> <span
+                    onclick="checkGrammar(this, false)">Dickens</span> <span
+                    onclick="checkGrammar(this, false)">had</span> <span onclick="checkGrammar(this, false)">to</span>
+                <span onclick="checkGrammar(this, false)">quit</span> <span
+                    onclick="checkGrammar(this, false)">school</span> <span
+                    onclick="checkGrammar(this, false)">and</span> <span onclick="checkGrammar(this, false)">work</span>
+                <span onclick="checkGrammar(this, false)">at</span> <span onclick="checkGrammar(this, false)">a</span>
+                <span onclick="checkGrammar(this, false)">factory</span> <span
+                    onclick="checkGrammar(this, false)">along</span> <span
+                    onclick="checkGrammar(this, false)">the</span> <span
+                    onclick="checkGrammar(this, true, 'River Thames')">river thames</span>. <span
+                    onclick="checkGrammar(this, false)">Conditions</span> <span
+                    onclick="checkGrammar(this, false)">at</span> <span onclick="checkGrammar(this, false)">the</span>
+                <span onclick="checkGrammar(this, false)">factory</span> <span
+                    onclick="checkGrammar(this, false)">were</span> <span
+                    onclick="checkGrammar(this, false)">deplorable,</span> <span
+                    onclick="checkGrammar(this, true, '; it')">it</span> <span
+                    onclick="checkGrammar(this, false)">was</span> <span
+                    onclick="checkGrammar(this, false)">rundown,</span> <span
+                    onclick="checkGrammar(this, false)">with</span> <span
+                    onclick="checkGrammar(this, false)">rodents</span> <span
+                    onclick="checkGrammar(this, false)">everywhere</span> <span
+                    onclick="checkGrammar(this, false)">but</span> <span
+                    onclick="checkGrammar(this, false)">Dickens</span> <span
+                    onclick="checkGrammar(this, false)">was</span> <span onclick="checkGrammar(this, false)">able</span>
+                <span onclick="checkGrammar(this, false)">to</span> <span
+                    onclick="checkGrammar(this, false)">earn</span> <span onclick="checkGrammar(this, false)">a</span>
+                <span onclick="checkGrammar(this, false)">meager</span> <span
+                    onclick="checkGrammar(this, false)">wage</span>. <span
+                    onclick="checkGrammar(this, false)">His</span> <span
+                    onclick="checkGrammar(this, false)">favorite</span> <span
+                    onclick="checkGrammar(this, false)">work</span> <span onclick="checkGrammar(this, false)">was</span>
+                <span onclick="checkGrammar(this, true, 'David Copperfield')">david copperfield</span>.
+            </div>
+
+            <p id="grammar-feedback" style="color: var(--accent-red); font-weight: bold;"></p>
+            <button class="btn" onclick="nextSlide(3)" id="btn-slide-2" style="display:none;">案件归档，继续</button>
+        </div>
+
+        <!-- Slide 3: Reading - The Pip Extraction -->
+        <div class="slide" id="slide-3">
+            <h2>案件 02: 墓地遭遇 (阅读理解)</h2>
+            <p><b>来源：</b> 《远大前程》(Great Expectations) by Charles Dickens.</p>
+            <p><b>背景：</b> 主角 Pip 是个孤儿，被强悍的姐姐抚养长大。他在墓地遇到了逃犯。</p>
+            <p><b>任务：</b> 阅读下方选段。点击<b>一句话</b>，这句话必须能证明 Pip 仅凭想象（Inference）而非事实来构建他对已故家人的认知。</p>
+
+            <div class="text-passage">
+                <span class="highlightable-sentence" onclick="checkReading(this, false)">My father's family name being
+                    Pirrip, and my Christian name Philip, my infant tongue could make of both names nothing longer or
+                    more explicit than Pip.</span>
+                <span class="highlightable-sentence" onclick="checkReading(this, false)">I give Pirrip as my father's
+                    family name, on the authority of his tombstone and my sister,—Mrs. Joe Gargery, who married the
+                    blacksmith.</span>
+                <span class="highlightable-sentence" onclick="checkReading(this, true)">As I never saw my father or my
+                    mother, and never saw any likeness of either of them, my first fancies regarding what they were like
+                    were unreasonably derived from their tombstones.</span>
+                <span class="highlightable-sentence" onclick="checkReading(this, false)">The shape of the letters on my
+                    father's, gave me an odd idea that he was a square, stout, dark man, with curly black hair.</span>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h3>深度思考 (Deep Dive):</h3>
+                <p>Pip 看着死去的五个小弟弟的墓碑，认为他们："had been born on their backs with their hands in their trousers-pockets, and
+                    had never taken them out in this state of existence."</p>
+                <p>这句话暗示了 Pip 对所谓“生存 (Existence)”持有什么样的态度？</p>
+                <select id="reading-mc" class="input-area" onchange="showReadingFeedback()">
+                    <option value="">请选择你的推断...</option>
+                    <option value="A">他认为死去的兄弟很懒惰，没有努力生存。</option>
+                    <option value="B">他认为生存是一场“普遍的斗争 (universal struggle)”，需要拼尽全力，而不仅仅是躺着。</option>
+                    <option value="C">他嫉妒兄弟们不用像他一样被姐姐惩罚。</option>
+                </select>
+            </div>
+            <button class="btn" onclick="nextSlide(4)" id="btn-slide-3" style="display:none;">分析完成，继续</button>
+        </div>
+
+        <!-- Slide 4: Writing - The Architect -->
+        <div class="slide" id="slide-4">
+            <h2>案件 03: 影响力报告 (写作规划)</h2>
+            <p><b>任务：</b> 在这一单元中，我们将撰写关于“影响力”的文章。你需要像建筑师一样规划你的论点。</p>
+            <p><b>题目：</b> 解释“文学手法（Literary Devices）”如何影响读者的感受。</p>
+
+            <div style="background: white; padding: 20px; border: 1px solid #ccc;">
+                <p><b>你的论点 (Claim):</b></p>
+                <textarea class="input-area" placeholder="例如：狄更斯使用“并置（Juxtaposition）”的手法，不仅是为了描述背景，更是为了..."
+                    rows="3"></textarea>
+
+                <p><b>证据 (Evidence):</b></p>
+                <textarea class="input-area" placeholder="你打算引用什么例子？" rows="2"></textarea>
+            </div>
+
+            <p style="font-size: 0.9rem; color: #555;"><i>提示：想想我们在Slide 2中看到的“river thames”描写：肮脏的工厂 vs. 孩子微薄的收入。</i></p>
+
+            <button class="btn" onclick="finishExam()">提交所有证据</button>
+        </div>
+
+        <!-- Slide 5: Assessment Report -->
+        <div class="slide" id="slide-5">
+            <h2>评估报告: APPROVED</h2>
+            <div style="text-align: center; margin-top: 40px;">
+                <div style="font-size: 5rem; color: var(--accent-red); font-family: var(--font-typewriter);">A+</div>
+                <p>恭喜你，探员。</p>
+                <p>你已经展示了对<b>概念分类</b>、<b>文本纠错</b>以及<b>深度阅读推断</b>的能力。</p>
+                <p>在接下来的单元中，我们将深入研究《麦克白》中的影响力——野心、超自然力量与命运。</p>
+                <button class="btn" onclick="location.reload()">重新回顾</button>
+            </div>
+        </div>
+
+        <div id="progress-bar"></div>
+    </div>
+
+    <!-- Coach's Whisper -->
+    <div id="coach-whisper">
+        <h4>🕵️ 探长提示 (Coach's Whisper)</h4>
+        <p id="coach-text">仔细观察...</p>
+    </div>
+
+    <script>
+        // State Management
+        let currentGrammarScore = 0;
+        let requiredGrammarScore = 3;
+
+        // Helper: Show Feedback
+        function showCoach(text) {
+            const coach = document.getElementById('coach-whisper');
+            const coachText = document.getElementById('coach-text');
+            coachText.innerText = text;
+            coach.style.display = 'block';
+            setTimeout(() => {
+                coach.style.display = 'none';
+            }, 5000);
+        }
+
+        // Navigation
+        function nextSlide(n) {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.getElementById(`slide-${n}`).classList.add('active');
+
+            // Update Progress Bar
+            const progress = ((n - 1) / 4) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        // Slide 1 Logic: Drag and Drop
+        const draggables = document.querySelectorAll('.draggable');
+        const dropZones = document.querySelectorAll('.drop-zone');
+
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dragstart', () => {
+                draggable.classList.add('dragging');
+            });
+            draggable.addEventListener('dragend', () => {
+                draggable.classList.remove('dragging');
+            });
+        });
+
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', e => {
+                e.preventDefault();
+            });
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                const draggable = document.querySelector('.dragging');
+                zone.appendChild(draggable);
+            });
+        });
+
+        function checkSlide1() {
+            const external = document.getElementById('drop-external');
+            const internal = document.getElementById('drop-internal');
+
+            // Simple validation logic (Peers/Media = Ext, Values/Ambition = Int)
+            // In a real app, checking by ID is safer.
+            if (external.children.length > 0 && internal.children.length > 0) {
+                showCoach("很好的分类。无论是外部环境还是内部驱动力，都是‘影响力’的一环。");
+                nextSlide(2);
+            } else {
+                showCoach("请确保你对所有证据都进行了分类。拖动它们！");
+            }
+        }
+
+        // Slide 2 Logic: Grammar
+        function checkGrammar(element, isError, correction) {
+            if (element.classList.contains('fixed')) return; // Already fixed
+
+            if (isError) {
+                element.classList.add('fixed');
+                element.innerHTML += `<span class="correction">${correction}</span>`;
+                currentGrammarScore++;
+
+                if (correction === 'River Thames') {
+                    showCoach("专有名词（Proper Nouns）必须大写。这不仅是规则，更是对地点的强调。");
+                } else if (correction === '; it') {
+                    showCoach("精彩！这里需要分号。两个完整的句子不能仅用逗号连接（Run-on sentence）。分号创造了紧密的逻辑联系。");
+                } else {
+                    showCoach("书名需要大写。这是基本的学术规范。");
+                }
+
+                if (currentGrammarScore >= requiredGrammarScore) {
+                    document.getElementById('grammar-feedback').innerText = "所有错误已修正。档案修复完成。";
+                    document.getElementById('btn-slide-2').style.display = 'inline-block';
+                }
+            } else {
+                showCoach("看起来这个词是正确的。侦探，不要制造冤假错案。");
+                element.style.backgroundColor = "#ffcccc";
+                setTimeout(() => element.style.backgroundColor = "transparent", 500);
+            }
+        }
+
+        // Slide 3 Logic: Reading
+        function checkReading(element, isCorrect) {
+            // Clear previous highlights
+            document.querySelectorAll('.highlightable-sentence').forEach(el => el.classList.remove('highlighted'));
+
+            element.classList.add('highlighted');
+
+            if (isCorrect) {
+                showCoach("正是这一句！'Unreasonably derived from their tombstones'。这说明 Pip 是通过视觉线索（墓碑形状）来推断父母的形象，这就是‘影响力’在潜意识中的运作。");
+                checkSection3Complete();
+            } else {
+                showCoach("这句话是事实陈述。请寻找那句表明 Pip 在进行‘想象’或‘推断’的句子。关键词：fancies, derived。");
+            }
+        }
+
+        function showReadingFeedback() {
+            const val = document.getElementById('reading-mc').value;
+            if (val === 'B') {
+                showCoach("正确。这也是 Paul's Reasoning Model 中的关键概念：推断（Inference）。Pip 认为生存是艰难的，而死去的兄弟‘放弃’了这种斗争。");
+                checkSection3Complete();
+            } else if (val) {
+                showCoach("再想一想。Pip 此时还很小，他的想法虽然幼稚，但他用‘universal struggle（普遍的斗争）’来形容活着。");
+            }
+        }
+
+        function checkSection3Complete() {
+            const highlighted = document.querySelector('.highlightable-sentence.highlighted');
+            const selectedOption = document.getElementById('reading-mc').value;
+
+            // Ideally checking specific sentence content, but simplified here for logic
+            if (highlighted && highlighted.innerText.includes('As I never saw') && selectedOption === 'B') {
+                document.getElementById('btn-slide-3').style.display = 'inline-block';
+            }
+        }
+
+        // Slide 4: Just transition
+        function finishExam() {
+            const text = document.querySelector('textarea').value;
+            if (text.length > 5) {
+                nextSlide(5);
+                CourseEngine.markComplete(1);
+            } else {
+                showCoach("侦探，你的报告太简略了。请至少写下一个完整的句子。");
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

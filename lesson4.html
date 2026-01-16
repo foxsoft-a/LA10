@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10 Lesson 4: The Newsroom</title>
+    <style>
+        :root {
+            --paper-bg: #f9f7f1;
+            --ink-color: #2c3e50;
+            --highlight: #f1c40f;
+            --red-pen: #c0392b;
+            --blue-pen: #2980b9;
+            --cork-pattern: #e6ccb3; 
+            --font-typewriter: 'Courier New', Courier, monospace;
+            --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #d1d1d1;
+            background-image: radial-gradient(#bbb 15%, transparent 16%), radial-gradient(#bbb 15%, transparent 16%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            font-family: var(--font-sans);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--ink-color);
+        }
+
+        /* Main Container: The Desk */
+        #desk {
+            width: 95%;
+            max-width: 900px;
+            background-color: var(--paper-bg);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-height: 80vh;
+            position: relative;
+            padding: 40px;
+            border-left: 5px solid var(--red-pen); /* Margin line */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header: Typewriter Style */
+        header {
+            border-bottom: 2px solid var(--ink-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            font-family: var(--font-typewriter);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Slides */
+        .slide {
+            display: none;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography */
+        h2 {
+            font-family: var(--font-typewriter);
+            background-color: var(--ink-color);
+            color: white;
+            display: inline-block;
+            padding: 5px 10px;
+            transform: rotate(-1deg);
+            margin-top: 0;
+        }
+
+        p { line-height: 1.6; }
+
+        /* Interactive: Punctuation Proofreading */
+        .proofread-box {
+            font-family: var(--font-typewriter);
+            font-size: 1.2rem;
+            line-height: 2.2;
+            background: white;
+            padding: 20px;
+            border: 1px dashed #999;
+            margin: 20px 0;
+        }
+
+        .insertion-point {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 235, 59, 0.3);
+            border-bottom: 2px solid var(--red-pen);
+            margin: 0 2px;
+            cursor: pointer;
+            text-align: center;
+            vertical-align: text-bottom;
+            transition: all 0.2s;
+            font-weight: bold;
+            color: var(--red-pen);
+        }
+
+        .insertion-point:hover { background: rgba(255, 235, 59, 0.8); }
+
+        /* Interactive: Question Alchemy */
+        .alchemy-lab {
+            background: #fff;
+            padding: 20px;
+            border: 2px solid var(--ink-color);
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            font-family: var(--font-typewriter);
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            background: #fdfdfd;
+            box-sizing: border-box;
+        }
+
+        .feedback-bubble {
+            margin-top: 10px;
+            padding: 10px;
+            background: #eee;
+            border-left: 4px solid #999;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .feedback-bubble.bad { border-color: var(--red-pen); background: #fdeaea; color: var(--red-pen); }
+        .feedback-bubble.good { border-color: #27ae60; background: #eafaf1; color: #27ae60; }
+
+        /* Interactive: Structure Drag & Drop */
+        .structure-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            background: #eee;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .card {
+            background: white;
+            padding: 10px;
+            border: 1px solid #999;
+            cursor: grab;
+            font-family: var(--font-typewriter);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .timeline {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            min-height: 60px;
+        }
+
+        .slot {
+            flex: 1;
+            border: 2px dashed #bbb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #999;
+            background: rgba(255,255,255,0.5);
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--ink-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-family: var(--font-typewriter);
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--blue-pen);
+            transform: translateY(-2px);
+        }
+
+        /* Editor's Note (Coach) */
+        #editor-note {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 250px;
+            background: #fff9c4; /* Sticky note yellow */
+            padding: 15px;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive; /* Handwritten feel */
+            font-size: 0.9rem;
+            transform: rotate(-2deg);
+            z-index: 100;
+            display: none;
+            border: 1px solid #e6ce68;
+        }
+
+        #editor-note::before {
+            content: "📌 EDITOR'S NOTE";
+            display: block;
+            font-weight: bold;
+            border-bottom: 1px solid #d4c060;
+            margin-bottom: 5px;
+            color: #d35400;
+        }
+
+        /* Progress Stamp */
+        .stamp {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-family: var(--font-typewriter);
+            font-weight: bold;
+            color: var(--red-pen);
+            border: 3px solid var(--red-pen);
+            padding: 5px 10px;
+            transform: rotate(15deg);
+            opacity: 0.2;
+            pointer-events: none;
+            font-size: 1.5rem;
+        }
+
+    </style>
+    <script src="course.js"></script>
+</head>
+<body>
+    <a href="index.html" style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+<div id="desk">
+    <div class="stamp" id="progress-stamp">DRAFT 1</div>
+    
+    <header>
+        <h1>The Newsroom</h1>
+        <div class="meta">UNIT 10.4: DISCOVERING INFLUENCE // PRODUCER'S DESK</div>
+    </header>
+
+    <!-- Slide 1: Hook (Punctuation) -->
+    <div class="slide active" id="slide-1">
+        <h2>任务 01: 校对样稿 (Proofreading)</h2>
+        <p>制作人，Maya Angelou 的这份关于“影响力”的语录刚发过来，但排版乱了。标点符号对于表达语气至关重要。</p>
+        <p>请点击下划线位置，<b>只在需要的地方</b>插入逗号 ( , )、句号 ( . ) 或 破折号 ( -- )。</p>
+        
+        <div class="proofread-box">
+            "You are the sum total of everything you’ve ever seen<span class="insertion-point" onclick="punctuate(this)"></span> heard<span class="insertion-point" onclick="punctuate(this)"></span> eaten<span class="insertion-point" onclick="punctuate(this)"></span> smelled<span class="insertion-point" onclick="punctuate(this)"></span> been told<span class="insertion-point" onclick="punctuate(this)"></span> forgot<span class="insertion-point" onclick="punctuate(this)"></span> it's all there<span class="insertion-point" onclick="punctuate(this)"></span> Everything influences each of us<span class="insertion-point" onclick="punctuate(this)"></span> and because of that I try to make sure that my experiences are positive."
+        </div>
+
+        <button class="btn" onclick="checkSlide1()">提交校对</button>
+    </div>
+
+    <!-- Slide 2: Analysis (Structure) -->
+    <div class="slide" id="slide-2">
+        <h2>任务 02: 节目编排 (Structure)</h2>
+        <p>一个好的 StoryCorps 播客不是随机的聊天，它有精心的结构。根据上一课（Lesson 3）的经验，将下列卡片拖入正确的时间轴位置。</p>
+        
+        <div class="structure-container">
+            <div class="card" draggable="true" id="c1" ondragstart="drag(event)">Specific Story (Story)</div>
+            <div class="card" draggable="true" id="c2" ondragstart="drag(event)">Ice Breaker (Intro)</div>
+            <div class="card" draggable="true" id="c3" ondragstart="drag(event)">Connection to Influence (Reflection)</div>
+        </div>
+
+        <div class="timeline">
+            <div class="slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="c2">1. Start</div>
+            <div class="slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="c1">2. Middle</div>
+            <div class="slot" ondrop="drop(event)" ondragover="allowDrop(event)" data-expect="c3">3. End</div>
+        </div>
+
+        <p style="font-size:0.9rem; color:#666; margin-top:20px;"><i>提示：想想采访是从哪里开始的？是从“我是谁”开始，还是直接讲故事？</i></p>
+        
+        <button class="btn" onclick="checkSlide2()">确认节目单</button>
+    </div>
+
+    <!-- Slide 3: Instruction (The Locksmith) -->
+    <div class="slide" id="slide-3">
+        <h2>任务 03: 问题炼金术 (Question Alchemy)</h2>
+        <p>好的采访始于好的问题。我们要避免<b>“死胡同问题 (Dead-end Questions)”</b>（只能回答Yes/No）。我们需要<b>“故事钥匙 (Story Keys)”</b>。</p>
+        
+        <div class="alchemy-lab">
+            <div class="input-group">
+                <label>试着把这个封闭式问题改成开放式的：</label>
+                <p style="color:#666; font-style:italic;">"Did you like your teacher?" (Bad)</p>
+                <input type="text" id="q-input" placeholder="输入你的修改方案..." oninput="analyzeQuestion()">
+                <div id="q-feedback" class="feedback-bubble"></div>
+            </div>
+            
+            <div class="input-group" id="part2-q" style="opacity:0.5; pointer-events:none;">
+                <label>现在，为你自己的采访对象写一个<b>“黄金问题”</b>：</label>
+                <p style="font-size:0.8rem;">(必须关于 Who or What influenced them)</p>
+                <input type="text" id="golden-q" placeholder="Who or what has been the biggest influence..." oninput="analyzeGolden()">
+                <div id="g-feedback" class="feedback-bubble"></div>
+            </div>
+        </div>
+
+        <button class="btn" id="btn-slide-3" style="display:none;" onclick="nextSlide(4)">进入策划阶段</button>
+    </div>
+
+    <!-- Slide 4: Production (Planner) -->
+    <div class="slide" id="slide-4">
+        <h2>任务 04: 制作人通告单 (Producer's Call Sheet)</h2>
+        <p>这是你下周采访的正式计划书。请填写并准备打印（截图）。</p>
+        
+        <div style="background: white; padding: 20px; border: 1px solid #ccc; font-family: var(--font-typewriter);">
+            <h3 style="text-align:center; border-bottom:1px solid #000; padding-bottom:10px;">INTERVIEW PLANNER</h3>
+            
+            <label><b>Talent (Interviewee):</b></label>
+            <input type="text" placeholder="e.g., My Grandfather" style="border:none; border-bottom:1px dashed #000; margin-bottom:15px;">
+            
+            <label><b>Topic:</b></label>
+            <p>How influence shapes our lives.</p>
+            
+            <label><b>Question 1 (Warm up):</b></label>
+            <input type="text" placeholder="e.g., How did we first meet?" style="border:none; border-bottom:1px dashed #000; margin-bottom:10px;">
+            
+            <label><b>Question 2 (The Golden Question):</b></label>
+            <textarea rows="2" id="final-golden" readonly style="border:none; border-bottom:1px dashed #000; background:#eee;"></textarea>
+            
+            <label><b>Question 3 (Follow up):</b></label>
+            <input type="text" placeholder="e.g., How did that change you?" style="border:none; border-bottom:1px dashed #000; margin-bottom:10px;">
+        </div>
+
+        <div style="margin-top:20px; background:#eafaf1; padding:15px; border-radius:5px;">
+            <h4>🎙️ Tech Check (技术检查)</h4>
+            <label><input type="checkbox"> 征得对方同意录音 (Consent)</label><br>
+            <label><input type="checkbox"> 找一个安静的房间 (Quiet Room)</label><br>
+            <label><input type="checkbox"> 手机开启飞行模式 (Airplane Mode)</label><br>
+            <label><input type="checkbox"> 录音测试 (Test Record)</label>
+        </div>
+
+        <button class="btn" onclick="finishLesson()">批准制作 (Greenlight)</button>
+    </div>
+
+    <!-- Slide 5: End -->
+    <div class="slide" id="slide-5">
+        <div style="text-align: center; margin-top: 50px;">
+            <div style="font-size: 5rem;">🎬</div>
+            <h1>READY FOR PRODUCTION</h1>
+            <p>制作人，你的策划案已获批准。</p>
+            <p>请在下节课前完成采访录制。记住：<b>倾听比提问更重要。</b></p>
+            <p style="color:var(--red-pen); font-family:var(--font-typewriter);">STATUS: ON AIR</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Editor's Note -->
+<div id="editor-note">
+    <div id="editor-text">Watch your punctuation...</div>
+</div>
+
+<script>
+    // State
+    let currentPunctuation = [0,0,0,0,0,0,0,0]; 
+    const correctPunctuation = [',', ',', ',', ',', ',', '--', '.']; // Simplified logic for demo
+
+    // Helper: Show Feedback
+    function showNote(text) {
+        const note = document.getElementById('editor-note');
+        document.getElementById('editor-text').innerText = text;
+        note.style.display = 'block';
+        setTimeout(() => { note.style.display = 'none'; }, 6000);
+    }
+
+    function nextSlide(n) {
+        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+        document.getElementById(`slide-${n}`).classList.add('active');
+        
+        // Update stamp
+        const stamps = ["DRAFT 1", "EDITING", "POLISHING", "FINAL", "APPROVED"];
+        document.getElementById('progress-stamp').innerText = stamps[n-1];
+        document.getElementById('progress-stamp').style.opacity = 0.2 + (n * 0.15);
+    }
+
+    // Slide 1: Punctuation
+    const punctMarks = ['', ',', '.', '--'];
+    
+    function punctuate(el) {
+        // Cycle through marks
+        let currentMark = el.innerText;
+        let idx = punctMarks.indexOf(currentMark);
+        let nextIdx = (idx + 1) % punctMarks.length;
+        el.innerText = punctMarks[nextIdx];
+        
+        // Visual feedback
+        if(punctMarks[nextIdx] === '') el.style.background = "rgba(255, 235, 59, 0.3)";
+        else el.style.background = "#fff";
+    }
+
+    function checkSlide1() {
+        // Simplified check: Does it have enough commas and the dash?
+        const points = document.querySelectorAll('.insertion-point');
+        let commas = 0;
+        let dash = 0;
+        
+        points.forEach(p => {
+            if(p.innerText === ',') commas++;
+            if(p.innerText === '--') dash++;
+        });
+
+        if (commas >= 4 && dash >= 1) {
+            showNote("干得好！破折号（Em dash）在这里创造了戏剧性的停顿，强调了‘影响力’的积累。");
+            nextSlide(2);
+        } else {
+            showNote("排版还是有点乱。这是一个列举句（List），需要逗号分隔。在 'forgot' 之后试着用破折号来引出总结。");
+        }
+    }
+
+    // Slide 2: Drag and Drop
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        // Only allow one card per slot
+        if (ev.target.children.length === 0 && ev.target.classList.contains('slot')) {
+            ev.target.appendChild(document.getElementById(data));
+            ev.target.style.background = "white";
+        }
+    }
+
+    function checkSlide2() {
+        const slot1 = document.querySelector('div[data-expect="c2"]'); // Intro
+        const slot2 = document.querySelector('div[data-expect="c1"]'); // Story
+        const slot3 = document.querySelector('div[data-expect="c3"]'); // Reflection
+        
+        if (slot1.children.length && slot1.children[0].id === 'c2' &&
+            slot2.children.length && slot2.children[0].id === 'c1' &&
+            slot3.children.length && slot3.children[0].id === 'c3') {
+            
+            showNote("结构完美。先建立关系（Ice Breaker），再讲核心故事，最后反思意义。这是 StoryCorps 的经典配方。");
+            nextSlide(3);
+        } else {
+            showNote("顺序不对。通常我们先闲聊热身（Intro），然后讲故事，最后才进行深度的反思。");
+        }
+    }
+
+    // Slide 3: Question Alchemy (Regex Logic)
+    function analyzeQuestion() {
+        const input = document.getElementById('q-input').value.toLowerCase();
+        const feedback = document.getElementById('q-feedback');
+        
+        const closedStarters = /^(did|do|is|are|can|will|have|has)\b/;
+        const openStarters = /^(what|how|why|tell me|describe)\b/;
+
+        if (input.length < 5) {
+            feedback.style.display = 'none';
+            return;
+        }
+
+        feedback.style.display = 'block';
+        if (closedStarters.test(input)) {
+            feedback.className = "feedback-bubble bad";
+            feedback.innerText = "⚠️ 这是一个‘死胡同问题’。对方只能回答 Yes 或 No。试着把 'Did you...' 改成 'How did you...'";
+        } else if (openStarters.test(input)) {
+            feedback.className = "feedback-bubble good";
+            feedback.innerText = "✅ 很好！这是一个‘故事钥匙’。开放式问题能引出细节。";
+            
+            // Unlock part 2
+            document.getElementById('part2-q').style.opacity = 1;
+            document.getElementById('part2-q').style.pointerEvents = 'auto';
+        } else {
+            feedback.className = "feedback-bubble";
+            feedback.innerText = "正在分析... 试着用 'How', 'Why', 或 'What' 开头。";
+        }
+    }
+
+    function analyzeGolden() {
+        const input = document.getElementById('golden-q').value;
+        const feedback = document.getElementById('g-feedback');
+        
+        // Simple length check + keyword check
+        if (input.length > 10 && (input.toLowerCase().includes('who') || input.toLowerCase().includes('what'))) {
+            feedback.style.display = 'block';
+            feedback.className = "feedback-bubble good";
+            feedback.innerText = "这就是你的核心问题。把它加入策划书！";
+            document.getElementById('btn-slide-3').style.display = 'inline-block';
+            
+            // Transfer to next slide
+            document.getElementById('final-golden').value = input;
+        }
+    }
+
+    // Slide 4: Finish
+    function finishLesson() {
+        nextSlide(5); CourseEngine.markComplete(4);
+    }
+
+</script>
+
+</body>
+</html>

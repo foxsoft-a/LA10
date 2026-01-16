@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10 Lesson 12: The Bard's Workshop</title>
+    <style>
+        :root {
+            --wood-dark: #2d1b0e;
+            --wood-light: #5c4033;
+            --parchment: #f3e5ab;
+            --ink-black: #1a1a1a;
+            --royal-red: #800020;
+            --gold-accent: #c5a059;
+            --font-serif: 'Times New Roman', Georgia, serif;
+            --font-hand: 'Courier New', monospace; /* Fallback for handwriting feel */
+        }
+
+        body {
+            background-color: var(--wood-dark);
+            background-image: repeating-linear-gradient(45deg, #26160b 25%, transparent 25%, transparent 75%, #26160b 75%, #26160b), repeating-linear-gradient(45deg, #26160b 25%, #2d1b0e 25%, #2d1b0e 75%, #26160b 75%, #26160b);
+            background-position: 0 0, 10px 10px;
+            background-size: 20px 20px;
+            color: var(--ink-black);
+            font-family: var(--font-serif);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* The Workbench */
+        #stage-container {
+            width: 90%;
+            max-width: 900px;
+            background-color: var(--parchment);
+            min-height: 85vh;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 100px rgba(0,0,0,0.2);
+            border: 10px solid var(--wood-light);
+            border-radius: 5px;
+            position: relative;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Wax Seal Decoration */
+        #stage-container::after {
+            content: 'WS';
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: var(--royal-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.8);
+            font-weight: bold;
+            font-size: 1.5rem;
+            border: 4px double rgba(0,0,0,0.2);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--ink-black);
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--wood-dark);
+        }
+
+        .subtitle { font-style: italic; color: #555; }
+
+        /* Slides */
+        .slide {
+            display: none;
+            flex: 1;
+            animation: inkFade 0.8s ease-out;
+        }
+        
+        .slide.active { display: block; }
+
+        @keyframes inkFade {
+            from { opacity: 0; filter: blur(2px); }
+            to { opacity: 1; filter: blur(0); }
+        }
+
+        /* Slide 1: Journal Hook */
+        .quill-area {
+            background: rgba(255,255,255,0.4);
+            border: 1px dashed var(--ink-black);
+            padding: 20px;
+            font-family: var(--font-hand);
+            font-size: 1.2rem;
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 150px;
+            margin-top: 15px;
+            background-image: linear-gradient(#ccc 1px, transparent 1px);
+            background-size: 100% 1.5em;
+            line-height: 1.5em;
+        }
+
+        /* Slide 2: Prop Room (Matching) */
+        .prop-shelf {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .prop-tag {
+            background: var(--wood-light);
+            color: var(--parchment);
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: grab;
+            font-weight: bold;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .definition-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .def-slot {
+            border: 2px dashed #888;
+            padding: 15px;
+            background: rgba(0,0,0,0.05);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .def-slot::before {
+            content: attr(data-hint);
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: var(--parchment);
+            padding: 0 5px;
+            font-size: 0.8rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Slide 3 & 4: Sonnet Analysis */
+        .sonnet-frame {
+            display: flex;
+            gap: 20px;
+        }
+
+        .sonnet-text {
+            flex: 1;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .line {
+            cursor: pointer;
+            padding: 2px 5px;
+            transition: background 0.3s;
+            display: block;
+        }
+
+        .line:hover { background: rgba(197, 160, 89, 0.2); }
+        .line.highlighted { background: var(--gold-accent); font-weight: bold; }
+        
+        .line.highlighted-contrast { background: var(--royal-red); color: white; }
+
+        .lens-toggle {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            color: #555;
+            font-style: italic;
+        }
+
+        /* Modern Lens Overlay */
+        .line[data-modern]::after {
+            content: attr(data-modern);
+            display: block;
+            font-size: 0.85rem;
+            color: #666;
+            border-top: 1px dotted #ccc;
+            margin-top: 2px;
+            display: none; /* Hidden by default */
+        }
+
+        .show-lens .line[data-modern]::after {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--wood-dark);
+            color: var(--parchment);
+            border: 2px solid var(--gold-accent);
+            padding: 10px 25px;
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background-color: var(--royal-red);
+            transform: scale(1.05);
+        }
+
+        /* Stage Manager (Coach) */
+        #stage-manager {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background: var(--ink-black);
+            color: var(--parchment);
+            padding: 15px;
+            border: 2px solid var(--gold-accent);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 100;
+            font-family: var(--font-serif);
+        }
+
+        #stage-manager h4 { margin: 0 0 5px 0; color: var(--gold-accent); border-bottom: 1px solid #555; padding-bottom: 5px; }
+
+    </style>
+    <script src="course.js"></script>
+</head>
+<body>
+    <a href="index.html" style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+<div id="stage-container">
+    <header>
+        <h1>The Globe Backstage</h1>
+        <div class="subtitle">Unit 10.12: The Language of Shakespeare</div>
+    </header>
+
+    <!-- Slide 1: Hook -->
+    <div class="slide active" id="slide-1">
+        <h2>Act I: The Influence of One</h2>
+        <p>剧作家，在你拿起羽毛笔之前，请先思考。莎士比亚不仅是写故事，他是在用语言塑造历史。</p>
+        <p><b>Journal Entry:</b> 如果你能穿越时空，影响历史上的<b>一个人</b>，那会是谁？为什么？</p>
+        <textarea class="quill-area" id="journal-input" placeholder="I would influence... because..."></textarea>
+        <button class="btn" onclick="checkSlide1()">墨水已干，继续 >></button>
+    </div>
+
+    <!-- Slide 2: Literary Terms -->
+    <div class="slide" id="slide-2">
+        <h2>Act II: The Prop Room (文学术语)</h2>
+        <p>要理解莎士比亚，你需要掌握他的工具。将道具箱中的术语拖入正确的定义槽中。</p>
+        
+        <div class="prop-shelf" id="prop-source">
+            <div class="prop-tag" draggable="true" ondragstart="drag(event)" id="t1">Allusion (典故)</div>
+            <div class="prop-tag" draggable="true" ondragstart="drag(event)" id="t2">Dramatic Irony (戏剧反讽)</div>
+            <div class="prop-tag" draggable="true" ondragstart="drag(event)" id="t3">Soliloquy (独白)</div>
+            <div class="prop-tag" draggable="true" ondragstart="drag(event)" id="t4">Tragic Flaw (悲剧缺陷)</div>
+        </div>
+
+        <div class="definition-box">
+            <div class="def-slot" data-hint="Referencing another work" ondrop="drop(event, 't1')" ondragover="allowDrop(event)">引用历史或文学作品：</div>
+            <div class="def-slot" data-hint="Audience knows, character doesn't" ondrop="drop(event, 't2')" ondragover="allowDrop(event)">观众知道但角色不知道的秘密：</div>
+            <div class="def-slot" data-hint="Speaking thoughts aloud" ondrop="drop(event, 't3')" ondragover="allowDrop(event)">角色独自在舞台上说出内心想法：</div>
+            <div class="def-slot" data-hint="Character's weakness" ondrop="drop(event, 't4')" ondragover="allowDrop(event)">导致英雄毁灭的性格弱点：</div>
+        </div>
+
+        <button class="btn" id="btn-slide-2" style="display:none;" onclick="nextSlide(3)">工具备齐 >></button>
+    </div>
+
+    <!-- Slide 3: Sonnet 18 Analysis -->
+    <div class="slide" id="slide-3">
+        <h2>Act III: The Ideal (Sonnet 18)</h2>
+        <p>这是莎士比亚最著名的十四行诗。他试图通过语言战胜时间。</p>
+        <div class="lens-toggle">💡 提示：按住 [空格键] 或鼠标长按诗歌查看现代翻译</div>
+        <p><b>任务：</b> 找出这首诗中描述<b>“大自然是不完美的 (Nature is imperfect)”</b>的诗句。点击高亮至少两处。</p>
+
+        <div class="sonnet-frame">
+            <div class="sonnet-text" id="sonnet18" onmousedown="showLens(true)" onmouseup="showLens(false)">
+                <span class="line" onclick="markLine(this, 'nature')">Shall I compare thee to a summer's day?</span>
+                <span class="line" onclick="markLine(this, 'nature')">Thou art more lovely and more temperate:</span>
+                <span class="line" data-modern="狂风会吹落五月娇嫩的花蕾" onclick="markLine(this, 'nature', true)">Rough winds do shake the darling buds of May,</span>
+                <span class="line" data-modern="夏天的期限又未免太短暂" onclick="markLine(this, 'nature', true)">And summer's lease hath all too short a date;</span>
+                <span class="line" data-modern="有时天上的太阳照得太热" onclick="markLine(this, 'nature', true)">Sometime too hot the eye of heaven shines,</span>
+                <span class="line" data-modern="它金色的面容往往蒙上阴霾" onclick="markLine(this, 'nature', true)">And often is his gold complexion dimmed;</span>
+                <span class="line" onclick="markLine(this, 'nature')">And every fair from fair sometime declines,</span>
+                <span class="line" onclick="markLine(this, 'nature')">By chance or nature's changing course untrimmed;</span>
+                <span class="line" onclick="markLine(this, 'nature')">But thy eternal summer shall not fade,</span>
+                <span class="line" onclick="markLine(this, 'nature')">Nor lose possession of that fair thou ow'st;</span>
+            </div>
+        </div>
+
+        <button class="btn" onclick="checkSlide3()">分析完成</button>
+    </div>
+
+    <!-- Slide 4: Sonnet 130 Analysis -->
+    <div class="slide" id="slide-4">
+        <h2>Act IV: The Reality (Sonnet 130)</h2>
+        <p>莎士比亚不仅会赞美，也会讽刺。这首诗是对传统情诗的<b>“反讽 (Parody)”</b>。</p>
+        <p><b>任务：</b> 找出诗人<b>“承认爱人并不完美 (Admitting flaws)”</b>的句子。点击高亮至少两处。</p>
+
+        <div class="sonnet-frame">
+            <div class="sonnet-text" id="sonnet130" onmousedown="showLens(true)" onmouseup="showLens(false)">
+                <span class="line" data-modern="我爱人的眼睛一点不像太阳" onclick="markLine(this, 'reality', true)">My mistress' eyes are nothing like the sun;</span>
+                <span class="line" data-modern="珊瑚比她的嘴唇红得多" onclick="markLine(this, 'reality', true)">Coral is far more red than her lips' red;</span>
+                <span class="line" data-modern="如果雪是白的，那她的胸就是暗褐色的" onclick="markLine(this, 'reality', true)">If snow be white, why then her breasts are dun;</span>
+                <span class="line" data-modern="如果头发像铁丝，那她头上就长满了黑铁丝" onclick="markLine(this, 'reality', true)">If hairs be wires, black wires grow on her head.</span>
+                <span class="line" onclick="markLine(this, 'reality')">I have seen roses damasked, red and white,</span>
+                <span class="line" onclick="markLine(this, 'reality')">But no such roses see I in her cheeks;</span>
+                <span class="line" onclick="markLine(this, 'reality')">And in some perfumes is there more delight</span>
+                <span class="line" data-modern="有些香水比我爱人的气息好闻多了" onclick="markLine(this, 'reality', true)">Than in the breath that from my mistress reeks.</span>
+            </div>
+        </div>
+
+        <button class="btn" onclick="checkSlide4()">提交对比</button>
+    </div>
+
+    <!-- Slide 5: Reflection -->
+    <div class="slide" id="slide-5">
+        <h2>Final Act: The Playwright's Insight</h2>
+        <div style="text-align: center; margin-top: 50px;">
+            <div style="font-size: 4rem;">🎭</div>
+            <h3>你发现了莎士比亚的秘密。</h3>
+            <p>Sonnet 18 使用了<b>理想化 (Idealization)</b>，通过贬低自然来赞美爱人。</p>
+            <p>Sonnet 130 使用了<b>现实主义 (Realism)</b>，通过承认缺陷来表达真爱。</p>
+            <p>这就是语言的影响力：它可以构建梦境，也可以打破幻象。</p>
+            <p><b>Homework:</b> 选择一首十四行诗，完成 Poetry Analysis Sheet。</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Stage Manager Whisper -->
+<div id="stage-manager">
+    <h4>📜 Stage Manager's Note</h4>
+    <div id="manager-text">Waiting for cue...</div>
+</div>
+
+<script>
+    // State
+    let currentSlide = 1;
+    let propScore = 0;
+
+    // Helper: Whisper
+    function whisper(msg) {
+        const box = document.getElementById('stage-manager');
+        document.getElementById('manager-text').innerText = msg;
+        box.style.display = 'block';
+        setTimeout(() => box.style.display = 'none', 6000);
+    }
+
+    function nextSlide(n) {
+        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+        document.getElementById(`slide-${n}`).classList.add('active');
+    }
+
+    // Slide 1
+    function checkSlide1() {
+        const val = document.getElementById('journal-input').value;
+        if(val.length > 5) {
+            nextSlide(2);
+        } else {
+            whisper("剧作家，你的羽毛笔似乎没墨水了。请写下完整的想法。");
+        }
+    }
+
+    // Slide 2: Drag & Drop
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+    
+    function drop(ev, targetId) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        
+        if(data === targetId) {
+            ev.target.appendChild(document.getElementById(data));
+            ev.target.style.backgroundColor = "rgba(197, 160, 89, 0.3)";
+            propScore++;
+            if(propScore === 4) {
+                document.getElementById('btn-slide-2').style.display = 'inline-block';
+                whisper("道具整理完毕。记住这些术语，我们在分析《麦克白》时会用到它们。");
+            }
+        } else {
+            whisper("这似乎不是正确的定义。再试一次。");
+        }
+    }
+
+    // Slide 3 & 4: Sonnet Interaction
+    let lensActive = false;
+
+    // Keyboard listener for lens
+    document.addEventListener('keydown', (e) => {
+        if(e.code === 'Space') showLens(true);
+    });
+    document.addEventListener('keyup', (e) => {
+        if(e.code === 'Space') showLens(false);
+    });
+
+    function showLens(show) {
+        const frames = document.querySelectorAll('.sonnet-text');
+        frames.forEach(f => {
+            if(show) f.classList.add('show-lens');
+            else f.classList.remove('show-lens');
+        });
+    }
+
+    function markLine(el, type, isTarget = false) {
+        // Toggle highlight
+        if(type === 'nature') {
+            el.classList.toggle('highlighted');
+        } else {
+            el.classList.toggle('highlighted-contrast');
+        }
+        
+        el.dataset.correct = isTarget;
+    }
+
+    function checkSlide3() {
+        // Check for Sonnet 18 (nature's imperfection)
+        // Correct lines: Rough winds..., summer's lease..., too hot..., gold complexion dimmed...
+        const lines = document.querySelectorAll('#sonnet18 .line.highlighted');
+        let correctCount = 0;
+        
+        lines.forEach(l => {
+            if(l.dataset.correct === "true") correctCount++;
+        });
+
+        if(correctCount >= 2) {
+            whisper("观察敏锐。莎士比亚指出夏天会‘风吹’、‘太热’、‘阴霾’，以此来衬托爱人的永恒。");
+            setTimeout(() => nextSlide(4), 4000);
+        } else {
+            whisper("请寻找那些描述夏天‘缺点’的句子（太热、太短、风太大）。");
+        }
+    }
+
+    function checkSlide4() {
+        // Check for Sonnet 130 (reality/flaws)
+        // Correct lines: nothing like the sun, breasts are dun, wires grow on head, breath reeks...
+        const lines = document.querySelectorAll('#sonnet130 .line.highlighted-contrast');
+        let correctCount = 0;
+        
+        lines.forEach(l => {
+            if(l.dataset.correct === "true") correctCount++;
+        });
+
+        if(correctCount >= 2) {
+            whisper("正是如此。他没有撒谎说爱人是女神，而是说她是一个真实的凡人。这种诚实（Honesty）是另一种强大的影响力。");
+            setTimeout(() => nextSlide(5); CourseEngine.markComplete(12), 4000);
+        } else {
+            whisper("寻找那些听起来不像‘情话’的句子。比如形容头发像铁丝，或者口气不好闻。");
+        }
+    }
+
+</script>
+
+</body>
+</html>

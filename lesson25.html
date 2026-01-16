@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10 Lesson 25: The Main Stage</title>
+    <style>
+        :root {
+            --bg-stage: #111;
+            --curtain: #0a0a0a;
+            --spotlight: rgba(255, 255, 255, 0.8);
+            --accent-gold: #ffd700;
+            --accent-red: #e74c3c;
+            --text-light: #ecf0f1;
+            --font-display: 'Impact', sans-serif;
+            --font-body: 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-stage);
+            color: var(--text-light);
+            font-family: var(--font-body);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Spotlight Effect Background */
+        .stage-lights {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 0%, var(--spotlight) 0%, transparent 60%);
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Main Container */
+        #expo-center {
+            width: 90%;
+            max-width: 1000px;
+            min-height: 85vh;
+            background-color: var(--curtain);
+            border: 1px solid #333;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+            border-top: 5px solid var(--accent-red);
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(to bottom, #fff, #999);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-pill {
+            background: var(--accent-red);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        /* Slides */
+        .slide {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            animation: fadeInUp 0.6s ease;
+        }
+        .slide.active { display: block; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Slide 1: The Green Room (Prep) */
+        .checklist-card {
+            background: #222;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #444;
+        }
+
+        .check-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            padding: 10px;
+            transition: background 0.2s;
+        }
+        .check-row:hover { background: #333; }
+        
+        .check-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent-gold);
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .check-row.checked .check-box::after { content: '✔'; color: var(--accent-gold); }
+        .check-row.checked { color: var(--accent-gold); text-decoration: line-through; }
+
+        /* Slide 2: The Stage (Q&A Sim) */
+        .presentation-screen {
+            background: #fff;
+            color: #000;
+            height: 300px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-family: var(--font-display);
+            text-align: center;
+            position: relative;
+            margin-bottom: 20px;
+            box-shadow: 0 0 30px rgba(255,255,255,0.1);
+        }
+
+        .audience-pit {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            height: 150px;
+            align-items: flex-end;
+        }
+
+        .audience-member {
+            width: 60px;
+            height: 60px;
+            background: #333;
+            border-radius: 50%;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .audience-member.active {
+            background: var(--accent-gold);
+            transform: scale(1.2) translateY(-20px);
+            box-shadow: 0 0 20px var(--accent-gold);
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            color: #000;
+            padding: 15px;
+            border-radius: 10px;
+            width: 250px;
+            font-size: 0.9rem;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            margin-left: -10px;
+            border-width: 10px;
+            border-style: solid;
+            border-color: #fff transparent transparent transparent;
+        }
+
+        /* Slide 3: Concept Weaver */
+        .loom-board {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .thread-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 45%;
+        }
+
+        .concept-node {
+            background: #2c3e50;
+            padding: 15px;
+            border: 1px solid #444;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .concept-node:hover { border-color: var(--accent-gold); }
+        .concept-node.selected { background: var(--accent-gold); color: #000; }
+        .concept-node.matched { opacity: 0.5; border-color: green; background: #1a1a1a; cursor: default; }
+
+        /* Slide 4: SPARK Playback */
+        .playback-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .playback-card {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-top: 3px solid #555;
+        }
+
+        .playback-card h3 { margin-top: 0; color: #888; font-size: 1rem; }
+        
+        textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #555;
+            color: #fff;
+            padding: 5px;
+            font-family: var(--font-body);
+            resize: none;
+        }
+        textarea:focus { outline: none; border-bottom: 1px solid var(--accent-gold); }
+
+        /* UI Buttons */
+        .btn {
+            background: transparent;
+            border: 2px solid var(--accent-gold);
+            color: var(--accent-gold);
+            padding: 12px 30px;
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-top: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover { background: var(--accent-gold); color: #000; box-shadow: 0 0 20px var(--accent-gold); }
+
+        /* Stage Manager (Coach) */
+        #stage-manager {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background: #000;
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 15px;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .control-btn {
+            background: #333;
+            border: none;
+            color: #fff;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .control-btn:hover { background: #555; }
+
+    </style>
+    <script src="course.js"></script>
+</head>
+<body>
+    <a href="index.html" style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+<div class="stage-lights"></div>
+
+<div id="expo-center">
+    <header>
+        <div style="font-family:var(--font-display); color:#666;">UNIT 10.25</div>
+        <h1>THE MAIN STAGE</h1>
+        <div class="status-pill">LIVE</div>
+    </header>
+
+    <!-- Slide 1: Green Room -->
+    <div class="slide active" id="slide-1">
+        <h2>01. The Green Room (Preparation)</h2>
+        <p>你的观众已经入座。在登台之前，请进行最后的设备检查。</p>
+        
+        <div class="checklist-card">
+            <div class="check-row" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div>My presentation has a clear Hook/Opening.</div>
+            </div>
+            <div class="check-row" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div>I have evidence (photos/quotes) from my fieldwork.</div>
+            </div>
+            <div class="check-row" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div>I can explain HOW the environment influenced behavior.</div>
+            </div>
+            <div class="check-row" onclick="toggleCheck(this)">
+                <div class="check-box"></div>
+                <div>I have a concluding thought.</div>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <button class="btn" id="btn-1" style="display:none; border-color:var(--accent-red); color:var(--accent-red);" onclick="nextSlide(2)">WALK ON STAGE</button>
+        </div>
+    </div>
+
+    <!-- Slide 2: The Presentation -->
+    <div class="slide" id="slide-2">
+        <h2>02. The Spotlight (Simulation)</h2>
+        <p>你正在展示你的研究。点击“Next Slide”推进演讲。准备好回答观众的随机提问。</p>
+
+        <div class="presentation-screen" id="screen-content">
+            TITLE SLIDE:<br>Ethnographic Study
+        </div>
+
+        <div class="audience-pit">
+            <div class="audience-member" id="am-1"><div class="bubble">你在这个地点遇到了什么困难吗？</div></div>
+            <div class="audience-member" id="am-2"><div class="bubble">你是如何确保观察客观的？</div></div>
+            <div class="audience-member" id="am-3"><div class="bubble">除了环境，还有什么在影响他们？</div></div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" onclick="nextScreen()">Next Slide >></button>
+        </div>
+
+        <div id="q-response" style="display:none; margin-top:20px; text-align:center;">
+            <textarea placeholder="Type your answer to the audience here (Simulated)..." style="width:60%; border:1px solid #fff;"></textarea>
+            <br>
+            <button class="btn" style="margin-top:10px; font-size:0.9rem;" onclick="answerQuestion()">Answer Question</button>
+        </div>
+        
+        <button class="btn" id="btn-2" style="display:none;" onclick="nextSlide(3)">APPLAUSE (Exit Stage)</button>
+    </div>
+
+    <!-- Slide 3: Concept Weaver -->
+    <div class="slide" id="slide-3">
+        <h2>03. The Neural Link (Synthesis)</h2>
+        <p>演出结束了。现在我们需要将你的微观研究与整个单元的宏观主题连接起来。</p>
+        <p><b>任务：</b> 将左侧的<b>具体活动</b>与右侧的<b>影响力真理 (Generalization)</b> 连接起来。</p>
+
+        <div class="loom-board">
+            <div class="thread-col" id="col-left">
+                <div class="concept-node" onclick="selectNode(this, 'left', 1)">MACBETH (Witches/Lady M)</div>
+                <div class="concept-node" onclick="selectNode(this, 'left', 2)">ETHNOGRAPHY (Gym/Cafe)</div>
+                <div class="concept-node" onclick="selectNode(this, 'left', 3)">PODCASTS (StoryCorps)</div>
+            </div>
+            <div class="thread-col" id="col-right">
+                <div class="concept-node" onclick="selectNode(this, 'right', 2)">Environment shapes behavior implicitly. (环境隐形地塑造行为)</div>
+                <div class="concept-node" onclick="selectNode(this, 'right', 3)">Personal stories create emotional influence. (个人故事创造情感影响)</div>
+                <div class="concept-node" onclick="selectNode(this, 'right', 1)">Influence can be manipulative or destructive. (影响力可能是操纵性的)</div>
+            </div>
+        </div>
+
+        <button class="btn" id="btn-3" style="display:none;" onclick="nextSlide(4)">Connections Established >></button>
+    </div>
+
+    <!-- Slide 4: SPARK Playback -->
+    <div class="slide" id="slide-4">
+        <h2>04. SPARK Playback (Reflection)</h2>
+        <p>SPARK 流程的最后一步是 "Playback"（回放/复盘）。</p>
+        <p>请诚实记录你在本次研究中的得失。</p>
+
+        <div class="playback-grid">
+            <div class="playback-card" style="border-top-color: var(--accent-gold);">
+                <h3>SUCCESSES (成功之处)</h3>
+                <textarea rows="4" placeholder="- Found a great location..."></textarea>
+            </div>
+            <div class="playback-card" style="border-top-color: var(--accent-red);">
+                <h3>CHALLENGES (遇到的挑战)</h3>
+                <textarea rows="4" placeholder="- Hard to hear conversations..."></textarea>
+            </div>
+            <div class="playback-card" style="border-top-color: #3498db;">
+                <h3>CHANGES (下次改进)</h3>
+                <textarea rows="4" placeholder="- Go at a different time..."></textarea>
+            </div>
+        </div>
+
+        <button class="btn" onclick="finishLesson()">ARCHIVE PROJECT</button>
+    </div>
+
+    <!-- Slide 5: End -->
+    <div class="slide" id="slide-5">
+        <div style="text-align: center; margin-top: 100px;">
+            <div style="font-size: 4rem;">🥂</div>
+            <h1 style="color: var(--accent-gold);">EXPO COMPLETE</h1>
+            <p>你已经完成了从观察、分析到展示的全过程。</p>
+            <p>你不仅研究了影响力，你现在也是一个有影响力的人（Influencer）。</p>
+            <p style="color: #888; margin-top: 20px;">Unit 10.25 Complete. Next: Post-Assessment.</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Stage Manager -->
+<div id="stage-manager">
+    <strong>🎧 Stage Manager:</strong>
+    <div id="manager-text">...</div>
+</div>
+
+<script>
+    // State
+    let currentSlide = 1;
+    let checkedItems = 0;
+    let slideIndex = 0;
+    const slideContent = [
+        "TITLE SLIDE:<br>Ethnographic Study",
+        "OBSERVATIONS:<br>What I saw...",
+        "ANALYSIS:<br>The influence of space...",
+        "CONCLUSION:<br>My findings..."
+    ];
+    let selectedLeft = null;
+    let selectedRight = null;
+    let matches = 0;
+
+    // Helper: Whisper
+    function whisper(msg) {
+        const box = document.getElementById('stage-manager');
+        document.getElementById('manager-text').innerText = msg;
+        box.style.display = 'block';
+        setTimeout(() => box.style.display = 'none', 6000);
+    }
+
+    function nextSlide(n) {
+        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+        document.getElementById(`slide-${n}`).classList.add('active');
+    }
+
+    // Slide 1: Checklist
+    function toggleCheck(el) {
+        if(el.classList.contains('checked')) return;
+        el.classList.add('checked');
+        checkedItems++;
+        if(checkedItems === 4) {
+            document.getElementById('btn-1').style.display = 'inline-block';
+            whisper("所有系统准备就绪。深呼吸，上台吧。");
+        }
+    }
+
+    // Slide 2: Presentation Sim
+    function nextScreen() {
+        slideIndex++;
+        if(slideIndex < slideContent.length) {
+            document.getElementById('screen-content').innerHTML = slideContent[slideIndex];
+            
+            // Randomly trigger question on slide 2 or 3
+            if(slideIndex === 1 || slideIndex === 2) {
+                triggerQuestion();
+            }
+        } else {
+            document.getElementById('screen-content').innerHTML = "THANK YOU";
+            document.getElementById('btn-2').style.display = 'inline-block';
+            document.querySelector('.controls').style.display = 'none';
+            whisper("展示结束。如果你能自如回答问题，说明你真的懂了。");
+        }
+    }
+
+    function triggerQuestion() {
+        const audienceID = Math.floor(Math.random() * 3) + 1;
+        const member = document.getElementById(`am-${audienceID}`);
+        member.classList.add('active');
+        member.querySelector('.bubble').style.display = 'block';
+        
+        document.querySelector('.controls').style.display = 'none'; // Pause presentation
+        document.getElementById('q-response').style.display = 'block';
+        
+        whisper("有人提问！保持冷静，用你 Field Notes 里的证据来回答。");
+    }
+
+    function answerQuestion() {
+        const val = document.querySelector('#q-response textarea').value;
+        if(val.length > 5) {
+            document.getElementById('q-response').style.display = 'none';
+            document.querySelector('.controls').style.display = 'flex'; // Resume
+            
+            // Reset audience
+            document.querySelectorAll('.audience-member').forEach(m => {
+                m.classList.remove('active');
+                m.querySelector('.bubble').style.display = 'none';
+            });
+            
+            whisper("回答得好。继续演示。");
+        } else {
+            whisper("请给出一个完整的回答。");
+        }
+    }
+
+    // Slide 3: Connections
+    function selectNode(el, side, id) {
+        if(el.classList.contains('matched')) return;
+
+        // Clear previous selection on same side
+        document.querySelectorAll(`#col-${side} .concept-node`).forEach(n => n.classList.remove('selected'));
+        el.classList.add('selected');
+
+        if(side === 'left') selectedLeft = {el: el, id: id};
+        else selectedRight = {el: el, id: id};
+
+        if(selectedLeft && selectedRight) {
+            if(selectedLeft.id === selectedRight.id) {
+                // Match
+                selectedLeft.el.classList.remove('selected');
+                selectedLeft.el.classList.add('matched');
+                selectedRight.el.classList.remove('selected');
+                selectedRight.el.classList.add('matched');
+                selectedLeft = null;
+                selectedRight = null;
+                matches++;
+                whisper("连接建立。这就是综合（Synthesis）的力量——看到不同事物背后的共同真理。");
+                
+                if(matches === 3) {
+                    document.getElementById('btn-3').style.display = 'inline-block';
+                }
+            } else {
+                whisper("连接不匹配。试着从主题（Topic）的角度思考。");
+                setTimeout(() => {
+                    selectedLeft.el.classList.remove('selected');
+                    selectedRight.el.classList.remove('selected');
+                    selectedLeft = null;
+                    selectedRight = null;
+                }, 500);
+            }
+        }
+    }
+
+    // Slide 4
+    function finishLesson() {
+        const text = document.querySelector('.playback-card textarea').value;
+        if(text.length > 0) {
+            nextSlide(5); CourseEngine.markComplete(25);
+        } else {
+            whisper("请至少记录一项成功或挑战。");
+        }
+    }
+
+</script>
+
+</body>
+</html>

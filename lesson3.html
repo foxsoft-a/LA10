@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10 Lesson 3: The Frequency Lab</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
+            --text-main: #e0e0e0;
+            --accent-green: #00ff41;
+            --accent-orange: #ff5722;
+            --accent-dim: #333;
+            --font-mono: 'Courier New', Courier, monospace;
+            --font-sans: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* CRT Screen Effect Overlay */
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 200;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        #studio-container {
+            width: 95%;
+            max-width: 1000px;
+            height: 90vh;
+            background: var(--panel-bg);
+            border: 2px solid #444;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Top Bar: Frequency Visualizer */
+        .top-bar {
+            height: 60px;
+            background: #000;
+            border-bottom: 1px solid #444;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+        }
+
+        .vu-meter {
+            display: flex;
+            gap: 2px;
+            height: 30px;
+            align-items: flex-end;
+        }
+
+        .vu-bar {
+            width: 6px;
+            background: var(--accent-green);
+            animation: bounce 0.5s infinite ease-in-out alternate;
+        }
+
+        @keyframes bounce {
+            0% { height: 5px; opacity: 0.5; }
+            100% { height: 25px; opacity: 1; }
+        }
+
+        .status-light {
+            color: var(--accent-orange);
+            font-family: var(--font-mono);
+            font-weight: bold;
+            text-transform: uppercase;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink { 50% { opacity: 0.3; } }
+
+        /* Main Workspace */
+        .workspace {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .slide.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        h1, h2 {
+            font-family: var(--font-mono);
+            color: var(--accent-green);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px dashed #444;
+            padding-bottom: 10px;
+        }
+
+        /* Interactive Components */
+        
+        /* Tuning Knob (Hook) */
+        .knob-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .static-text {
+            filter: blur(4px);
+            transition: filter 0.5s;
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 20px;
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 300px;
+            background: transparent;
+        }
+        
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            cursor: pointer;
+            margin-top: -8px;
+        }
+        
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #555;
+        }
+
+        /* Tape Player (Reading/Listening) */
+        .tape-deck {
+            background: #111;
+            border: 2px solid #333;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .transcript-box {
+            height: 150px;
+            background: #000;
+            color: var(--accent-green);
+            font-family: var(--font-mono);
+            padding: 15px;
+            overflow-y: auto;
+            border: 1px inset #333;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 8px 16px;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover { background: #444; border-color: var(--accent-green); }
+        .btn.active { background: var(--accent-green); color: black; }
+
+        /* Mixing Board (Analysis) */
+        .mixing-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .fader-group {
+            background: #222;
+            padding: 15px;
+            border: 1px solid #444;
+        }
+
+        .fader-label {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            background: #111;
+            border: 1px solid #444;
+            color: white;
+            padding: 10px;
+            font-family: var(--font-sans);
+            box-sizing: border-box;
+        }
+
+        /* Jigsaw Drag & Drop */
+        .jigsaw-desk {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .colleague-file {
+            flex: 1;
+            background: #2a2a2a;
+            padding: 15px;
+            border: 1px dashed #666;
+            font-size: 0.9rem;
+        }
+
+        .attribute-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            background: #444;
+            padding: 5px 10px;
+            border-radius: 15px;
+            cursor: move;
+            font-size: 0.8rem;
+            border: 1px solid #666;
+        }
+
+        .drop-zone {
+            min-height: 50px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--accent-green);
+            margin-top: 10px;
+            padding: 5px;
+        }
+
+        /* Coach Whisper */
+        #coach-screen {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 250px;
+            background: #000;
+            border: 2px solid var(--accent-orange);
+            color: var(--accent-orange);
+            padding: 15px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            display: none;
+            box-shadow: 0 0 10px var(--accent-orange);
+        }
+
+        .next-btn-container {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+    </style>
+    <script src="course.js"></script>
+</head>
+<body>
+    <a href="index.html" style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+<div id="studio-container">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div class="status-light">ON AIR</div>
+            <div style="color:#666;">// UNIT 10.3 PODCAST LAB</div>
+        </div>
+        <div class="vu-meter">
+            <div class="vu-bar" style="animation-delay: 0.1s"></div>
+            <div class="vu-bar" style="animation-delay: 0.2s"></div>
+            <div class="vu-bar" style="animation-delay: 0.3s"></div>
+            <div class="vu-bar" style="animation-delay: 0.1s"></div>
+            <div class="vu-bar" style="animation-delay: 0.4s"></div>
+        </div>
+    </div>
+
+    <div class="workspace">
+        
+        <!-- Slide 1: Tuning In (Hook) -->
+        <div class="slide active" id="slide-1">
+            <h1>Step 1: Signal Tuning</h1>
+            <p>制作人，我们在信号中捕捉到一句关于“个性与从众”的名言，但信号受到干扰。请调节频率旋钮，直到文字清晰可见。</p>
+            
+            <div class="knob-container">
+                <div class="static-text" id="hook-quote">
+                    "We must be courageous enough to be different from the world."
+                </div>
+                <input type="range" min="0" max="100" value="0" id="tuner" oninput="tuneSignal()">
+                <div style="margin-top:10px; color: var(--accent-green); font-family: var(--font-mono);">FREQ: <span id="freq-val">0</span> Hz</div>
+            </div>
+
+            <div id="journal-entry" style="display:none; animation: fadeIn 1s;">
+                <p><b>Elaine S. Dalton 的这句话意味着什么？</b> 作为制作人，你需要写下你的开场白（Journal Entry）。</p>
+                <textarea rows="4" placeholder="在此输入你的想法... (Have you ever felt the pressure to be the same as everyone else?)" id="journal-input"></textarea>
+                <div class="next-btn-container">
+                    <button class="btn" onclick="checkJournal()">确认录入</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: The Listening Station -->
+        <div class="slide" id="slide-2">
+            <h1>Step 2: Story Analysis</h1>
+            <p>我们收到了一份 StoryCorps 的音频档案。这是一位伊拉克战争退伍军人的故事。请点击播放，阅读实时转录稿，并在混音台记录关键信息。</p>
+            
+            <div class="tape-deck">
+                <div style="color:#888; margin-bottom:5px;">TAPE: "Real Men Cry" (Iraq Vet & Student)</div>
+                <div class="transcript-box" id="transcript-display">
+                    [WAITING FOR PLAYBACK...]
+                </div>
+                <div class="controls">
+                    <button class="btn" onclick="playTape()">► PLAY</button>
+                    <button class="btn" onclick="stopTape()">■ STOP</button>
+                </div>
+            </div>
+
+            <div class="mixing-board">
+                <div class="fader-group">
+                    <label class="fader-label">TRACK 1: THE INFLUENCE</label>
+                    <p style="font-size:0.8rem; color:#666;">谁或什么影响了故事的主角？</p>
+                    <input type="text" id="input-influence" placeholder="e.g., His teacher...">
+                </div>
+                <div class="fader-group">
+                    <label class="fader-label">TRACK 2: THE RESULT</label>
+                    <p style="font-size:0.8rem; color:#666;">这种影响带来了什么改变？</p>
+                    <input type="text" id="input-result" placeholder="e.g., It allowed him to show emotion...">
+                </div>
+                <div class="fader-group" style="grid-column: span 2;">
+                    <label class="fader-label">MASTER MIX: INTERVIEWER TECHNIQUE</label>
+                    <p style="font-size:0.8rem; color:#666;">采访者（学生）做得好的地方是什么？（提示：有时候安静也是一种技巧）</p>
+                    <textarea rows="2" id="input-tech"></textarea>
+                </div>
+            </div>
+
+            <div class="next-btn-container">
+                <button class="btn" onclick="checkAnalysis()">提交分析报告</button>
+            </div>
+        </div>
+
+        <!-- Slide 3: Jigsaw Synthesis -->
+        <div class="slide" id="slide-3">
+            <h1>Step 3: Pattern Recognition (Jigsaw)</h1>
+            <p>你的同事们刚刚分析了另外两个故事。请阅读他们的简报，并找出所有故事的<b>共同特征 (Common Attributes)</b>。</p>
+            
+            <div class="attribute-bank" id="tag-bank">
+                <div class="tag" draggable="true" ondragstart="drag(event)" id="tag1">Resilience (韧性)</div>
+                <div class="tag" draggable="true" ondragstart="drag(event)" id="tag2">Celebrities (名人)</div>
+                <div class="tag" draggable="true" ondragstart="drag(event)" id="tag3">Personal Connection (个人联结)</div>
+                <div class="tag" draggable="true" ondragstart="drag(event)" id="tag4">Money (金钱)</div>
+                <div class="tag" draggable="true" ondragstart="drag(event)" id="tag5">Turning Points (转折点)</div>
+            </div>
+
+            <div class="jigsaw-desk">
+                <div class="colleague-file">
+                    <strong style="color:var(--accent-orange)">FILE A: The Wheelman</strong>
+                    <p>Subj: MLK Jr.'s unexpected driver.</p>
+                    <p>Notes: Ordinary person in extraordinary time. Influence of a single moment.</p>
+                </div>
+                <div class="colleague-file">
+                    <strong style="color:var(--accent-orange)">FILE B: The 6th Grader</strong>
+                    <p>Subj: Girl with seizures.</p>
+                    <p>Notes: Influence of parents' support. Overcoming medical challenges.</p>
+                </div>
+                <div class="colleague-file" style="border-color: var(--accent-green);">
+                    <strong style="color:var(--accent-green)">YOUR FILE: The Vet</strong>
+                    <p>Subj: Teacher & Student.</p>
+                    <p>Notes: Influence of vulnerability. Breaking stereotypes.</p>
+                </div>
+            </div>
+
+            <div style="margin-top:20px;">
+                <label>DROP ZONE: 什么是这些具有“影响力”的故事的共同点？</label>
+                <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)" id="final-drop"></div>
+            </div>
+
+            <div class="next-btn-container">
+                <button class="btn" onclick="checkJigsaw()">生成最终报告</button>
+            </div>
+        </div>
+
+        <!-- Slide 4: Pre-Production (Homework) -->
+        <div class="slide" id="slide-4">
+            <h1>Step 4: Pre-Production</h1>
+            <p>既然你已经理解了“影响力”故事的要素，下一课轮到你制作播客了。</p>
+            <p><b>任务：</b> 在你的“联系人名片盒”中选择一位家庭成员。写下你最想问他们的一个关于“影响力”的问题。</p>
+            
+            <div style="background:#222; padding:20px; border-left: 4px solid var(--accent-green); margin-top:20px;">
+                <label style="display:block; margin-bottom:10px;">Interview Candidate:</label>
+                <input type="text" placeholder="e.g., My Grandmother">
+                
+                <label style="display:block; margin:10px 0;">The "Golden Question" (关于 Who/What influenced them):</label>
+                <textarea rows="3" placeholder="e.g., Who was the person who believed in you when no one else did?"></textarea>
+            </div>
+
+            <div class="next-btn-container">
+                <button class="btn" onclick="finishLesson()">课程结束 (Finish)</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Coach Screen -->
+    <div id="coach-screen">
+        <div style="border-bottom:1px solid var(--accent-orange); margin-bottom:5px;">PRODUCER'S NOTE:</div>
+        <div id="coach-text">Listen closely to the silence between the words.</div>
+    </div>
+
+</div>
+
+<script>
+    // --- Slide 1: Tuning ---
+    function tuneSignal() {
+        const val = document.getElementById('tuner').value;
+        const text = document.getElementById('hook-quote');
+        const freqDisplay = document.getElementById('freq-val');
+        
+        // Blur calculation: 0 at val=85 (sweet spot), high otherwise
+        let blur = Math.abs(85 - val) / 10;
+        text.style.filter = `blur(${blur}px)`;
+        freqDisplay.innerText = (88 + (val/5)).toFixed(1);
+
+        if (val > 80 && val < 90) {
+            text.style.color = "#00ff41";
+            text.style.textShadow = "0 0 5px #00ff41";
+            document.getElementById('journal-entry').style.display = 'block';
+            showCoach("信号清晰！这句话提醒我们：真正的影响力往往来自那些敢于与众不同的人。");
+        } else {
+            text.style.color = "#fff";
+            text.style.textShadow = "none";
+        }
+    }
+
+    function checkJournal() {
+        const val = document.getElementById('journal-input').value;
+        if(val.length > 10) {
+            nextSlide(2);
+        } else {
+            showCoach("制作人，你的开场白太短了。请多分享一点关于‘不同’的看法。");
+        }
+    }
+
+    // --- Slide 2: Tape Deck ---
+    const storyText = [
+        "Interviewer: You mentioned your teacher, Mr. Al. Why him?",
+        "Vet: You know, coming back from Iraq, I was angry. I was a tough guy.",
+        "Vet: But Mr. Al... he saw past that. One day I broke down in class.",
+        "Vet: I thought he'd judge me. Instead, he said 'Real men cry, son.'",
+        "Vet: That moment changed how I saw strength. It wasn't about holding it in.",
+        "Vet: It was about having the courage to let it out."
+    ];
+    let tapeInterval;
+
+    function playTape() {
+        const display = document.getElementById('transcript-display');
+        display.innerHTML = "";
+        let i = 0;
+        showCoach("注意听（读）。影响力往往发生在最脆弱的时刻。");
+        
+        clearInterval(tapeInterval);
+        tapeInterval = setInterval(() => {
+            if(i < storyText.length) {
+                display.innerHTML += storyText[i] + "\n\n";
+                display.scrollTop = display.scrollHeight; // Auto scroll
+                i++;
+            } else {
+                clearInterval(tapeInterval);
+                display.innerHTML += "[END OF TAPE]";
+            }
+        }, 1500); // Speed of text reveal
+    }
+
+    function stopTape() {
+        clearInterval(tapeInterval);
+    }
+
+    function checkAnalysis() {
+        const inf = document.getElementById('input-influence').value;
+        const res = document.getElementById('input-result').value;
+        
+        if(inf.length > 2 && res.length > 2) {
+            nextSlide(3);
+        } else {
+            showCoach("混音台数据不完整。请填入‘影响力来源’和‘结果’。");
+        }
+    }
+
+    // --- Slide 3: Jigsaw ---
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        ev.target.appendChild(document.getElementById(data));
+    }
+
+    function checkJigsaw() {
+        const dropZone = document.getElementById('final-drop');
+        const children = dropZone.children;
+        let correctCount = 0;
+        let wrongCount = 0;
+
+        for (let i = 0; i < children.length; i++) {
+            const text = children[i].innerText;
+            if (text.includes("Resilience") || text.includes("Personal Connection") || text.includes("Turning Points")) {
+                correctCount++;
+            } else {
+                wrongCount++;
+            }
+        }
+
+        if (correctCount >= 2 && wrongCount === 0) {
+            showCoach("分析精准。 StoryCorps 的故事通常关乎个人的坚韧与人际联结，而非金钱或名气。");
+            setTimeout(() => nextSlide(4); CourseEngine.markComplete(3), 2000);
+        } else {
+            showCoach("再仔细看看。NPR StoryCorps 关注的是普通人的非凡时刻（Resilience, Connection），而不是名人或金钱。");
+        }
+    }
+
+    // --- Helper Functions ---
+    function nextSlide(n) {
+        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+        document.getElementById(`slide-${n}`).classList.add('active');
+    }
+
+    function showCoach(msg) {
+        const screen = document.getElementById('coach-screen');
+        const text = document.getElementById('coach-text');
+        text.innerText = msg;
+        screen.style.display = 'block';
+        
+        // Auto hide
+        setTimeout(() => {
+            screen.style.display = 'none';
+        }, 6000);
+    }
+
+    function finishLesson() {
+        document.querySelector('.workspace').innerHTML = `
+            <div style="text-align:center; padding-top:100px;">
+                <h1 style="color:var(--accent-green); font-size:3rem;">BROADCAST READY</h1>
+                <p>你已经掌握了个人叙事中的“影响力”频率。</p>
+                <p>下节课，我们将正式录制你的 Podcast。</p>
+            </div>
+        `;
+    }
+
+</script>
+
+</body>
+</html>

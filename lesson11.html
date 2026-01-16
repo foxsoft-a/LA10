@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10 Lesson 11: The Architect of History</title>
+    <style>
+        :root {
+            --bg-blue: #2c3e50;
+            --blueprint-blue: #34495e;
+            --line-white: #ecf0f1;
+            --accent-yellow: #f1c40f;
+            --error-red: #e74c3c;
+            --success-green: #2ecc71;
+            --font-tech: 'Courier New', Courier, monospace;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-blue);
+            color: var(--line-white);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Architect's Desk */
+        #desk-container {
+            width: 95%;
+            max-width: 1000px;
+            min-height: 90vh;
+            border: 4px solid var(--line-white);
+            background-color: var(--blueprint-blue);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Title Block */
+        .title-block {
+            border: 2px solid var(--line-white);
+            padding: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-tech);
+        }
+
+        .project-name { font-size: 1.5rem; font-weight: bold; text-transform: uppercase; }
+        .project-meta { font-size: 0.8rem; text-align: right; opacity: 0.8; }
+
+        /* Slides */
+        .slide {
+            display: none;
+            flex: 1;
+            animation: fadeIn 0.5s ease-out;
+        }
+        .slide.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 { border-bottom: 1px dashed var(--line-white); padding-bottom: 10px; color: var(--accent-yellow); font-family: var(--font-tech); }
+
+        /* Slide 1: Word Construction */
+        .vocab-construct {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        
+        .vocab-part {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border: 1px dashed var(--line-white);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .vocab-part:hover { background: rgba(255,255,255,0.2); }
+        .vocab-part.selected { border-color: var(--accent-yellow); color: var(--accent-yellow); }
+
+        /* Slide 2: Thesis Builder */
+        .blueprint-form {
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border: 1px solid var(--line-white);
+            margin-bottom: 20px;
+        }
+
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-family: var(--font-tech); font-size: 0.9rem; margin-bottom: 5px; color: var(--accent-yellow); }
+        
+        input[type="text"], textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--line-white);
+            color: white;
+            font-family: var(--font-tech);
+            padding: 10px 0;
+            font-size: 1.1rem;
+        }
+        
+        input:focus, textarea:focus { outline: none; border-bottom-color: var(--accent-yellow); }
+
+        .thesis-preview {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.3rem;
+            line-height: 1.6;
+            padding: 20px;
+            background: #fff;
+            color: black;
+            border-radius: 2px;
+            margin-top: 20px;
+            min-height: 80px;
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.5);
+        }
+
+        /* Slide 3: Outline Sorting */
+        .outline-board {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .outline-slots {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .slot {
+            border: 2px dashed #7f8c8d;
+            padding: 15px;
+            min-height: 50px;
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            font-family: var(--font-tech);
+        }
+        
+        .slot::before {
+            content: attr(data-label);
+            margin-right: 15px;
+            color: var(--accent-yellow);
+            font-weight: bold;
+        }
+
+        .card-stack {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+        }
+
+        .draggable-card {
+            background: var(--line-white);
+            color: var(--bg-blue);
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: grab;
+            font-weight: bold;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* Slide 4: Citation Repair */
+        .citation-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid var(--line-white);
+            min-height: 60px;
+            align-items: center;
+        }
+
+        .cite-part {
+            background: var(--accent-yellow);
+            color: var(--bg-blue);
+            padding: 8px 15px;
+            font-family: 'Times New Roman', serif;
+            cursor: grab;
+            font-size: 1.1rem;
+        }
+
+        /* Buttons */
+        .btn {
+            background: transparent;
+            border: 2px solid var(--accent-yellow);
+            color: var(--accent-yellow);
+            padding: 10px 30px;
+            font-family: var(--font-tech);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background: var(--accent-yellow);
+            color: var(--bg-blue);
+        }
+
+        /* Chief Architect (Coach) */
+        #architect-whisper {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 300px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--accent-yellow);
+            padding: 15px;
+            display: none;
+            z-index: 100;
+        }
+        
+        #architect-text { font-family: var(--font-tech); font-size: 0.9rem; }
+
+    </style>
+    <script src="course.js"></script>
+</head>
+<body>
+    <a href="index.html" style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+<div id="desk-container">
+    <div class="title-block">
+        <div class="project-name">The Architect of History</div>
+        <div class="project-meta">
+            UNIT 10.11 // RESEARCH PLAN<br>
+            STATUS: DRAFTING
+        </div>
+    </div>
+
+    <!-- Slide 1: Hook (Vocabulary) -->
+    <div class="slide active" id="slide-1">
+        <h2>Module 01: Authority Construction</h2>
+        <p>在开始研究之前，我们需要理解核心词汇：<b>Authority (权威)</b>。</p>
+        <p>这个词源于拉丁语 <i>Auctor</i>。请点击与“Authority”共享同一词根的单词，构建你的地基。</p>
+        
+        <div class="vocab-construct">
+            <div class="vocab-part" onclick="checkVocab(this, true)">Author<br>(作者)</div>
+            <div class="vocab-part" onclick="checkVocab(this, false)">Audience<br>(听众)</div>
+            <div class="vocab-part" onclick="checkVocab(this, true)">Authentic<br>(真实的)</div>
+            <div class="vocab-part" onclick="checkVocab(this, false)">Automatic<br>(自动的)</div>
+        </div>
+
+        <button class="btn" id="btn-slide-1" style="display:none;" onclick="nextSlide(2)">地基确认 >> 进入规划</button>
+    </div>
+
+    <!-- Slide 2: Thesis Builder -->
+    <div class="slide" id="slide-2">
+        <h2>Module 02: Thesis Construction (论文陈述)</h2>
+        <p>一个好的 Research Paper 需要一个稳固的 Thesis。它不仅是事实的陈述，更是一个观点的表达。</p>
+        <p>请填入你的研究对象信息，生成你的设计蓝图。</p>
+
+        <div class="blueprint-form">
+            <div class="input-group">
+                <label>SUBJECT (谁?):</label>
+                <input type="text" id="inp-subject" placeholder="e.g., Nelson Mandela" oninput="updateThesis()">
+            </div>
+            <div class="input-group">
+                <label>ACTION (做了什么?):</label>
+                <input type="text" id="inp-action" placeholder="e.g., fought against apartheid" oninput="updateThesis()">
+            </div>
+            <div class="input-group">
+                <label>SIGNIFICANCE (为什么重要/造成了什么影响?):</label>
+                <input type="text" id="inp-sig" placeholder="e.g., redefined the concept of forgiveness in leadership" oninput="updateThesis()">
+            </div>
+        </div>
+
+        <div class="thesis-preview" id="thesis-output">
+            [ 等待输入数据以生成蓝图... ]
+        </div>
+
+        <button class="btn" onclick="checkThesis()">批准蓝图</button>
+    </div>
+
+    <!-- Slide 3: Outline Structure -->
+    <div class="slide" id="slide-3">
+        <h2>Module 03: Structural Frame (大纲架构)</h2>
+        <p>按照 PDF 的要求，你的论文需要三个主体段落。请将右侧的“建材”拖入左侧正确的“楼层”。</p>
+
+        <div class="outline-board">
+            <div class="outline-slots">
+                <div class="slot" id="slot-1" data-label="Body I (Context):" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                <div class="slot" id="slot-2" data-label="Body II (Influenced By):" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                <div class="slot" id="slot-3" data-label="Body III (Influence On):" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+            </div>
+            
+            <div class="card-stack" id="source-stack">
+                <div class="draggable-card" draggable="true" ondragstart="drag(event)" id="card-c">
+                    独特的贡献 (Contribution) & 改变历史的声音
+                </div>
+                <div class="draggable-card" draggable="true" ondragstart="drag(event)" id="card-a">
+                    生平描述 (Life Description) & 历史背景
+                </div>
+                <div class="draggable-card" draggable="true" ondragstart="drag(event)" id="card-b">
+                    童年细节 (Childhood) & 影响他/她的生活经历
+                </div>
+            </div>
+        </div>
+
+        <button class="btn" id="btn-slide-3" style="display:none;" onclick="nextSlide(4)">结构验收通过 >></button>
+    </div>
+
+    <!-- Slide 4: MLA Citation -->
+    <div class="slide" id="slide-4">
+        <h2>Module 04: Source Code Repair (MLA 引用)</h2>
+        <p>引用格式就像建筑代码，必须精确。请拖动下方的方块，将其排列成正确的 MLA 引用顺序。</p>
+        <p style="font-size:0.9rem; color:#aaa">提示：Who -> What -> Where -> When</p>
+
+        <div class="citation-container" id="cite-zone" ondrop="dropCite(event)" ondragover="allowDrop(event)">
+            <!-- Dropped items go here -->
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:20px;" id="cite-source">
+            <div class="cite-part" draggable="true" ondragstart="dragCite(event)" id="cp-1">"Article Title."</div>
+            <div class="cite-part" draggable="true" ondragstart="dragCite(event)" id="cp-2">Website Name,</div>
+            <div class="cite-part" draggable="true" ondragstart="dragCite(event)" id="cp-3">Date,</div>
+            <div class="cite-part" draggable="true" ondragstart="dragCite(event)" id="cp-4">Author Last, First.</div>
+            <div class="cite-part" draggable="true" ondragstart="dragCite(event)" id="cp-5">URL.</div>
+        </div>
+
+        <button class="btn" onclick="checkCitation()">运行代码检查</button>
+    </div>
+
+    <!-- Slide 5: Final -->
+    <div class="slide" id="slide-5">
+        <div style="text-align: center; margin-top: 80px;">
+            <h1 style="color: var(--success-green); font-family: var(--font-tech); font-size: 3rem;">BLUEPRINT APPROVED</h1>
+            <p>你的论文结构已通过审核。</p>
+            <p>现在，你可以开始撰写初稿了。请确保使用双倍行距和 MLA 格式引用。</p>
+            <div style="border: 1px solid var(--line-white); padding: 20px; margin-top: 30px; font-family: 'Times New Roman', serif;">
+                <p><b>Next Step (Lesson 12):</b> 我们将进入莎士比亚的语言世界。</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Coach Whisper -->
+<div id="architect-whisper">
+    <strong>📐 Chief Architect:</strong>
+    <div id="architect-text">...</div>
+</div>
+
+<script>
+    // Helper: Whisper
+    function whisper(msg) {
+        const box = document.getElementById('architect-whisper');
+        document.getElementById('architect-text').innerText = msg;
+        box.style.display = 'block';
+        setTimeout(() => box.style.display = 'none', 6000);
+    }
+
+    function nextSlide(n) {
+        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+        document.getElementById(`slide-${n}`).classList.add('active');
+    }
+
+    // Slide 1: Vocab
+    let vocabScore = 0;
+    function checkVocab(el, isCorrect) {
+        if(el.classList.contains('selected')) return;
+        
+        el.classList.add('selected');
+        if(isCorrect) {
+            el.style.borderColor = "#2ecc71";
+            el.style.color = "#2ecc71";
+            vocabScore++;
+            if(vocabScore === 2) {
+                document.getElementById('btn-slide-1').style.display = 'inline-block';
+                whisper("结构稳固。Author (创造者) 拥有 Authority (权威)。Authentic (真实的) 也源于此——这都是关于源头的力量。");
+            }
+        } else {
+            el.style.borderColor = "#e74c3c";
+            el.style.color = "#e74c3c";
+            whisper("小心。这个词根不同。Authority 关乎‘创造’和‘源头’。");
+        }
+    }
+
+    // Slide 2: Thesis Builder
+    function updateThesis() {
+        const s = document.getElementById('inp-subject').value;
+        const a = document.getElementById('inp-action').value;
+        const sig = document.getElementById('inp-sig').value;
+        
+        const output = document.getElementById('thesis-output');
+        
+        if(s && a && sig) {
+            output.innerHTML = `<b>${s}</b> ${a}, and in doing so, <b>${sig}</b>.`;
+        } else {
+            output.innerHTML = "[ 正在计算结构完整性... ]";
+        }
+    }
+
+    function checkThesis() {
+        const s = document.getElementById('inp-subject').value;
+        const sig = document.getElementById('inp-sig').value;
+        
+        if(s.length > 2 && sig.length > 5) {
+            whisper("蓝图通过。这就叫‘Thesis’——不仅仅是陈述事实，而是指出了‘Significance (重要性)’。");
+            nextSlide(3);
+        } else {
+            whisper("结构不稳。请确保你完整填写了‘Significance’部分——为什么这个人很重要？");
+        }
+    }
+
+    // Slide 3: Outline Drag & Drop
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+    
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        var card = document.getElementById(data);
+        var slot = ev.target;
+        
+        // Ensure dropping on slot
+        if(!slot.classList.contains('slot')) return;
+        
+        // Validation Logic
+        // slot-1 (Context) should get card-a (Life/Context)
+        // slot-2 (Influenced By) should get card-b (Childhood/Influences)
+        // slot-3 (Influence On) should get card-c (Contribution)
+        
+        let correct = false;
+        if(slot.id === 'slot-1' && data === 'card-a') correct = true;
+        if(slot.id === 'slot-2' && data === 'card-b') correct = true;
+        if(slot.id === 'slot-3' && data === 'card-c') correct = true;
+
+        if(correct) {
+            slot.appendChild(card);
+            slot.style.borderColor = "#2ecc71";
+            checkOutlineComplete();
+        } else {
+            whisper("位置错误。想想逻辑顺序：先介绍背景（Context），再谈受到的影响（Influenced By），最后谈对他人的影响（Influence On）。");
+        }
+    }
+
+    function checkOutlineComplete() {
+        if(document.getElementById('slot-1').children.length > 0 &&
+           document.getElementById('slot-2').children.length > 0 &&
+           document.getElementById('slot-3').children.length > 0) {
+            document.getElementById('btn-slide-3').style.display = 'inline-block';
+            whisper("架构完美。这就是一篇优秀 Research Paper 的骨架。");
+        }
+    }
+
+    // Slide 4: Citation Sorter
+    function dragCite(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+    
+    function dropCite(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        document.getElementById('cite-zone').appendChild(document.getElementById(data));
+    }
+
+    function checkCitation() {
+        const zone = document.getElementById('cite-zone');
+        const children = zone.children;
+        const correctOrder = ['cp-4', 'cp-1', 'cp-2', 'cp-3', 'cp-5']; // Author, Title, Container, Date, URL
+        
+        let isCorrect = true;
+        if(children.length !== 5) isCorrect = false;
+        else {
+            for(let i=0; i<5; i++) {
+                if(children[i].id !== correctOrder[i]) isCorrect = false;
+            }
+        }
+
+        if(isCorrect) {
+            whisper("代码无误。MLA 格式：Author. Title. Container, Date, Location(URL).");
+            setTimeout(() => nextSlide(5); CourseEngine.markComplete(11), 3000);
+        } else {
+            whisper("引用顺序错误。记住口诀：谁写的(Author) -> 写了什么(Title) -> 发在哪(Website) -> 什么时候(Date) -> 链接(URL)。");
+        }
+    }
+
+</script>
+
+</body>
+</html>

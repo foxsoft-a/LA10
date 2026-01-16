@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 10 Lesson 6: The Temple of Reason</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --marble: #ffffff;
+            --text-color: #2c3e50;
+            --accent-blue: #3498db; /* Blue Hat */
+            --accent-red: #e74c3c; /* Red Hat */
+            --accent-yellow: #f1c40f; /* Yellow Hat */
+            --accent-green: #2ecc71; /* Green Hat */
+            --accent-black: #34495e; /* Black Hat */
+            --accent-white: #ecf0f1; /* White Hat (border) */
+            --font-serif: 'Georgia', 'Times New Roman', serif;
+            --font-sans: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-sans);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(#dfe6e9 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        #temple-container {
+            width: 90%;
+            max-width: 900px;
+            background: var(--marble);
+            min-height: 85vh;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-top: 10px solid var(--text-color);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+        }
+
+        /* Pillars Decoration */
+        #temple-container::before, #temple-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            border-left: 2px solid #ddd;
+            border-right: 2px solid #ddd;
+        }
+        #temple-container::before { left: 10px; }
+        #temple-container::after { right: 10px; }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .subtitle {
+            font-style: italic;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+
+        /* Slides */
+        .slide {
+            display: none;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Interactive Elements */
+        .btn {
+            background-color: var(--text-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        /* Slide 1: Quote Restoration */
+        .quote-box {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            line-height: 1.8;
+            text-align: center;
+            padding: 40px;
+            background: #fafafa;
+            border: 1px solid #eee;
+        }
+
+        .missing-word {
+            border: none;
+            border-bottom: 2px solid var(--text-color);
+            background: transparent;
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            width: 100px;
+            text-align: center;
+            color: var(--accent-blue);
+        }
+
+        /* Slide 2: Article Analysis */
+        .article-segment {
+            font-family: var(--font-serif);
+            line-height: 1.8;
+            font-size: 1.1rem;
+            padding: 20px;
+            background: #fff;
+            border-left: 4px solid #ccc;
+            margin-bottom: 20px;
+            transition: filter 0.5s;
+        }
+
+        .blur-mode {
+            filter: blur(4px);
+            user-select: none;
+            cursor: pointer;
+        }
+        
+        .blur-mode:hover {
+            filter: blur(0);
+        }
+
+        .annotation-tool {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .highlighter {
+            display: inline-block;
+            padding: 5px 15px;
+            margin: 0 5px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .highlighter.active {
+            background: var(--text-color);
+            color: white;
+        }
+
+        .highlightable {
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        /* Slide 3: Six Hats */
+        .hat-arena {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .hat-card {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            padding: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border: 2px solid transparent;
+        }
+
+        .hat-card:hover { transform: scale(1.05); }
+
+        .hat-white { background: white; border: 2px solid #bdc3c7; color: #7f8c8d; }
+        .hat-red { background: var(--accent-red); color: white; }
+        .hat-black { background: var(--accent-black); color: white; }
+        .hat-yellow { background: var(--accent-yellow); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .hat-green { background: var(--accent-green); color: white; }
+        .hat-blue { background: var(--accent-blue); color: white; }
+
+        .thought-bubble {
+            background: #fff;
+            padding: 20px;
+            border-radius: 20px;
+            border: 2px solid var(--text-color);
+            margin-bottom: 20px;
+            position: relative;
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .thought-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-bottom: 2px solid var(--text-color);
+            border-right: 2px solid var(--text-color);
+            transform: rotate(45deg);
+        }
+
+        /* Professor's Notes */
+        #professor-note {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 280px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-left: 5px solid var(--accent-blue);
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 0.9rem;
+            display: none;
+            z-index: 100;
+        }
+
+    </style>
+    <script src="course.js"></script>
+</head>
+<body>
+    <a href="index.html" style="position:fixed; top:20px; left:20px; z-index:999; background:rgba(0,0,0,0.5); color:white; padding:10px; border-radius:50%; text-decoration:none;">🏠</a>
+<div id="temple-container">
+    <header>
+        <h1>THE TEMPLE OF REASON</h1>
+        <div class="subtitle">Unit 10.6: Confronting Anti-Intellectualism</div>
+    </header>
+
+    <!-- Slide 1: Hook - Restoration -->
+    <div class="slide active" id="slide-1">
+        <h2>Part 1: The Crumbling Pillar</h2>
+        <p>我们正处在一个“反智主义（Anti-Intellectualism）”抬头的时代。正如 Ralph Waldo Emerson 所言，如果不加以维护，国家的智慧就会自我吞噬。</p>
+        <p>请填补这句名言缺失的单词，修复智慧的支柱：</p>
+        
+        <div class="quote-box">
+            "The mind of this country, taught to <input type="text" class="missing-word" id="w1" placeholder="a__"> at <input type="text" class="missing-word" id="w2" placeholder="l__"> objects, <input type="text" class="missing-word" id="w3" placeholder="e__s"> upon itself."
+        </div>
+        <p style="text-align: center; color: #7f8c8d;">提示词：aim, eats, low</p>
+
+        <button class="btn" onclick="checkSlide1()">提交修复</button>
+    </div>
+
+    <!-- Slide 2: Deep Dive - The Fog -->
+    <div class="slide" id="slide-2">
+        <h2>Part 2: Clearing the Fog (社论分析)</h2>
+        <p>这是 Susan Jacoby 的文章 <i>The Dumbing of America</i> 的选段。目前它被“无知的迷雾”笼罩。</p>
+        <p><b>任务：</b> 
+            1. 鼠标悬停以驱散迷雾。<br>
+            2. 找到作者的核心<b>论点 (Claim)</b> 并点击高亮它。<br>
+            3. 找到作者提出的<b>问题 (Problem)</b> 并点击高亮它。
+        </p>
+
+        <div class="annotation-tool">
+            <span class="highlighter active" id="hl-claim" onclick="setMode('claim')">🖊️ Highlight Claim (论点)</span>
+            <span class="highlighter" id="hl-problem" onclick="setMode('problem')">🖊️ Highlight Problem (问题)</span>
+        </div>
+
+        <div class="article-segment blur-mode" id="article-text">
+            <span class="highlightable" onclick="annotate(this)">The mind of this country is indeed eating upon itself.</span> 
+            <span class="highlightable" onclick="annotate(this)">It is not just that we are ignorant of facts.</span> 
+            <span class="highlightable" onclick="annotate(this)">The problem is that we are increasingly proud of our ignorance.</span>
+            <span class="highlightable" onclick="annotate(this)">Anti-intellectualism is a virus that has mutated into a new, more dangerous form.</span>
+            <span class="highlightable" onclick="annotate(this)">It is the idea that "my ignorance is just as good as your knowledge."</span>
+        </div>
+
+        <button class="btn" onclick="checkSlide2()">完成分析</button>
+    </div>
+
+    <!-- Slide 3: Strategy - Six Hats -->
+    <div class="slide" id="slide-3">
+        <h2>Part 3: The Council (六顶思考帽)</h2>
+        <p>要解决反智主义，我们不能只靠争吵。我们需要<b>平行思维 (Parallel Thinking)</b>。</p>
+        <p><b>议题：</b> “为了对抗反智主义，学校应该强制所有学生接受至少两年的大学通识教育。”</p>
+        <p><b>任务：</b> 辨别下列发言分别属于哪顶“思考帽”？点击下方的帽子来归类当前的发言。</p>
+
+        <div class="thought-bubble" id="current-statement">
+            Loading...
+        </div>
+
+        <div class="hat-arena">
+            <div class="hat-card hat-white" onclick="checkHat('White')">
+                ⚪ WHITE<br>Facts/Data
+            </div>
+            <div class="hat-card hat-red" onclick="checkHat('Red')">
+                🔴 RED<br>Feelings
+            </div>
+            <div class="hat-card hat-black" onclick="checkHat('Black')">
+                ⚫ BLACK<br>Caution/Risks
+            </div>
+            <div class="hat-card hat-yellow" onclick="checkHat('Yellow')">
+                🟡 YELLOW<br>Benefits
+            </div>
+            <div class="hat-card hat-green" onclick="checkHat('Green')">
+                🟢 GREEN<br>Creativity
+            </div>
+            <div class="hat-card hat-blue" onclick="checkHat('Blue')">
+                🔵 BLUE<br>Process
+            </div>
+        </div>
+        
+        <div id="hat-progress" style="text-align:center; font-weight:bold; color:var(--accent-blue);">0 / 6 Correct</div>
+    </div>
+
+    <!-- Slide 4: Reflection -->
+    <div class="slide" id="slide-4">
+        <h2>Part 4: The Verdict</h2>
+        <p>在你的学校或社区中，你是否观察到了“反智主义”的现象？（例如：嘲笑努力学习的人，相信谣言多于科学）</p>
+        <textarea style="width:100%; height:100px; padding:10px; font-family:var(--font-serif); margin-bottom:20px;" placeholder="在此写下你的观察..."></textarea>
+        
+        <p>你认为强制教育是解决之道吗？</p>
+        <div>
+            <label><input type="radio" name="verdict"> 是的，教育是解药。</label><br>
+            <label><input type="radio" name="verdict"> 不，这会适得其反。</label><br>
+            <label><input type="radio" name="verdict"> 我们需要更有创意的方法（Green Hat）。</label>
+        </div>
+
+        <button class="btn" onclick="finishLesson()">结束会议</button>
+    </div>
+
+    <!-- Slide 5: End -->
+    <div class="slide" id="slide-5">
+        <div style="text-align: center; margin-top: 50px;">
+            <div style="font-size: 4rem;">🏛️</div>
+            <h1>理性的守护者</h1>
+            <p>你已经成功修复了理性神殿。</p>
+            <p>记住：<b>Six Thinking Hats</b> 不是为了赢得辩论，而是为了全面地探索真理。</p>
+            <p>下一课，我们将探讨个人成功如何影响未来表现。</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Professor's Note -->
+<div id="professor-note">
+    <strong>🎓 Professor's Whisper:</strong>
+    <p id="note-content">Think deeper...</p>
+</div>
+
+<script>
+    // Helper: Show Feedback
+    function whisper(text) {
+        const note = document.getElementById('professor-note');
+        document.getElementById('note-content').innerText = text;
+        note.style.display = 'block';
+        setTimeout(() => note.style.display = 'none', 5000);
+    }
+
+    function nextSlide(n) {
+        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+        document.getElementById(`slide-${n}`).classList.add('active');
+    }
+
+    // Slide 1: Quote
+    function checkSlide1() {
+        const w1 = document.getElementById('w1').value.toLowerCase().trim();
+        const w2 = document.getElementById('w2').value.toLowerCase().trim();
+        const w3 = document.getElementById('w3').value.toLowerCase().trim();
+
+        if(w1 === 'aim' && w2 === 'low' && w3 === 'eats') {
+            whisper("正确。当智慧瞄准低处时，它就开始自我毁灭。这是一个强有力的拟人化隐喻。");
+            setTimeout(() => nextSlide(2), 2000);
+        } else {
+            whisper("有些词不对。名言强调的是‘目标(aim)’过‘低(low)’会导致‘吞噬(eats)’。");
+        }
+    }
+
+    // Slide 2: Annotation
+    let currentMode = 'claim';
+    
+    function setMode(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.highlighter').forEach(h => h.classList.remove('active'));
+        document.getElementById(`hl-${mode}`).classList.add('active');
+    }
+
+    function annotate(el) {
+        // Clear old classes
+        el.style.backgroundColor = 'transparent';
+        
+        if(currentMode === 'claim') {
+            el.style.backgroundColor = '#f1c40f'; // Yellow highlight
+            el.dataset.type = 'claim';
+        } else {
+            el.style.backgroundColor = '#e74c3c'; // Red highlight
+            el.style.color = 'white';
+            el.dataset.type = 'problem';
+        }
+    }
+
+    function checkSlide2() {
+        // Ideal: 
+        // Problem: "The problem is that we are increasingly proud of our ignorance."
+        // Claim: "Anti-intellectualism is a virus..." OR "my ignorance is just as good..."
+        
+        // Simplified check logic
+        const spans = document.querySelectorAll('.highlightable');
+        let hasClaim = false;
+        let hasProblem = false;
+
+        spans.forEach(s => {
+            if(s.innerText.includes("increasingly proud") && s.dataset.type === 'problem') hasProblem = true;
+            if(s.innerText.includes("virus") && s.dataset.type === 'claim') hasClaim = true;
+        });
+
+        if(hasProblem && hasClaim) {
+            whisper("分析透彻。Jacoby 认为问题不在于我们‘不知道’，而在于我们将无知视为一种‘骄傲’。");
+            nextSlide(3);
+        } else {
+            whisper("再试一次。Problem 是关于我们对无知的‘态度’（proud），Claim 是作者对反智主义本质的定义（virus）。");
+        }
+    }
+
+    // Slide 3: Six Hats Game
+    const statements = [
+        { hat: "White", text: "根据数据，拥有学位的公民参与投票率高出 40%。" },
+        { hat: "Red", text: "我感到很焦虑，逼迫不想上学的孩子去上学会让他们憎恨学习。" },
+        { hat: "Black", text: "这在经济上行不通。强制教育会产生巨额债务，且文凭会贬值。" },
+        { hat: "Yellow", text: "但这会提升整个社会的文明程度，减少犯罪，促进理性对话。" },
+        { hat: "Green", text: "也许我们不需要传统的大学？我们可以创造一种新型的‘学徒制’大学？" },
+        { hat: "Blue", text: "好了，我们已经看过了风险和收益，现在让我们总结一下下一步的行动计划。" }
+    ];
+    let currentStatementIndex = 0;
+    let score = 0;
+
+    function loadStatement() {
+        if(currentStatementIndex < statements.length) {
+            document.getElementById('current-statement').innerText = statements[currentStatementIndex].text;
+        } else {
+            document.getElementById('current-statement').innerText = "讨论结束。思维模型已构建。";
+            setTimeout(() => nextSlide(4), 1500);
+        }
+    }
+
+    function checkHat(color) {
+        if(color === statements[currentStatementIndex].hat) {
+            score++;
+            document.getElementById('hat-progress').innerText = `${score} / 6 Correct`;
+            
+            // Coach feedback based on hat
+            if(color === 'White') whisper("白帽关注客观事实和数据 (Facts)。");
+            if(color === 'Red') whisper("红帽允许表达直觉和情感，无需辩解 (Feelings)。");
+            if(color === 'Black') whisper("黑帽是批判性思维，指出风险和潜在问题 (Caution)。");
+            if(color === 'Yellow') whisper("黄帽寻找价值和积极面 (Benefits)。");
+            if(color === 'Green') whisper("绿帽代表创造力和替代方案 (Creativity)。");
+            if(color === 'Blue') whisper("蓝帽控制思考的过程，是‘思考的思考’ (Process)。");
+
+            currentStatementIndex++;
+            loadStatement();
+        } else {
+            whisper("不对。试着分析这句话的情感色彩或逻辑目的。");
+        }
+    }
+
+    // Initialize Slide 3
+    loadStatement();
+
+    // Slide 4
+    function finishLesson() {
+        nextSlide(5); CourseEngine.markComplete(6);
+    }
+
+</script>
+
+</body>
+</html>
